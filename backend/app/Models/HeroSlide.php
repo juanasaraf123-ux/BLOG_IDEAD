@@ -16,8 +16,8 @@ class HeroSlide extends Model
     protected $casts = [
         'is_active' => 'boolean',
         'is_demo' => 'boolean',
-        'starts_on' => 'date',
-        'ends_on' => 'date',
+        'starts_on' => 'date:Y-m-d',
+        'ends_on' => 'date:Y-m-d',
     ];
 
     public function image() { return $this->belongsTo(StoredFile::class, 'image_file_id'); }

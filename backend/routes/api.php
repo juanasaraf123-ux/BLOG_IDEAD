@@ -33,6 +33,7 @@ Route::prefix('public/v1')->middleware('throttle:public')->group(function () {
     Route::get('pages/{slug}', [P::class, 'page']);
     Route::get('projects', [P::class, 'projects']);
     Route::get('projects/{slug}', [P::class, 'project']);
+    Route::get('agreements', [P::class, 'agreements']);
     Route::get('documents', [P::class, 'documents']);
     Route::get('documents/{id}/download', [P::class, 'documentDownload'])->whereNumber('id')->middleware('throttle:public-heavy');
     Route::get('search', [P::class, 'search']);

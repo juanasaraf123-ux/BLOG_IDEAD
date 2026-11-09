@@ -17,8 +17,8 @@ class Agreement extends Model
         'is_public' => 'boolean',
         'is_demo' => 'boolean',
         'contributed_amount' => 'float',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
 
     public function project() { return $this->belongsTo(Project::class); }

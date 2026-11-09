@@ -314,8 +314,26 @@ class PortalController extends Controller
         if ($request->filled('department')) {
             $list = $list->where('department_code', $request->query('department'))->values();
         }
+        if ($request->query('with') === 'details') {
+            $details = $this->publishedEntity(Cat::query())->with(['sites' => fn ($q) => $q->where('is_active', true), 'facilities', 'events'])->get()->keyBy('slug');
+            $list = $list->map(fn ($c) => $c + [
+                'sites' => $details[$c['slug']]->sites->map->only(['name', 'ownership', 'address'])->values(),
+                'facilities' => $details[$c['slug']]->facilities->map->only(['facility_type', 'quantity', 'capacity'])->values(),
+                'events' => $details[$c['slug']]->events->map(fn ($e) => ['event_type' => $e->event_type, 'event_date' => $e->event_date?->toDateString(), 'description' => $e->description])->values(),
+            ])->values();
+        }
 
         return $list;
+    }
+
+    public function agreements(Request $request)
+    {
+        $q = $this->demo(Agreement::query())->where('is_public', true)->orderByDesc('start_date');
+        if ($request->filled('status')) {
+            $q->where('status', $request->query('status'));
+        }
+
+        return $q->get(['id', 'number', 'counterpart', 'object', 'start_date', 'end_date', 'status', 'contributed_amount', 'is_demo']);
     }
 
     public function cat(string $slug)

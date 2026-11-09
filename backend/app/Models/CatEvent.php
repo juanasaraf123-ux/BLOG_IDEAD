@@ -14,7 +14,7 @@ class CatEvent extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'event_date' => 'date',
+        'event_date' => 'date:Y-m-d',
     ];
 
     public function cat() { return $this->belongsTo(Cat::class); }

@@ -15,7 +15,7 @@ class CatalogItem extends Model
 
     protected $casts = [
         'is_demo' => 'boolean',
-        'date' => 'date',
+        'date' => 'date:Y-m-d',
     ];
 
     public function cat() { return $this->belongsTo(Cat::class); }

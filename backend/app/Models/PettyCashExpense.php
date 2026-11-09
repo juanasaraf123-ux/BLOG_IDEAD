@@ -15,7 +15,7 @@ class PettyCashExpense extends Model
 
     protected $casts = [
         'amount' => 'float',
-        'expense_date' => 'date',
+        'expense_date' => 'date:Y-m-d',
     ];
 
     public function budget() { return $this->belongsTo(PettyCashBudget::class, 'budget_id'); }

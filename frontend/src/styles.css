@@ -1,0 +1,50 @@
+@import "tailwindcss";
+@import "@fontsource-variable/montserrat";
+
+/* Design tokens: valores tomados del boceto. Sustituir por el manual de identidad oficial cuando se reciba. */
+@theme {
+  --font-sans: "Montserrat Variable", ui-sans-serif, system-ui, sans-serif;
+  --color-ut-red: #c51718;
+  --color-ut-red-dark: #8e1416;
+  --color-ut-red-900: #6b1012;
+  --color-ut-red-50: #fdf1f1;
+  --color-teal-light: #72c4c2;
+  --color-teal: #51bbb1;
+  --color-green: #289d8d;
+  --color-green-dark: #17534b;
+  --color-ink: #2b2f33;
+  --color-muted: #5f656b;
+  --color-line: #e6e3e1;
+  --color-surface: #f6f5f4;
+}
+
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
+body { @apply bg-white text-ink antialiased; font-size: 16px; }
+:focus-visible { outline: 3px solid var(--color-teal); outline-offset: 2px; }
+.skip-link { @apply sr-only; }
+.skip-link:focus { @apply not-sr-only fixed left-3 top-3 z-50 rounded bg-ut-red px-4 py-2 font-semibold text-white; }
+
+/* Contenido HTML enriquecido (noticias, páginas, historias) */
+.prose-idead { @apply text-[1.0625rem] leading-relaxed text-ink; }
+.prose-idead p { @apply my-3; }
+.prose-idead h2 { @apply mt-6 mb-2 text-xl font-bold text-ut-red; }
+.prose-idead h3 { @apply mt-5 mb-2 text-lg font-bold; }
+.prose-idead ul { @apply my-3 list-disc pl-6; }
+.prose-idead ol { @apply my-3 list-decimal pl-6; }
+.prose-idead a { @apply text-ut-red underline; }
+.prose-idead img { @apply my-4 rounded-lg; }
+.prose-idead table { @apply my-4 w-full border-collapse text-sm; }
+.prose-idead td, .prose-idead th { @apply border border-line p-2; }
+
+.fade-in { animation: fadeIn .45s ease-out both; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+
+@media print {
+  header, footer, nav, .no-print { display: none !important; }
+  body { font-size: 12px; }
+  .print-break { break-inside: avoid; }
+}

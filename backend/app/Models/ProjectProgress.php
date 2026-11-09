@@ -14,7 +14,7 @@ class ProjectProgress extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
-        'reported_on' => 'date',
+        'reported_on' => 'date:Y-m-d',
         'progress_pct' => 'float',
         'executed_amount' => 'float',
     ];

@@ -22,7 +22,7 @@ class Cat extends Model
         'is_demo' => 'boolean',
         'latitude' => 'float',
         'longitude' => 'float',
-        'opened_on' => 'date',
+        'opened_on' => 'date:Y-m-d',
     ];
 
     public function municipality() { return $this->belongsTo(Municipality::class); }

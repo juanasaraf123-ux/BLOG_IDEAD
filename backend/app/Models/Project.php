@@ -21,8 +21,8 @@ class Project extends Model
         'approved_amount' => 'float',
         'executed_amount' => 'float',
         'progress_pct' => 'float',
-        'start_date' => 'date',
-        'end_date' => 'date',
+        'start_date' => 'date:Y-m-d',
+        'end_date' => 'date:Y-m-d',
     ];
 
     public function cats() { return $this->belongsToMany(Cat::class); }

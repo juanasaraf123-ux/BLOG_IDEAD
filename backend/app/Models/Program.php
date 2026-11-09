@@ -18,8 +18,8 @@ class Program extends Model
 
     protected $casts = [
         'is_demo' => 'boolean',
-        'qualified_registry_until' => 'date',
-        'accreditation_until' => 'date',
+        'qualified_registry_until' => 'date:Y-m-d',
+        'accreditation_until' => 'date:Y-m-d',
     ];
 
     public function level() { return $this->belongsTo(EducationLevel::class, 'level_id'); }
