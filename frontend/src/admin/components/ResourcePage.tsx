@@ -16,6 +16,8 @@ export interface ResourceConfig {
   entity?: string;
   description?: string;
   editPermission: string[];
+  /** Permisos para crear registros (por defecto, los de edición). */
+  createPermission?: string[];
   publishPermission?: string[];
   workflowField?: 'status' | 'publication_status';
   fields: FieldDef[];
@@ -181,7 +183,7 @@ export function ResourcePage({ cfg }: { cfg: ResourceConfig }) {
           <h1 className="text-2xl font-extrabold text-green-dark">{cfg.title}</h1>
           {cfg.description && <p className="text-sm text-muted">{cfg.description}</p>}
         </div>
-        {can(...cfg.editPermission) && <Button className="ml-auto" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button>}
+        {can(...(cfg.createPermission ?? cfg.editPermission)) && <Button className="ml-auto" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button>}
       </div>
       <div className="mb-3 flex flex-wrap items-end gap-3">
         <label className="text-xs font-bold text-muted uppercase">Buscar

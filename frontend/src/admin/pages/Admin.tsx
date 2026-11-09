@@ -17,6 +17,8 @@ const PENDING_LABELS: Record<string, [string, string]> = {
   lotes_por_revisar: ['Lotes de datos por revisar', '/cargas'], lotes_por_publicar: ['Lotes aprobados por publicar', '/cargas'],
   mis_lotes_devueltos: ['Mis lotes devueltos para corrección', '/cargas'], mis_borradores: ['Mis borradores', '/cargas'],
   contenidos_en_revision: ['Contenidos en revisión', '/r/noticias'],
+  solicitudes_abiertas: ['Solicitudes de actualización para mi dependencia', '/r/solicitudes'],
+  solicitudes_vencidas: ['Solicitudes de actualización vencidas', '/r/solicitudes'],
 };
 
 export function Dashboard() {

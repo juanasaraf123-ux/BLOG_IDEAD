@@ -1557,7 +1557,7 @@
    "classifier"
   ],
   "classifier": "tipo_producto",
-  "widget": null,
+  "widget": "publications",
   "filters_text": "Año, Tipo, Programa",
   "publication_level": "PUB",
   "observations": null,

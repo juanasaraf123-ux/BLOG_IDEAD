@@ -110,6 +110,12 @@ class MiscController extends Controller
         if ($u->hasPermission('indicators.publish')) {
             $out['pending']['lotes_por_publicar'] = DataSubmission::where('status', 'aprobado')->count();
         }
+        if ($u->hasPermission('indicators.submit') && ! $u->hasPermission('indicators.review')) {
+            $out['pending']['solicitudes_abiertas'] = \App\Models\UpdateRequest::whereIn('dependency_id', $u->dependencyIds())->whereIn('status', ['abierta', 'en_proceso'])->count();
+        }
+        if ($u->hasPermission('indicators.review')) {
+            $out['pending']['solicitudes_vencidas'] = \App\Models\UpdateRequest::whereIn('status', ['abierta', 'en_proceso'])->whereDate('due_date', '<', now())->count();
+        }
         if ($u->hasPermission('indicators.submit')) {
             $mine = DataSubmission::where('created_by', $u->id);
             $out['pending']['mis_lotes_devueltos'] = (clone $mine)->where('status', 'devuelto')->count();

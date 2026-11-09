@@ -341,6 +341,18 @@ class PortalController extends Controller
         });
     }
 
+    public function publications(Request $request)
+    {
+        $q = $this->publishedEntity(\App\Models\Publication::query())->with('program:id,name,slug')->orderByDesc('year')->orderBy('title');
+        foreach (['publication_type', 'year', 'program_id'] as $f) {
+            if ($request->filled($f)) {
+                $q->where($f, $request->query($f));
+            }
+        }
+
+        return $q->limit(500)->get(['id', 'title', 'publication_type', 'authors', 'year', 'publisher', 'isbn_issn', 'doi', 'url', 'program_id', 'is_demo']);
+    }
+
     public function agreements(Request $request)
     {
         $q = $this->demo(Agreement::query())->where('is_public', true)->orderByDesc('start_date');
@@ -674,6 +686,9 @@ class PortalController extends Controller
             }
             foreach (Page::where('status', 'publicado')->where(fn ($w) => $w->where('title', 'like', $like)->orWhere('body', 'like', $like))->limit(5)->get() as $p) {
                 $res[] = ['type' => 'publicaciones', 'title' => $p->title, 'excerpt' => mb_substr(strip_tags((string) $p->body), 0, 160), 'url' => '/pagina/'.$p->slug];
+            }
+            foreach ($this->publishedEntity(\App\Models\Publication::query())->where(fn ($w) => $w->where('title', 'like', $like)->orWhere('authors', 'like', $like))->limit(10)->get() as $pb) {
+                $res[] = ['type' => 'publicaciones', 'title' => $pb->title, 'excerpt' => trim($pb->authors.' · '.$pb->year, ' ·'), 'url' => $pb->url ?: '/estadisticas/investigacion#M09-I04'];
             }
             foreach ($this->publishedEntity(CatalogItem::query())->where(fn ($w) => $w->where('title', 'like', $like)->orWhere('description', 'like', $like))->limit(10)->get() as $c) {
                 $res[] = ['type' => 'publicaciones', 'title' => $c->title, 'excerpt' => $c->category, 'url' => $c->url ?: '/estadisticas'];

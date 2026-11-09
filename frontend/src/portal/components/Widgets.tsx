@@ -212,6 +212,22 @@ export function AccreditationList({ filters }: { filters: Record<string, string>
   );
 }
 
+const PUB_TYPES: Record<string, string> = { articulo: 'Artículo', libro: 'Libro', capitulo: 'Capítulo', ponencia: 'Ponencia', creacion: 'Creación', revista: 'Revista', boletin: 'Boletín', informe: 'Informe' };
+
+export function PublicationsTable() {
+  return (
+    <Loader load={() => publicGet<Any[]>('publications')} deps={[]}>
+      {(rows) => rows.length === 0 ? <Pending text="Listado de publicaciones pendiente de publicación" /> : (
+        <DataTable rows={rows} caption="Publicaciones" csvName="publicaciones" columns={[
+          { key: 'title', label: 'Título', render: (r) => (r.url ? <a href={r.url} target="_blank" rel="noopener noreferrer" className="font-semibold text-ut-red hover:underline">{r.title}</a> : <span className="font-semibold">{r.title}</span>) },
+          { key: 'publication_type', label: 'Tipo', value: (r) => PUB_TYPES[r.publication_type] ?? r.publication_type },
+          { key: 'authors', label: 'Autores' }, { key: 'year', label: 'Año', align: 'right' }, { key: 'publisher', label: 'Editorial / revista / evento' },
+        ]} />
+      )}
+    </Loader>
+  );
+}
+
 export function Widget({ type, filters }: { type: string; filters: Record<string, string> }) {
   if (type.startsWith('list:')) return <CatalogList type={type.slice(5)} />;
   switch (type) {
@@ -226,6 +242,7 @@ export function Widget({ type, filters }: { type: string; filters: Record<string
     case 'projects_map': return <ProjectsWidget mode="map" filters={filters} />;
     case 'projects_progress': return <ProjectsWidget mode="progress" filters={filters} />;
     case 'agreements': return <AgreementsTable />;
+    case 'publications': return <PublicationsTable />;
     case 'accreditation': return <AccreditationList filters={filters} />;
     default: return null;
   }

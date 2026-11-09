@@ -126,7 +126,7 @@ CFG = {
 "M09-I01":("grupos","count","bar","classifier",[K],"grupos_semilleros","list:grupos_investigacion","SAIDEAD"),
 "M09-I02":("personas","count","bar","classifier",[P,C,K],"participantes_inv",None,"SAIDEAD"),
 "M09-I03":("proyectos","count","bar","classifier",[K],"estado_inv",None,"SAIDEAD"),
-"M09-I04":("productos","count","bar","classifier",[P,K],"tipo_producto",None,"SAIDEAD"),
+"M09-I04":("productos","count","bar","classifier",[P,K],"tipo_producto","publications","SAIDEAD"),
 "M09-I05":("número","number","bar","classifier",[P,K],"inv_formativa",None,"SAIDEAD"),
 "M10-I01":("iniciativas","count","bar","classifier",[C,K],"extension",None,"PSIDEAD"),
 "M10-I02":("número","count","bar","classifier",[C,D,M,K],"beneficiarios_ext",None,"PSIDEAD"),

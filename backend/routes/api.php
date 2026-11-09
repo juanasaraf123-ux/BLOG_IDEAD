@@ -34,6 +34,7 @@ Route::prefix('public/v1')->middleware('throttle:public')->group(function () {
     Route::get('projects', [P::class, 'projects']);
     Route::get('projects/{slug}', [P::class, 'project']);
     Route::get('agreements', [P::class, 'agreements']);
+    Route::get('publications', [P::class, 'publications']);
     Route::get('documents', [P::class, 'documents']);
     Route::get('documents/{id}/download', [P::class, 'documentDownload'])->whereNumber('id')->middleware('throttle:public-heavy');
     Route::get('search', [P::class, 'search']);
@@ -124,6 +125,8 @@ Route::prefix('admin/v1')->name('admin.')->group(function () {
             'project-progress' => Admin\ProjectProgressController::class,
             'agreements' => Admin\AgreementController::class,
             'catalog-items' => Admin\CatalogItemController::class,
+            'publications' => Admin\PublicationController::class,
+            'update-requests' => Admin\UpdateRequestController::class,
             'departments' => Admin\DepartmentController::class,
             'municipalities' => Admin\MunicipalityController::class,
             'education-levels' => Admin\EducationLevelController::class,

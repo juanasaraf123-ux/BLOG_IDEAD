@@ -17,6 +17,7 @@ const MENU: { group: string; items: { to: string; label: string; icon: string; p
   { group: 'Indicadores', items: [
     { to: '/indicadores', label: 'Catálogo de indicadores', icon: 'chart', perms: ['indicators.view_internal', 'indicators.submit', 'indicators.catalog.manage', 'indicators.review'] },
     { to: '/cargas', label: 'Cargas de datos', icon: 'upload', perms: ['indicators.submit', 'indicators.review', 'indicators.publish'] },
+    { to: '/r/solicitudes', label: 'Solicitudes de actualización', icon: 'mail', perms: ['indicators.review', 'indicators.submit'] },
     { to: '/informes', label: 'Informes', icon: 'download', perms: ['reports.internal.export', 'petty_cash.view'] },
   ] },
   { group: 'Contenidos', items: [
@@ -36,6 +37,7 @@ const MENU: { group: string; items: { to: string; label: string; icon: string; p
     { to: '/r/proyectos', label: 'Proyectos', icon: 'project', perms: ['projects.edit', 'entities.publish'] },
     { to: '/r/avances', label: 'Avances de proyectos', icon: 'chart', perms: ['projects.edit'] },
     { to: '/r/listados', label: 'Listados institucionales', icon: 'book', perms: ['lists.edit', 'entities.publish'] },
+    { to: '/r/publicaciones', label: 'Publicaciones', icon: 'book', perms: ['lists.edit', 'entities.publish'] },
     { to: '/r/convenios', label: 'Convenios', icon: 'hands', perms: ['agreements.view', 'agreements.manage'] },
   ] },
   { group: 'Gestión documental y financiera', items: [

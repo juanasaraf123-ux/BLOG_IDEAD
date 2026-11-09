@@ -284,6 +284,9 @@ class BaseCatalogSeeder extends Seeder
                     'min_cell_size' => in_array($d['publication_level'], ['AGR', 'AGR_S'], true) ? 5 : null,
                 ];
             }
+            if ($ind->exists && $ind->widget === null && $d['widget'] !== null) {
+                $catalog['widget'] = $d['widget']; // nuevos listados asociados sin sobrescribir ajustes hechos en el panel
+            }
             $ind->fill($catalog)->save();
             $ind->sources()->sync(DataSource::whereIn('code', $d['sources'])->pluck('id'));
         }
