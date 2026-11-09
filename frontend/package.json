@@ -8,7 +8,10 @@
     "build": "tsc -b && vite build",
     "preview": "vite preview",
     "test": "vitest run",
-    "typecheck": "tsc -b"
+    "typecheck": "tsc -b",
+    "e2e:portal": "node e2e/recorrido-portal.cjs",
+    "e2e:a11y": "node e2e/accesibilidad.cjs",
+    "e2e:panel": "node e2e/panel-por-rol.cjs director@demo.idead.local /,/indicadores,/cargas,/documentos"
   },
   "dependencies": {
     "@fontsource-variable/montserrat": "^5.3.0",

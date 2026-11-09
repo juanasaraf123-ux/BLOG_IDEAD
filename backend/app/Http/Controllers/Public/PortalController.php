@@ -353,41 +353,43 @@ class PortalController extends Controller
 
     public function cat(string $slug)
     {
-        $c = $this->publishedEntity(Cat::query())->with(['municipality.department', 'photo', 'sites' => fn ($q) => $q->where('is_active', true), 'facilities', 'events', 'coverage.department'])->where('slug', $slug)->firstOrFail();
-        $data = $c->toArray();
-        if (! $c->manager_public) {
-            $data['manager_name'] = null;
-        }
-        if (! $c->coords_verified) {
-            $data['latitude'] = $data['longitude'] = null;
-        }
-        unset($data['dependency_id']);
-        $data['photo_url'] = $c->photo?->url;
-
-        $latest = ProgramOffering::where('cat_id', $c->id)->join('academic_periods', 'academic_periods.id', '=', 'program_offerings.period_id')
-            ->orderByDesc('academic_periods.year')->orderByDesc('academic_periods.term')->value('period_id');
-        $data['offerings'] = $latest ? ProgramOffering::with(['program.level', 'period'])->where('cat_id', $c->id)->where('period_id', $latest)
-            ->whereHas('program', fn ($p) => $this->publishedEntity($p))->get()
-            ->map(fn ($o) => ['program' => $o->program->name, 'slug' => $o->program->slug, 'level' => $o->program->level->name, 'admits_new' => $o->admits_new, 'approved_quota' => $o->approved_quota, 'period' => $o->period->code]) : [];
-
-        // Cifras integradas (M07-I07): reutiliza los valores publicados por CAT de todos los indicadores que admiten esa desagregación.
-        $figures = [];
-        foreach (Indicator::with('module')->where('is_active', true)->get() as $i) {
-            if (! in_array('cat', $i->allowed_dimensions ?? [], true) || ! $i->isPublishable()) {
-                continue;
+        return PublicCache::remember('cat.'.$slug, function () use ($slug) {
+            $c = $this->publishedEntity(Cat::query())->with(['municipality.department', 'photo', 'sites' => fn ($q) => $q->where('is_active', true), 'facilities', 'events', 'coverage.department'])->where('slug', $slug)->firstOrFail();
+            $data = $c->toArray();
+            if (! $c->manager_public) {
+                $data['manager_name'] = null;
             }
-            $r = $this->query->run($i, ['cat' => $c->id]);
-            if ($r['kpi']) {
-                $figures[] = ['code' => $i->code, 'name' => $i->name, 'module' => $i->module->name, 'module_slug' => $i->module->slug, 'unit' => $i->unit, 'value_type' => $i->value_type] + $r['kpi'] + ['is_demo' => $r['is_demo']];
+            if (! $c->coords_verified) {
+                $data['latitude'] = $data['longitude'] = null;
             }
-        }
-        $data['figures'] = $figures;
-        $data['projects'] = $this->publishedEntity(Project::query())->whereHas('cats', fn ($q) => $q->where('cats.id', $c->id))->get(['id', 'slug', 'name', 'status', 'progress_pct', 'is_demo']);
-        $data['news'] = $this->newsQuery()->where('cat_id', $c->id)->orderByDesc('publish_at')->limit(4)->get()->map(fn ($n) => $this->newsCard($n));
-        $data['activities'] = $this->published(Event::query())->where('cat_id', $c->id)->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(4)->get()->map(fn ($e) => $this->eventCard($e));
-        $data['media'] = $this->published(MediaItem::query())->with('file')->where('cat_id', $c->id)->latest('publish_at')->limit(8)->get()->map(fn ($m) => $this->mediaCard($m));
-
-        return $data;
+            unset($data['dependency_id']);
+            $data['photo_url'] = $c->photo?->url;
+    
+            $latest = ProgramOffering::where('cat_id', $c->id)->join('academic_periods', 'academic_periods.id', '=', 'program_offerings.period_id')
+                ->orderByDesc('academic_periods.year')->orderByDesc('academic_periods.term')->value('period_id');
+            $data['offerings'] = $latest ? ProgramOffering::with(['program.level', 'period'])->where('cat_id', $c->id)->where('period_id', $latest)
+                ->whereHas('program', fn ($p) => $this->publishedEntity($p))->get()
+                ->map(fn ($o) => ['program' => $o->program->name, 'slug' => $o->program->slug, 'level' => $o->program->level->name, 'admits_new' => $o->admits_new, 'approved_quota' => $o->approved_quota, 'period' => $o->period->code]) : [];
+    
+            // Cifras integradas (M07-I07): reutiliza los valores publicados por CAT de todos los indicadores que admiten esa desagregación.
+            $figures = [];
+            foreach (Indicator::with('module')->where('is_active', true)->get() as $i) {
+                if (! in_array('cat', $i->allowed_dimensions ?? [], true) || ! $i->isPublishable()) {
+                    continue;
+                }
+                $r = $this->query->run($i, ['cat' => $c->id]);
+                if ($r['kpi']) {
+                    $figures[] = ['code' => $i->code, 'name' => $i->name, 'module' => $i->module->name, 'module_slug' => $i->module->slug, 'unit' => $i->unit, 'value_type' => $i->value_type] + $r['kpi'] + ['is_demo' => $r['is_demo']];
+                }
+            }
+            $data['figures'] = $figures;
+            $data['projects'] = $this->publishedEntity(Project::query())->whereHas('cats', fn ($q) => $q->where('cats.id', $c->id))->get(['id', 'slug', 'name', 'status', 'progress_pct', 'is_demo']);
+            $data['news'] = $this->newsQuery()->where('cat_id', $c->id)->orderByDesc('publish_at')->limit(4)->get()->map(fn ($n) => $this->newsCard($n));
+            $data['activities'] = $this->published(Event::query())->where('cat_id', $c->id)->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(4)->get()->map(fn ($e) => $this->eventCard($e));
+            $data['media'] = $this->published(MediaItem::query())->with('file')->where('cat_id', $c->id)->latest('publish_at')->limit(8)->get()->map(fn ($m) => $this->mediaCard($m));
+    
+            return $data;
+        });
     }
 
     public function programs(Request $request)

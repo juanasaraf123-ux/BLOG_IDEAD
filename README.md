@@ -1,22 +1,55 @@
 # Portal institucional IDEAD – Universidad del Tolima
 
-Portal de información, indicadores y gestión del Instituto de Educación a Distancia (IDEAD): portal público con 13 módulos de indicadores y panel privado de administración con flujo de revisión y publicación.
+Portal de información, indicadores y gestión del Instituto de Educación a Distancia (IDEAD): **portal público** con los 13 módulos de indicadores del documento «Indicadores sugeridos» y diseño según el boceto aprobado, y **panel privado** con roles, flujo de revisión y publicación, gestión documental, contenidos y auditoría.
 
-## Estado
+| | |
+|---|---|
+| Frontend | React 19 + TypeScript + Vite (portal `/` y panel `/admin` como paquetes independientes) |
+| Backend | Laravel 13 (PHP ≥ 8.3), API REST, sesión segura + CSRF, 2FA TOTP |
+| Base de datos | MariaDB 10.11+ / MySQL 8.4 (SQLite para desarrollo y pruebas) |
 
-**Fase 1 — Análisis y planificación (en espera de aprobación).** Todavía no hay código de la aplicación.
+## Inicio rápido (desarrollo, con datos de demostración)
+
+```bash
+cd backend && composer install && cp .env.example .env
+# en .env: APP_ENV=local, APP_DEBUG=true, DB_CONNECTION=sqlite, IDEAD_DEMO_DATA=true, DEMO_PASSWORD=<clave>
+touch database/database.sqlite && php artisan key:generate
+php artisan migrate --seed && php artisan db:seed --class=DemoDataSeeder && php artisan storage:link
+php artisan serve
+```
+
+```bash
+cd frontend && npm install && npm run dev
+```
+
+Portal: <http://localhost:5173> · Panel: <http://localhost:5173/admin/> (usuarios `director@`, `coordinador@`, `comunicaciones@`, `documental@`, `cajamenor@`, `admin@demo.idead.local`).
+
+> Los datos de demostración están marcados como **DEMO** y nunca deben cargarse en producción. Sin ellos, el portal muestra «Información pendiente de actualización» en lugar de cifras.
+
+## Pruebas
+
+```bash
+cd backend && php artisan test          # 20 pruebas (seguridad, flujo de indicadores, portal)
+cd frontend && npm test && npm run build
+npm run e2e:portal && npm run e2e:a11y   # con los servidores en marcha (Playwright + axe)
+```
+
+## Documentación
 
 | Documento | Contenido |
 |---|---|
-| [docs/fase-1/01-diagnostico-tecnico.md](docs/fase-1/01-diagnostico-tecnico.md) | Diagnóstico, hallazgos, arquitectura, navegación, decisiones pendientes y plan por fases |
-| [docs/fase-1/02-matriz-indicadores.md](docs/fase-1/02-matriz-indicadores.md) | Los 76 indicadores del Excel asignados a módulo, ruta, visualización, filtros, fuente y nivel de publicación ([CSV](docs/fase-1/matriz-indicadores.csv)) |
-| [docs/fase-1/03-modelo-datos-preliminar.md](docs/fase-1/03-modelo-datos-preliminar.md) | Modelo entidad-relación preliminar |
-| [docs/fase-1/04-roles-permisos.md](docs/fase-1/04-roles-permisos.md) | RBAC: roles, permisos y flujo de publicación |
-| [docs/fase-1/05-compatibilidad-tecnologica.md](docs/fase-1/05-compatibilidad-tecnologica.md) | Requisitos de servidor, escenarios de despliegue, posición frente a PHP 5.6 |
-| [docs/referencias/Indicadores_Sugeridos.xlsx](docs/referencias/Indicadores_Sugeridos.xlsx) | Documento fuente de requerimientos de información |
+| [docs/fase-1/01-diagnostico-tecnico.md](docs/fase-1/01-diagnostico-tecnico.md) | Diagnóstico, decisiones pendientes y plan |
+| [docs/fase-1/02-matriz-indicadores.md](docs/fase-1/02-matriz-indicadores.md) | Los 76 indicadores ↔ módulos, visualización, filtros, fuente, publicación |
+| [docs/tecnica/arquitectura.md](docs/tecnica/arquitectura.md) | Arquitectura, modelo de indicadores, seguridad, cambios respecto a la Fase 1 |
+| [docs/tecnica/api.md](docs/tecnica/api.md) | API REST (27 endpoints públicos, 212 del panel) |
+| [docs/tecnica/diccionario-datos.md](docs/tecnica/diccionario-datos.md) · [esquema-mariadb.sql](docs/tecnica/esquema-mariadb.sql) · [modelo ER](docs/fase-1/03-modelo-datos-preliminar.md) | Base de datos |
+| [docs/fase-1/04-roles-permisos.md](docs/fase-1/04-roles-permisos.md) | Roles y flujo de publicación (la lista final de permisos está en `BaseCatalogSeeder`) |
+| [docs/tecnica/instalacion-despliegue.md](docs/tecnica/instalacion-despliegue.md) | Requisitos del servidor, instalación, respaldo, recuperación, mantenimiento |
+| [docs/manual-usuario.md](docs/manual-usuario.md) | Manual del portal público |
+| [docs/manual-administracion.md](docs/manual-administracion.md) | Manual del panel por rol |
+| [docs/pruebas/resultados.md](docs/pruebas/resultados.md) | Resultados de las pruebas ejecutadas |
+| [deploy/](deploy) | Nginx, Apache, respaldo cifrado, cron, servicio de colas |
 
-La matriz se regenera desde el Excel con:
+## Pendientes institucionales
 
-```bash
-python3 scripts/generar_matriz_indicadores.py docs/referencias/Indicadores_Sugeridos.xlsx docs/fase-1/02-matriz-indicadores.md docs/fase-1/matriz-indicadores.csv
-```
+Logotipo y manual de identidad oficiales (se usa temporalmente el logotipo extraído del boceto), cifras reales por dependencia, metodologías de cálculo, listado verificado de CAT con coordenadas, autorizaciones de publicación de datos sensibles, significado de las fuentes no definidas en el Excel (CIBAGUE, SGUT, OPDI, «profesor Llanos»…) y datos del servidor. Ver §10 del diagnóstico.

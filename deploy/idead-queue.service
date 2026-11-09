@@ -1,0 +1,14 @@
+# systemd: trabajador de colas (correo de recuperación de contraseña, tareas diferidas)
+[Unit]
+Description=Portal IDEAD - cola de trabajos
+After=network.target mariadb.service
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/idead/backend
+ExecStart=/usr/bin/php artisan queue:work --sleep=3 --tries=3 --max-time=3600
+Restart=always
+
+[Install]
+WantedBy=multi-user.target

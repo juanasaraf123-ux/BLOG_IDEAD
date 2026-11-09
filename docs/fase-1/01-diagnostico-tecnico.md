@@ -5,7 +5,7 @@
 |---|---|
 | Versión | 0.1 — borrador para aprobación |
 | Fecha | 2026-11-09 |
-| Estado | **En espera de aprobación** (no se ha escrito código de la aplicación) |
+| Estado | Aprobado e implementado (ver README y docs/tecnica). Este documento conserva el diagnóstico original. |
 | Documentos relacionados | [02 Matriz de indicadores](02-matriz-indicadores.md) · [03 Modelo de datos preliminar](03-modelo-datos-preliminar.md) · [04 Roles y permisos](04-roles-permisos.md) · [05 Compatibilidad tecnológica](05-compatibilidad-tecnologica.md) |
 
 ---

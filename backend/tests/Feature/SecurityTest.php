@@ -74,7 +74,7 @@ class SecurityTest extends IdeadTestCase
     {
         $admin = $this->userWithRole('admin_tecnico');
         $this->actingAs($admin)->putJson("/api/admin/v1/users/{$admin->id}", [
-            'name' => $admin->name, 'email' => $admin->email, 'role_ids' => [1, 2, 3, 4, 5, 6],
+            'name' => $admin->name, 'email' => $admin->email, 'role_ids' => \App\Models\Role::pluck('id')->all(),
         ])->assertForbidden();
     }
 
