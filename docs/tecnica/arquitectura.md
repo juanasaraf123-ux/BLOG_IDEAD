@@ -63,7 +63,7 @@ docs/          diagnóstico (fase-1), técnica, manuales, pruebas
 | Autenticación | Sesión de servidor con cookie `HttpOnly`/`SameSite=Lax` + CSRF (Sanctum SPA); sin tokens en `localStorage` |
 | 2FA | TOTP (RFC 6238); obligatorio para todos si se activa en Configuración; restablecimiento por el administrador |
 | Intentos de acceso | 5 fallos por correo+IP → bloqueo 15 min; 10 solicitudes/min por IP a rutas de autenticación |
-| Autorización | 40 permisos atómicos, 6 roles editables, alcance por dependencia, verificación en el servidor en cada endpoint |
+| Autorización | 35 permisos atómicos, 6 roles editables, alcance por dependencia, verificación en el servidor en cada endpoint |
 | Separación de funciones | Quien registra/envía un lote o redacta un contenido no puede aprobarlo; nadie modifica sus propios roles |
 | Administrador técnico | Sin acceso a documentos financieros/restringidos ni a datos de indicadores |
 | Inyección SQL | Consultas parametrizadas (Eloquent/Query Builder); `LIKE` escapado en el buscador |

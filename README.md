@@ -29,7 +29,7 @@ Portal: <http://localhost:5173> · Panel: <http://localhost:5173/admin/> (usuari
 ## Pruebas
 
 ```bash
-cd backend && php artisan test          # 20 pruebas (seguridad, flujo de indicadores, portal)
+cd backend && php artisan test          # 24 pruebas (seguridad, indicadores, registros, portal)
 cd frontend && npm test && npm run build
 npm run e2e:portal && npm run e2e:a11y   # con los servidores en marcha (Playwright + axe)
 ```
@@ -42,7 +42,7 @@ npm run e2e:portal && npm run e2e:a11y   # con los servidores en marcha (Playwri
 | [docs/fase-1/02-matriz-indicadores.md](docs/fase-1/02-matriz-indicadores.md) | Los 76 indicadores ↔ módulos, visualización, filtros, fuente, publicación |
 | [docs/tecnica/arquitectura.md](docs/tecnica/arquitectura.md) | Arquitectura, modelo de indicadores, seguridad, cambios respecto a la Fase 1 |
 | [docs/tecnica/api.md](docs/tecnica/api.md) | API REST (27 endpoints públicos, 212 del panel) |
-| [docs/tecnica/diccionario-datos.md](docs/tecnica/diccionario-datos.md) · [esquema-mariadb.sql](docs/tecnica/esquema-mariadb.sql) · [modelo ER](docs/fase-1/03-modelo-datos-preliminar.md) | Base de datos |
+| [docs/tecnica/diccionario-datos.md](docs/tecnica/diccionario-datos.md) · [scripts SQL](backend/database/sql) · [modelo de datos](docs/tecnica/modelo-datos.md) · [modelo ER](docs/fase-1/03-modelo-datos-preliminar.md) | Base de datos |
 | [docs/fase-1/04-roles-permisos.md](docs/fase-1/04-roles-permisos.md) | Roles y flujo de publicación (la lista final de permisos está en `BaseCatalogSeeder`) |
 | [docs/tecnica/instalacion-despliegue.md](docs/tecnica/instalacion-despliegue.md) | Requisitos del servidor, instalación, respaldo, recuperación, mantenimiento |
 | [docs/manual-usuario.md](docs/manual-usuario.md) | Manual del portal público |

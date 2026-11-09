@@ -9,7 +9,7 @@ class IndicatorModule extends Model
 {
     use TracksChanges;
 
-    protected $table = 'indicator_modules';
+    protected $table = 'indicator_categories';
 
     protected $guarded = ['id'];
 

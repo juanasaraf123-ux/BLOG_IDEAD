@@ -50,7 +50,7 @@ CREATE USER 'idead_app'@'localhost' IDENTIFIED BY '<contraseña-fuerte>';
 GRANT SELECT, INSERT, UPDATE, DELETE, CREATE, ALTER, INDEX, DROP, REFERENCES ON idead_portal.* TO 'idead_app'@'localhost';
 ```
 
-El script SQL equivalente al esquema completo está en `docs/tecnica/esquema-mariadb.sql` (la fuente de verdad son las migraciones).
+El script SQL equivalente al esquema completo está en `backend/database/sql/` (00, 01 y 02) (la fuente de verdad son las migraciones).
 
 ### Primer uso
 

@@ -4,17 +4,20 @@ Fecha de ejecución: 2026-11-09. Entorno: contenedor de desarrollo (Ubuntu 24.04
 
 ## 1. Pruebas automatizadas del backend (PHPUnit)
 
-`cd backend && php artisan test` — **20 pruebas, 85 aserciones, todas aprobadas**, en SQLite y en **MariaDB 10.11** (mismo resultado en ambos motores).
+`cd backend && php artisan test` — **24 pruebas, 95 aserciones, todas aprobadas**, en SQLite y en **MariaDB 10.11** (mismo resultado en ambos motores).
 
 | Grupo | Pruebas |
 |---|---|
 | Seguridad (`SecurityTest`) | Rutas privadas exigen sesión (401) · inicio de sesión fuera del navegador rechazado (400) · contraseña errónea y bloqueo tras 5 intentos · contraseñas con hash · desafío 2FA obligatorio y código TOTP válido/incorrecto · administrador técnico sin acceso a documentos financieros/restringidos y caja menor sí a financieros · nadie modifica sus propios roles · rechazo de archivos PHP disfrazados de imagen (doble extensión y contenido falso) y aceptación de PNG real · saneamiento de HTML (`<script>`, `onclick`, `javascript:`) · documentos privados no descargables públicamente |
 | Indicadores (`IndicatorWorkflowTest`) | El catálogo tiene los 76 indicadores y 13 módulos · flujo completo borrador → enviado → aprobado → publicado con separación de funciones (el coordinador no puede aprobar ni publicar) · nada visible antes de publicar · supresión de celda pequeña (n=3 < k=5 → «Reservado») · validaciones (porcentaje > 100, desagregación no admitida) · coordinador sin acceso a indicadores de otra dependencia · indicador sensible sin autorización no se publica · importación CSV con separador «;» |
+| Registros institucionales (`InstitutionalRecordsTest`) | Clave seudónima estable, irreversible y que exige llave configurada · datos sensibles cifrados en la base y ocultos en las respuestas · un estudiante no se matricula dos veces en el mismo programa y período · graduados (personas) y títulos se cuentan por separado |
 | Portal (`PublicPortalTest`) | 16 endpoints públicos responden · sin datos publicados las cifras del inicio quedan «pendientes» · borradores, contenido programado a futuro y datos demo ocultos (también en el buscador) · cabeceras de seguridad |
 
 ## 2. Pruebas del frontend (Vitest)
 
 `cd frontend && npm test` — **7 pruebas aprobadas**: formatos colombianos (pesos, porcentajes, fechas sin desfase de zona horaria), tabla consultable (filtro y orden), estado «pendiente», distribución porcentual por variable.
+
+Scripts SQL (`backend/database/sql`): ejecutados sobre una base vacía de MariaDB 10.11 → 66 tablas, 120 claves foráneas, 76 indicadores y registro de migraciones reconocido por Laravel.
 
 Compilación de producción (`npm run build`, verificación de tipos estricta de TypeScript): sin errores.
 

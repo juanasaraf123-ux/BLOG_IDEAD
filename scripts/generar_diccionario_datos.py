@@ -17,7 +17,7 @@ ix = collections.defaultdict(list)
 for t, n, c, nu in idx: ix[t].append(f"`{n}` ({c}){'' if nu == '1' else ' — único'}")
 skip = {'cache', 'cache_locks', 'jobs', 'job_batches', 'failed_jobs', 'migrations', 'sessions', 'password_reset_tokens'}
 md = ['# Diccionario de datos', '', f'Generado automáticamente desde el esquema real (`{db}`, MariaDB 10.11) con `scripts/generar_diccionario_datos.py`.',
-      'Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten. Script de creación: [`esquema-mariadb.sql`](esquema-mariadb.sql); fuente de verdad: `backend/database/migrations`.', '']
+      'Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten. Scripts de creación: [`backend/database/sql`](../../backend/database/sql); fuente de verdad: `backend/database/migrations`.', '']
 for t, rows in by.items():
     if t in skip: continue
     md += [f'## `{t}`', '', '| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |', '|---|---|---|---|---|---|']

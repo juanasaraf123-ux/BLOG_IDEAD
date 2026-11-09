@@ -72,7 +72,7 @@ Primero cargue la factura o soporte en *Documentos* con confidencialidad *Financ
 ## 10. Administración técnica
 
 - **Usuarios**: crear, asignar roles y dependencias, desactivar (no se borran, para conservar la trazabilidad), restablecer 2FA.
-- **Roles y permisos**: 40 permisos independientes agrupados.
+- **Roles y permisos**: 35 permisos independientes agrupados.
 - **Catálogos**: períodos, dependencias, fuentes (con estado de validación del nombre oficial), clasificadores y categorías («Variable: valor» agrupa distribuciones), territorio, niveles, áreas, categorías documentales.
 - **Configuración**: contacto, logotipo oficial, enlaces, tamaño máximo de archivos, umbral *k*, exigir 2FA, revisión obligatoria de contenidos.
 - **Auditoría**: filtros por acción y fechas (`auth.login`, `auth.failed`, `indicator.publish`, `document.download`, `user.roles_changed`, `report.export`…).

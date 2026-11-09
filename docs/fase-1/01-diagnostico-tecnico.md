@@ -244,7 +244,7 @@ Detallado en [03-modelo-datos-preliminar.md](03-modelo-datos-preliminar.md). Pri
 
 ## 8. Roles y permisos
 
-Detallado en [04-roles-permisos.md](04-roles-permisos.md): 6 roles iniciales, 40 permisos atómicos, alcance por dependencia, separación de funciones y matriz rol × permiso.
+Detallado en [04-roles-permisos.md](04-roles-permisos.md): 6 roles iniciales, 35 permisos atómicos, alcance por dependencia, separación de funciones y matriz rol × permiso.
 
 ## 9. Evaluación de compatibilidad tecnológica
 

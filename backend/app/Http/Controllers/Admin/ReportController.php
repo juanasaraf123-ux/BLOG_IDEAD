@@ -21,7 +21,7 @@ class ReportController extends Controller
         $u = $request->user();
         abort_unless($u->hasPermission('reports.internal.export'), 403);
         $data = $request->validate([
-            'module_id' => 'nullable|exists:indicator_modules,id',
+            'module_id' => 'nullable|exists:indicator_categories,id',
             'indicator_id' => 'nullable|exists:indicators,id',
             'format' => 'nullable|in:csv,xlsx',
             'period' => 'nullable', 'year' => 'nullable|integer', 'program' => 'nullable|integer', 'cat' => 'nullable|integer',

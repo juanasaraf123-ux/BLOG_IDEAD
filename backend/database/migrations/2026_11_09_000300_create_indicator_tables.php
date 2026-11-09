@@ -12,7 +12,8 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('indicator_modules', function (Blueprint $table) {
+        // Categorías de indicadores: los 13 apartados del Excel (en el código se les llama «módulos»).
+        Schema::create('indicator_categories', function (Blueprint $table) {
             $table->id();
             $table->unsignedTinyInteger('number')->unique();
             $table->string('slug', 80)->unique();
@@ -49,7 +50,7 @@ return new class extends Migration
         Schema::create('indicators', function (Blueprint $table) {
             $table->id();
             $table->string('code', 20)->unique(); // M02-I03
-            $table->foreignId('module_id')->constrained('indicator_modules')->restrictOnDelete();
+            $table->foreignId('module_id')->constrained('indicator_categories')->restrictOnDelete();
             $table->unsignedSmallInteger('sort')->default(0);
             $table->string('name');
             $table->text('description')->nullable();
@@ -151,7 +152,7 @@ return new class extends Migration
 
     public function down(): void
     {
-        foreach (['home_highlights', 'reviews', 'indicator_values', 'data_submissions', 'data_source_indicator', 'indicators', 'classifier_items', 'classifiers', 'data_sources', 'indicator_modules'] as $t) {
+        foreach (['home_highlights', 'reviews', 'indicator_values', 'data_submissions', 'data_source_indicator', 'indicators', 'classifier_items', 'classifiers', 'data_sources', 'indicator_categories'] as $t) {
             Schema::dropIfExists($t);
         }
     }

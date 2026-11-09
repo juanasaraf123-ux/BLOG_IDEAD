@@ -1,3 +1,9 @@
+-- =====================================================================================
+-- Portal IDEAD — Paso 1: estructura (66 tablas, claves foráneas, índices y restricciones).
+-- Generado desde las migraciones de Laravel en MariaDB 10.11 (fuente de verdad: backend/database/migrations).
+-- Uso: mariadb idead_portal < 01_estructura.sql
+-- =====================================================================================
+SET FOREIGN_KEY_CHECKS=0;
 /*M!999999\- enable the sandbox mode */ 
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
@@ -12,6 +18,39 @@ CREATE TABLE `academic_periods` (
   PRIMARY KEY (`id`),
   UNIQUE KEY `academic_periods_code_unique` (`code`),
   KEY `academic_periods_year_term_index` (`year`,`term`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `administrative_staff` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `period_id` bigint(20) unsigned NOT NULL,
+  `staff_key` char(64) NOT NULL,
+  `staff_type` varchar(20) NOT NULL,
+  `contract_type` varchar(30) DEFAULT NULL,
+  `position` varchar(120) DEFAULT NULL,
+  `grade` varchar(20) DEFAULT NULL,
+  `main_function` varchar(255) DEFAULT NULL,
+  `dependency_id` bigint(20) unsigned DEFAULT NULL,
+  `cat_id` bigint(20) unsigned DEFAULT NULL,
+  `sex` varchar(20) DEFAULT NULL,
+  `age_range` varchar(10) DEFAULT NULL,
+  `education_level` varchar(20) DEFAULT NULL,
+  `seniority_years` tinyint(3) unsigned DEFAULT NULL,
+  `trained_in_period` tinyint(1) NOT NULL DEFAULT 0,
+  `import_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `administrative_staff_period_id_staff_key_unique` (`period_id`,`staff_key`),
+  KEY `administrative_staff_dependency_id_foreign` (`dependency_id`),
+  KEY `administrative_staff_cat_id_foreign` (`cat_id`),
+  KEY `administrative_staff_import_id_foreign` (`import_id`),
+  KEY `administrative_staff_period_id_staff_type_index` (`period_id`,`staff_type`),
+  CONSTRAINT `administrative_staff_cat_id_foreign` FOREIGN KEY (`cat_id`) REFERENCES `cats` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `administrative_staff_dependency_id_foreign` FOREIGN KEY (`dependency_id`) REFERENCES `dependencies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `administrative_staff_import_id_foreign` FOREIGN KEY (`import_id`) REFERENCES `record_imports` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `administrative_staff_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `academic_periods` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -422,6 +461,45 @@ CREATE TABLE `education_levels` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `enrollments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `period_id` bigint(20) unsigned NOT NULL,
+  `student_key` char(64) NOT NULL,
+  `program_id` bigint(20) unsigned NOT NULL,
+  `cat_id` bigint(20) unsigned NOT NULL,
+  `enrollment_status` varchar(20) NOT NULL DEFAULT 'matriculado',
+  `is_new` tinyint(1) NOT NULL DEFAULT 0,
+  `semester` tinyint(3) unsigned DEFAULT NULL,
+  `sex` varchar(20) DEFAULT NULL,
+  `age_range` varchar(10) DEFAULT NULL,
+  `marital_status` varchar(20) DEFAULT NULL,
+  `stratum` tinyint(3) unsigned DEFAULT NULL,
+  `residence_zone` varchar(10) DEFAULT NULL,
+  `residence_municipality_id` bigint(20) unsigned DEFAULT NULL,
+  `special_population` text DEFAULT NULL,
+  `academic_average` decimal(3,2) DEFAULT NULL,
+  `is_student_representative` tinyint(1) NOT NULL DEFAULT 0,
+  `import_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `enrollments_period_id_student_key_program_id_unique` (`period_id`,`student_key`,`program_id`),
+  KEY `enrollments_program_id_foreign` (`program_id`),
+  KEY `enrollments_cat_id_foreign` (`cat_id`),
+  KEY `enrollments_residence_municipality_id_foreign` (`residence_municipality_id`),
+  KEY `enrollments_import_id_foreign` (`import_id`),
+  KEY `enrollments_period_id_cat_id_index` (`period_id`,`cat_id`),
+  KEY `enrollments_period_id_program_id_index` (`period_id`,`program_id`),
+  KEY `enrollments_student_key_index` (`student_key`),
+  CONSTRAINT `enrollments_cat_id_foreign` FOREIGN KEY (`cat_id`) REFERENCES `cats` (`id`),
+  CONSTRAINT `enrollments_import_id_foreign` FOREIGN KEY (`import_id`) REFERENCES `record_imports` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `enrollments_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `academic_periods` (`id`),
+  CONSTRAINT `enrollments_program_id_foreign` FOREIGN KEY (`program_id`) REFERENCES `programs` (`id`),
+  CONSTRAINT `enrollments_residence_municipality_id_foreign` FOREIGN KEY (`residence_municipality_id`) REFERENCES `municipalities` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `events` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `slug` varchar(180) NOT NULL,
@@ -489,6 +567,38 @@ CREATE TABLE `files` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `graduations` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `graduate_key` char(64) NOT NULL,
+  `program_id` bigint(20) unsigned NOT NULL,
+  `cat_id` bigint(20) unsigned DEFAULT NULL,
+  `period_id` bigint(20) unsigned NOT NULL,
+  `cohort_period_id` bigint(20) unsigned DEFAULT NULL,
+  `graduation_date` date NOT NULL,
+  `degree_option` varchar(60) DEFAULT NULL,
+  `sex` varchar(20) DEFAULT NULL,
+  `final_average` decimal(3,2) DEFAULT NULL,
+  `employment_status` varchar(20) DEFAULT NULL,
+  `import_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `graduations_graduate_key_program_id_unique` (`graduate_key`,`program_id`),
+  KEY `graduations_program_id_foreign` (`program_id`),
+  KEY `graduations_cat_id_foreign` (`cat_id`),
+  KEY `graduations_cohort_period_id_foreign` (`cohort_period_id`),
+  KEY `graduations_import_id_foreign` (`import_id`),
+  KEY `graduations_period_id_program_id_index` (`period_id`,`program_id`),
+  KEY `graduations_graduate_key_index` (`graduate_key`),
+  CONSTRAINT `graduations_cat_id_foreign` FOREIGN KEY (`cat_id`) REFERENCES `cats` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `graduations_cohort_period_id_foreign` FOREIGN KEY (`cohort_period_id`) REFERENCES `academic_periods` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `graduations_import_id_foreign` FOREIGN KEY (`import_id`) REFERENCES `record_imports` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `graduations_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `academic_periods` (`id`),
+  CONSTRAINT `graduations_program_id_foreign` FOREIGN KEY (`program_id`) REFERENCES `programs` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `hero_slides` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
@@ -530,7 +640,7 @@ CREATE TABLE `home_highlights` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
-CREATE TABLE `indicator_modules` (
+CREATE TABLE `indicator_categories` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `number` tinyint(3) unsigned NOT NULL,
   `slug` varchar(80) NOT NULL,
@@ -538,8 +648,8 @@ CREATE TABLE `indicator_modules` (
   `description` text DEFAULT NULL,
   `icon` varchar(40) DEFAULT NULL,
   PRIMARY KEY (`id`),
-  UNIQUE KEY `indicator_modules_number_unique` (`number`),
-  UNIQUE KEY `indicator_modules_slug_unique` (`slug`)
+  UNIQUE KEY `indicator_categories_number_unique` (`number`),
+  UNIQUE KEY `indicator_categories_slug_unique` (`slug`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -617,7 +727,7 @@ CREATE TABLE `indicators` (
   KEY `indicators_responsible_dependency_id_foreign` (`responsible_dependency_id`),
   KEY `indicators_module_id_sort_index` (`module_id`,`sort`),
   CONSTRAINT `indicators_classifier_id_foreign` FOREIGN KEY (`classifier_id`) REFERENCES `classifiers` (`id`) ON DELETE SET NULL,
-  CONSTRAINT `indicators_module_id_foreign` FOREIGN KEY (`module_id`) REFERENCES `indicator_modules` (`id`),
+  CONSTRAINT `indicators_module_id_foreign` FOREIGN KEY (`module_id`) REFERENCES `indicator_categories` (`id`),
   CONSTRAINT `indicators_responsible_dependency_id_foreign` FOREIGN KEY (`responsible_dependency_id`) REFERENCES `dependencies` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -958,6 +1068,68 @@ CREATE TABLE `projects` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `publications` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `slug` varchar(180) NOT NULL,
+  `title` varchar(255) NOT NULL,
+  `publication_type` varchar(30) NOT NULL,
+  `authors` text DEFAULT NULL,
+  `year` smallint(5) unsigned NOT NULL,
+  `publisher` varchar(255) DEFAULT NULL,
+  `isbn_issn` varchar(30) DEFAULT NULL,
+  `doi` varchar(120) DEFAULT NULL,
+  `url` varchar(255) DEFAULT NULL,
+  `abstract` text DEFAULT NULL,
+  `program_id` bigint(20) unsigned DEFAULT NULL,
+  `dependency_id` bigint(20) unsigned DEFAULT NULL,
+  `research_group_id` bigint(20) unsigned DEFAULT NULL,
+  `document_id` bigint(20) unsigned DEFAULT NULL,
+  `publication_status` varchar(20) NOT NULL DEFAULT 'borrador',
+  `is_demo` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `publications_slug_unique` (`slug`),
+  KEY `publications_program_id_foreign` (`program_id`),
+  KEY `publications_dependency_id_foreign` (`dependency_id`),
+  KEY `publications_research_group_id_foreign` (`research_group_id`),
+  KEY `publications_document_id_foreign` (`document_id`),
+  KEY `publications_publication_type_year_index` (`publication_type`,`year`),
+  CONSTRAINT `publications_dependency_id_foreign` FOREIGN KEY (`dependency_id`) REFERENCES `dependencies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `publications_document_id_foreign` FOREIGN KEY (`document_id`) REFERENCES `documents` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `publications_program_id_foreign` FOREIGN KEY (`program_id`) REFERENCES `programs` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `publications_research_group_id_foreign` FOREIGN KEY (`research_group_id`) REFERENCES `catalog_items` (`id`) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `record_imports` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `entity` varchar(40) NOT NULL,
+  `period_id` bigint(20) unsigned DEFAULT NULL,
+  `dependency_id` bigint(20) unsigned DEFAULT NULL,
+  `file_id` bigint(20) unsigned DEFAULT NULL,
+  `rows_total` int(10) unsigned NOT NULL DEFAULT 0,
+  `rows_valid` int(10) unsigned NOT NULL DEFAULT 0,
+  `errors` longtext CHARACTER SET utf8mb4 COLLATE utf8mb4_bin DEFAULT NULL CHECK (json_valid(`errors`)),
+  `status` varchar(20) NOT NULL DEFAULT 'cargado',
+  `created_by` bigint(20) unsigned NOT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `record_imports_period_id_foreign` (`period_id`),
+  KEY `record_imports_dependency_id_foreign` (`dependency_id`),
+  KEY `record_imports_file_id_foreign` (`file_id`),
+  KEY `record_imports_created_by_foreign` (`created_by`),
+  KEY `record_imports_entity_period_id_index` (`entity`,`period_id`),
+  CONSTRAINT `record_imports_created_by_foreign` FOREIGN KEY (`created_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `record_imports_dependency_id_foreign` FOREIGN KEY (`dependency_id`) REFERENCES `dependencies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `record_imports_file_id_foreign` FOREIGN KEY (`file_id`) REFERENCES `files` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `record_imports_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `academic_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `reviews` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `reviewable_type` varchar(60) NOT NULL,
@@ -1023,6 +1195,55 @@ CREATE TABLE `settings` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `teacher_assignments` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `teacher_id` bigint(20) unsigned NOT NULL,
+  `cat_id` bigint(20) unsigned NOT NULL,
+  `program_id` bigint(20) unsigned DEFAULT NULL,
+  `courses` smallint(5) unsigned NOT NULL DEFAULT 0,
+  `hours` smallint(5) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `teacher_assignments_teacher_id_cat_id_program_id_unique` (`teacher_id`,`cat_id`,`program_id`),
+  KEY `teacher_assignments_cat_id_foreign` (`cat_id`),
+  KEY `teacher_assignments_program_id_foreign` (`program_id`),
+  CONSTRAINT `teacher_assignments_cat_id_foreign` FOREIGN KEY (`cat_id`) REFERENCES `cats` (`id`),
+  CONSTRAINT `teacher_assignments_program_id_foreign` FOREIGN KEY (`program_id`) REFERENCES `programs` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `teacher_assignments_teacher_id_foreign` FOREIGN KEY (`teacher_id`) REFERENCES `teachers` (`id`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `teachers` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `period_id` bigint(20) unsigned NOT NULL,
+  `teacher_key` char(64) NOT NULL,
+  `dependency_id` bigint(20) unsigned DEFAULT NULL,
+  `contract_type` varchar(20) NOT NULL,
+  `max_education` varchar(20) DEFAULT NULL,
+  `sex` varchar(20) DEFAULT NULL,
+  `age_range` varchar(10) DEFAULT NULL,
+  `category` varchar(20) DEFAULT NULL,
+  `seniority_years` tinyint(3) unsigned DEFAULT NULL,
+  `in_research_group` tinyint(1) NOT NULL DEFAULT 0,
+  `in_research_seedbed` tinyint(1) NOT NULL DEFAULT 0,
+  `teaching_seminar` tinyint(1) NOT NULL DEFAULT 0,
+  `import_id` bigint(20) unsigned DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `teachers_period_id_teacher_key_unique` (`period_id`,`teacher_key`),
+  KEY `teachers_dependency_id_foreign` (`dependency_id`),
+  KEY `teachers_import_id_foreign` (`import_id`),
+  KEY `teachers_period_id_contract_type_index` (`period_id`,`contract_type`),
+  CONSTRAINT `teachers_dependency_id_foreign` FOREIGN KEY (`dependency_id`) REFERENCES `dependencies` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `teachers_import_id_foreign` FOREIGN KEY (`import_id`) REFERENCES `record_imports` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `teachers_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `academic_periods` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `team_units` (
   `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
   `name` varchar(255) NOT NULL,
@@ -1036,6 +1257,39 @@ CREATE TABLE `team_units` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL,
   PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `update_requests` (
+  `id` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `title` varchar(255) NOT NULL,
+  `description` text DEFAULT NULL,
+  `indicator_id` bigint(20) unsigned DEFAULT NULL,
+  `dependency_id` bigint(20) unsigned NOT NULL,
+  `period_id` bigint(20) unsigned DEFAULT NULL,
+  `due_date` date DEFAULT NULL,
+  `status` varchar(20) NOT NULL DEFAULT 'abierta',
+  `requested_by` bigint(20) unsigned NOT NULL,
+  `attended_by` bigint(20) unsigned DEFAULT NULL,
+  `attended_at` timestamp NULL DEFAULT NULL,
+  `submission_id` bigint(20) unsigned DEFAULT NULL,
+  `response` text DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT NULL,
+  `updated_at` timestamp NULL DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  KEY `update_requests_indicator_id_foreign` (`indicator_id`),
+  KEY `update_requests_period_id_foreign` (`period_id`),
+  KEY `update_requests_requested_by_foreign` (`requested_by`),
+  KEY `update_requests_attended_by_foreign` (`attended_by`),
+  KEY `update_requests_submission_id_foreign` (`submission_id`),
+  KEY `update_requests_dependency_id_status_index` (`dependency_id`,`status`),
+  CONSTRAINT `update_requests_attended_by_foreign` FOREIGN KEY (`attended_by`) REFERENCES `users` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `update_requests_dependency_id_foreign` FOREIGN KEY (`dependency_id`) REFERENCES `dependencies` (`id`),
+  CONSTRAINT `update_requests_indicator_id_foreign` FOREIGN KEY (`indicator_id`) REFERENCES `indicators` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `update_requests_period_id_foreign` FOREIGN KEY (`period_id`) REFERENCES `academic_periods` (`id`) ON DELETE SET NULL,
+  CONSTRAINT `update_requests_requested_by_foreign` FOREIGN KEY (`requested_by`) REFERENCES `users` (`id`),
+  CONSTRAINT `update_requests_submission_id_foreign` FOREIGN KEY (`submission_id`) REFERENCES `data_submissions` (`id`) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
@@ -1058,3 +1312,4 @@ CREATE TABLE `users` (
   UNIQUE KEY `users_email_unique` (`email`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
+SET FOREIGN_KEY_CHECKS=1;

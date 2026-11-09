@@ -1,7 +1,7 @@
 # Diccionario de datos
 
 Generado automáticamente desde el esquema real (`idead_portal`, MariaDB 10.11) con `scripts/generar_diccionario_datos.py`.
-Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten. Script de creación: [`esquema-mariadb.sql`](esquema-mariadb.sql); fuente de verdad: `backend/database/migrations`.
+Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten. Scripts de creación: [`backend/database/sql`](../../backend/database/sql); fuente de verdad: `backend/database/migrations`.
 
 ## `academic_periods`
 
@@ -16,6 +16,31 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `ends_on` | date | sí |  | NULL |  |
 
 Índices: `academic_periods_code_unique` (code) — único; `academic_periods_year_term_index` (year,term); `PRIMARY` (id) — único
+
+## `administrative_staff`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
+| `staff_key` | char(64) | no |  |  |  |
+| `staff_type` | varchar(20) | no |  |  |  |
+| `contract_type` | varchar(30) | sí |  | NULL |  |
+| `position` | varchar(120) | sí |  | NULL |  |
+| `grade` | varchar(20) | sí |  | NULL |  |
+| `main_function` | varchar(255) | sí |  | NULL |  |
+| `dependency_id` | bigint(20) unsigned | sí | MUL | NULL | dependencies.id |
+| `cat_id` | bigint(20) unsigned | sí | MUL | NULL | cats.id |
+| `sex` | varchar(20) | sí |  | NULL |  |
+| `age_range` | varchar(10) | sí |  | NULL |  |
+| `education_level` | varchar(20) | sí |  | NULL |  |
+| `seniority_years` | tinyint(3) unsigned | sí |  | NULL |  |
+| `trained_in_period` | tinyint(1) | no |  | 0 |  |
+| `import_id` | bigint(20) unsigned | sí | MUL | NULL | record_imports.id |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `administrative_staff_cat_id_foreign` (cat_id); `administrative_staff_dependency_id_foreign` (dependency_id); `administrative_staff_import_id_foreign` (import_id); `administrative_staff_period_id_staff_key_unique` (period_id,staff_key) — único; `administrative_staff_period_id_staff_type_index` (period_id,staff_type); `PRIMARY` (id) — único
 
 ## `agreements`
 
@@ -343,6 +368,33 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 
 Índices: `education_levels_code_unique` (code) — único; `PRIMARY` (id) — único
 
+## `enrollments`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
+| `student_key` | char(64) | no | MUL |  |  |
+| `program_id` | bigint(20) unsigned | no | MUL |  | programs.id |
+| `cat_id` | bigint(20) unsigned | no | MUL |  | cats.id |
+| `enrollment_status` | varchar(20) | no |  | 'matriculado' |  |
+| `is_new` | tinyint(1) | no |  | 0 |  |
+| `semester` | tinyint(3) unsigned | sí |  | NULL |  |
+| `sex` | varchar(20) | sí |  | NULL |  |
+| `age_range` | varchar(10) | sí |  | NULL |  |
+| `marital_status` | varchar(20) | sí |  | NULL |  |
+| `stratum` | tinyint(3) unsigned | sí |  | NULL |  |
+| `residence_zone` | varchar(10) | sí |  | NULL |  |
+| `residence_municipality_id` | bigint(20) unsigned | sí | MUL | NULL | municipalities.id |
+| `special_population` | text | sí |  | NULL |  |
+| `academic_average` | decimal(3,2) | sí |  | NULL |  |
+| `is_student_representative` | tinyint(1) | no |  | 0 |  |
+| `import_id` | bigint(20) unsigned | sí | MUL | NULL | record_imports.id |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `enrollments_cat_id_foreign` (cat_id); `enrollments_import_id_foreign` (import_id); `enrollments_period_id_cat_id_index` (period_id,cat_id); `enrollments_period_id_program_id_index` (period_id,program_id); `enrollments_period_id_student_key_program_id_unique` (period_id,student_key,program_id) — único; `enrollments_program_id_foreign` (program_id); `enrollments_residence_municipality_id_foreign` (residence_municipality_id); `enrollments_student_key_index` (student_key); `PRIMARY` (id) — único
+
 ## `events`
 
 | Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
@@ -384,6 +436,27 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `updated_at` | timestamp | sí |  | NULL |  |
 
 Índices: `files_uploaded_by_foreign` (uploaded_by); `PRIMARY` (id) — único
+
+## `graduations`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `graduate_key` | char(64) | no | MUL |  |  |
+| `program_id` | bigint(20) unsigned | no | MUL |  | programs.id |
+| `cat_id` | bigint(20) unsigned | sí | MUL | NULL | cats.id |
+| `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
+| `cohort_period_id` | bigint(20) unsigned | sí | MUL | NULL | academic_periods.id |
+| `graduation_date` | date | no |  |  |  |
+| `degree_option` | varchar(60) | sí |  | NULL |  |
+| `sex` | varchar(20) | sí |  | NULL |  |
+| `final_average` | decimal(3,2) | sí |  | NULL |  |
+| `employment_status` | varchar(20) | sí |  | NULL |  |
+| `import_id` | bigint(20) unsigned | sí | MUL | NULL | record_imports.id |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `graduations_cat_id_foreign` (cat_id); `graduations_cohort_period_id_foreign` (cohort_period_id); `graduations_graduate_key_index` (graduate_key); `graduations_graduate_key_program_id_unique` (graduate_key,program_id) — único; `graduations_import_id_foreign` (import_id); `graduations_period_id_program_id_index` (period_id,program_id); `graduations_program_id_foreign` (program_id); `PRIMARY` (id) — único
 
 ## `hero_slides`
 
@@ -428,7 +501,7 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 |---|---|---|---|---|---|
 | `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
 | `code` | varchar(20) | no | UNI |  |  |
-| `module_id` | bigint(20) unsigned | no | MUL |  | indicator_modules.id |
+| `module_id` | bigint(20) unsigned | no | MUL |  | indicator_categories.id |
 | `sort` | smallint(5) unsigned | no |  | 0 |  |
 | `name` | varchar(255) | no |  |  |  |
 | `description` | text | sí |  | NULL |  |
@@ -457,7 +530,7 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 
 Índices: `indicators_classifier_id_foreign` (classifier_id); `indicators_code_unique` (code) — único; `indicators_module_id_sort_index` (module_id,sort); `indicators_responsible_dependency_id_foreign` (responsible_dependency_id); `PRIMARY` (id) — único
 
-## `indicator_modules`
+## `indicator_categories`
 
 | Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
 |---|---|---|---|---|---|
@@ -468,7 +541,7 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `description` | text | sí |  | NULL |  |
 | `icon` | varchar(40) | sí |  | NULL |  |
 
-Índices: `indicator_modules_number_unique` (number) — único; `indicator_modules_slug_unique` (slug) — único; `PRIMARY` (id) — único
+Índices: `indicator_categories_number_unique` (number) — único; `indicator_categories_slug_unique` (slug) — único; `PRIMARY` (id) — único
 
 ## `indicator_values`
 
@@ -728,6 +801,51 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 
 Índices: `PRIMARY` (id) — único; `project_progress_project_id_foreign` (project_id)
 
+## `publications`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `slug` | varchar(180) | no | UNI |  |  |
+| `title` | varchar(255) | no |  |  |  |
+| `publication_type` | varchar(30) | no | MUL |  |  |
+| `authors` | text | sí |  | NULL |  |
+| `year` | smallint(5) unsigned | no |  |  |  |
+| `publisher` | varchar(255) | sí |  | NULL |  |
+| `isbn_issn` | varchar(30) | sí |  | NULL |  |
+| `doi` | varchar(120) | sí |  | NULL |  |
+| `url` | varchar(255) | sí |  | NULL |  |
+| `abstract` | text | sí |  | NULL |  |
+| `program_id` | bigint(20) unsigned | sí | MUL | NULL | programs.id |
+| `dependency_id` | bigint(20) unsigned | sí | MUL | NULL | dependencies.id |
+| `research_group_id` | bigint(20) unsigned | sí | MUL | NULL | catalog_items.id |
+| `document_id` | bigint(20) unsigned | sí | MUL | NULL | documents.id |
+| `publication_status` | varchar(20) | no |  | 'borrador' |  |
+| `is_demo` | tinyint(1) | no |  | 0 |  |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `PRIMARY` (id) — único; `publications_dependency_id_foreign` (dependency_id); `publications_document_id_foreign` (document_id); `publications_program_id_foreign` (program_id); `publications_publication_type_year_index` (publication_type,year); `publications_research_group_id_foreign` (research_group_id); `publications_slug_unique` (slug) — único
+
+## `record_imports`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `entity` | varchar(40) | no | MUL |  |  |
+| `period_id` | bigint(20) unsigned | sí | MUL | NULL | academic_periods.id |
+| `dependency_id` | bigint(20) unsigned | sí | MUL | NULL | dependencies.id |
+| `file_id` | bigint(20) unsigned | sí | MUL | NULL | files.id |
+| `rows_total` | int(10) unsigned | no |  | 0 |  |
+| `rows_valid` | int(10) unsigned | no |  | 0 |  |
+| `errors` | longtext | sí |  | NULL |  |
+| `status` | varchar(20) | no |  | 'cargado' |  |
+| `created_by` | bigint(20) unsigned | no | MUL |  | users.id |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `PRIMARY` (id) — único; `record_imports_created_by_foreign` (created_by); `record_imports_dependency_id_foreign` (dependency_id); `record_imports_entity_period_id_index` (entity,period_id); `record_imports_file_id_foreign` (file_id); `record_imports_period_id_foreign` (period_id)
+
 ## `reviews`
 
 | Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
@@ -776,6 +894,44 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 
 Índices: `PRIMARY` (key) — único
 
+## `teachers`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
+| `teacher_key` | char(64) | no |  |  |  |
+| `dependency_id` | bigint(20) unsigned | sí | MUL | NULL | dependencies.id |
+| `contract_type` | varchar(20) | no |  |  |  |
+| `max_education` | varchar(20) | sí |  | NULL |  |
+| `sex` | varchar(20) | sí |  | NULL |  |
+| `age_range` | varchar(10) | sí |  | NULL |  |
+| `category` | varchar(20) | sí |  | NULL |  |
+| `seniority_years` | tinyint(3) unsigned | sí |  | NULL |  |
+| `in_research_group` | tinyint(1) | no |  | 0 |  |
+| `in_research_seedbed` | tinyint(1) | no |  | 0 |  |
+| `teaching_seminar` | tinyint(1) | no |  | 0 |  |
+| `import_id` | bigint(20) unsigned | sí | MUL | NULL | record_imports.id |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `PRIMARY` (id) — único; `teachers_dependency_id_foreign` (dependency_id); `teachers_import_id_foreign` (import_id); `teachers_period_id_contract_type_index` (period_id,contract_type); `teachers_period_id_teacher_key_unique` (period_id,teacher_key) — único
+
+## `teacher_assignments`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `teacher_id` | bigint(20) unsigned | no | MUL |  | teachers.id |
+| `cat_id` | bigint(20) unsigned | no | MUL |  | cats.id |
+| `program_id` | bigint(20) unsigned | sí | MUL | NULL | programs.id |
+| `courses` | smallint(5) unsigned | no |  | 0 |  |
+| `hours` | smallint(5) unsigned | sí |  | NULL |  |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `PRIMARY` (id) — único; `teacher_assignments_cat_id_foreign` (cat_id); `teacher_assignments_program_id_foreign` (program_id); `teacher_assignments_teacher_id_cat_id_program_id_unique` (teacher_id,cat_id,program_id) — único
+
 ## `team_units`
 
 | Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
@@ -793,6 +949,28 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `updated_at` | timestamp | sí |  | NULL |  |
 
 Índices: `PRIMARY` (id) — único
+
+## `update_requests`
+
+| Campo | Tipo | Nulo | Clave | Por defecto | Referencia |
+|---|---|---|---|---|---|
+| `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
+| `title` | varchar(255) | no |  |  |  |
+| `description` | text | sí |  | NULL |  |
+| `indicator_id` | bigint(20) unsigned | sí | MUL | NULL | indicators.id |
+| `dependency_id` | bigint(20) unsigned | no | MUL |  | dependencies.id |
+| `period_id` | bigint(20) unsigned | sí | MUL | NULL | academic_periods.id |
+| `due_date` | date | sí |  | NULL |  |
+| `status` | varchar(20) | no |  | 'abierta' |  |
+| `requested_by` | bigint(20) unsigned | no | MUL |  | users.id |
+| `attended_by` | bigint(20) unsigned | sí | MUL | NULL | users.id |
+| `attended_at` | timestamp | sí |  | NULL |  |
+| `submission_id` | bigint(20) unsigned | sí | MUL | NULL | data_submissions.id |
+| `response` | text | sí |  | NULL |  |
+| `created_at` | timestamp | sí |  | NULL |  |
+| `updated_at` | timestamp | sí |  | NULL |  |
+
+Índices: `PRIMARY` (id) — único; `update_requests_attended_by_foreign` (attended_by); `update_requests_dependency_id_status_index` (dependency_id,status); `update_requests_indicator_id_foreign` (indicator_id); `update_requests_period_id_foreign` (period_id); `update_requests_requested_by_foreign` (requested_by); `update_requests_submission_id_foreign` (submission_id)
 
 ## `users`
 
