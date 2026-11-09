@@ -22,7 +22,7 @@
 | Municipios | `municipalities` | Código DANE (DIVIPOLA) |
 | Departamentos | `departments` | 33, código DANE (MGN) |
 | Períodos académicos | `academic_periods` | Semestres, años, vigencias, cohortes |
-| **Matrículas** | `enrollments` | Un registro por estudiante, programa y período (seudónimo) |
+| **Matrículas** | `enrollments` | Un registro por estudiante, programa y período (datos personales cifrados) |
 | **Docentes** | `teachers`, `teacher_assignments` | Vinculación, formación, categoría, carga por CAT/programa |
 | **Graduados** | `graduations` | Un registro por **título**; personas = claves distintas |
 | **Personal administrativo** | `administrative_staff` | Planta y contratistas separados por `staff_type` |
@@ -78,7 +78,7 @@ erDiagram
   DEPENDENCIES |o--o{ CATS : responsable
 ```
 
-### 2.3 Registros institucionales (personas seudonimizadas)
+### 2.3 Registros institucionales (parte privada, datos personales cifrados)
 
 ```mermaid
 erDiagram
@@ -160,11 +160,12 @@ erDiagram
 1. **Normalización (3FN)**: territorio, períodos, programas, niveles, áreas, dependencias y fuentes son tablas propias referenciadas por clave foránea; no se repiten nombres en las tablas de hechos.
 2. **Indicadores sin cambiar la estructura**: un indicador nuevo es un registro en `indicators`; sus desagregaciones usan las dimensiones existentes y los clasificadores.
 3. **Historia sin sobrescritura**: los valores publicados nunca se editan; una corrección es un lote nuevo con `supersedes_id`. `change_history` guarda antes/después de cada modificación de contenidos y fichas.
-4. **Separación entre registros y publicación**: las tablas de personas (`enrollments`, `teachers`, `graduations`, `administrative_staff`) son privadas. Lo que ve el público son los agregados aprobados en `indicator_values`, con supresión de grupos pequeños.
-5. **Protección de datos personales**:
-   - sin nombres ni números de documento: clave seudónima `HMAC-SHA256(documento, IDEAD_PSEUDONYM_KEY)` de 64 caracteres, que permite contar personas únicas y seguir cohortes entre períodos;
-   - poblaciones de especial protección (`enrollments.special_population`) **cifradas** con la llave de la aplicación y ocultas en las respuestas;
-   - autoría de publicaciones y responsables de CAT solo cuando su publicación esté autorizada.
+4. **Separación entre registros y publicación**: las tablas de personas (`enrollments`, `teachers`, `graduations`, `administrative_staff`) pertenecen a la parte privada. Lo que ve el público son los agregados aprobados en `indicator_values`, con supresión de grupos pequeños.
+5. **Protección de datos personales** (parte pública y parte privada):
+   - la parte privada guarda los datos completos de cada persona: tipo y número de documento, nombres, correo y teléfono, **cifrados en la base** con la llave de la aplicación; nunca salen en las respuestas del sistema salvo a quien tenga el permiso `records.view_personal` (por defecto, solo el Director);
+   - para unir archivos de distintas dependencias y períodos sin descifrar los documentos se usa además una clave seudónima `HMAC-SHA256(documento, IDEAD_PSEUDONYM_KEY)` de 64 caracteres;
+   - poblaciones de especial protección (`enrollments.special_population`) también cifradas;
+   - la parte pública solo muestra totales aprobados, con supresión de grupos pequeños; autoría de publicaciones y responsables de CAT solo cuando su publicación esté autorizada.
 6. **Restricciones de unicidad**: un estudiante una vez por programa y período; un docente o funcionario una vez por período; un título por persona y programa; una combinación de dimensiones por lote; una oferta por programa, CAT y período.
 7. **Borrado protegido**: `restrict` donde hay historia (períodos, indicadores, programas usados en registros), `cascade` en dependientes directos (sedes de un CAT, versiones de un documento), `set null` en referencias opcionales.
 

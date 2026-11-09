@@ -10,7 +10,14 @@ class Graduation extends Model
 
     protected $guarded = ['id'];
 
+    /** Datos personales cifrados: nunca se serializan por defecto (solo se muestran a roles autorizados). */
+    protected $hidden = ['document_number', 'full_name', 'email', 'phone'];
+
     protected $casts = [
+        'document_number' => 'encrypted',
+        'full_name' => 'encrypted',
+        'email' => 'encrypted',
+        'phone' => 'encrypted',
         'graduation_date' => 'date:Y-m-d',
         'final_average' => 'float',
     ];

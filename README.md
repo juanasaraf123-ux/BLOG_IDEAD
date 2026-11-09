@@ -29,7 +29,7 @@ Portal: <http://localhost:5173> · Panel: <http://localhost:5173/admin/> (usuari
 ## Pruebas
 
 ```bash
-cd backend && php artisan test          # 24 pruebas (seguridad, indicadores, registros, portal)
+cd backend && php artisan test          # 27 pruebas (seguridad, indicadores, registros, solicitudes, portal)
 cd frontend && npm test && npm run build
 npm run e2e:portal && npm run e2e:a11y   # con los servidores en marcha (Playwright + axe)
 ```

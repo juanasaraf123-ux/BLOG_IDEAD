@@ -10,7 +10,14 @@ class Teacher extends Model
 
     protected $guarded = ['id'];
 
+    /** Datos personales cifrados: nunca se serializan por defecto (solo se muestran a roles autorizados). */
+    protected $hidden = ['document_number', 'full_name', 'email', 'phone'];
+
     protected $casts = [
+        'document_number' => 'encrypted',
+        'full_name' => 'encrypted',
+        'email' => 'encrypted',
+        'phone' => 'encrypted',
         'in_research_group' => 'boolean',
         'in_research_seedbed' => 'boolean',
         'teaching_seminar' => 'boolean',

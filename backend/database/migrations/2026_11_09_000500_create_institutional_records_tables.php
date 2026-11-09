@@ -9,9 +9,10 @@ use Illuminate\Support\Facades\Schema;
  * Publicaciones y Solicitudes de actualización.
  *
  * Protección de datos (Ley 1581 de 2012):
- * - Las personas se identifican con una clave seudónima (HMAC-SHA256 del documento con una llave secreta del servidor,
- *   IDEAD_PSEUDONYM_KEY). No se guardan nombres ni números de documento, y la clave no es reversible.
- * - Los datos sensibles (poblaciones de especial protección) se guardan cifrados.
+ * - Parte privada: se guardan los datos personales completos (tipo y número de documento, nombres, correo, teléfono),
+ *   CIFRADOS en la base con la llave de la aplicación y ocultos en las respuestas por defecto.
+ * - Para unir archivos y períodos sin descifrar se usa una clave seudónima (HMAC-SHA256 del documento con IDEAD_PSEUDONYM_KEY).
+ * - Los datos sensibles (poblaciones de especial protección) también se guardan cifrados.
  * - Estas tablas solo se consultan en el panel privado; el portal publica únicamente agregados aprobados (indicator_values).
  */
 return new class extends Migration
@@ -38,7 +39,12 @@ return new class extends Migration
         Schema::create('enrollments', function (Blueprint $table) {
             $table->id();
             $table->foreignId('period_id')->constrained('academic_periods')->restrictOnDelete();
-            $table->char('student_key', 64);            // seudónimo HMAC (sin nombre ni documento)
+            $table->char('student_key', 64);            // seudónimo HMAC para unir archivos y períodos
+            $table->string('document_type', 5)->nullable(); // CC | TI | CE | PA | PEP
+            $table->text('document_number')->nullable(); // CIFRADO
+            $table->text('full_name')->nullable();       // CIFRADO
+            $table->text('email')->nullable();           // CIFRADO
+            $table->text('phone')->nullable();           // CIFRADO
             $table->foreignId('program_id')->constrained()->restrictOnDelete();
             $table->foreignId('cat_id')->constrained()->restrictOnDelete();
             $table->string('enrollment_status', 20)->default('matriculado'); // matriculado | retirado | aplazado | graduando
@@ -65,7 +71,12 @@ return new class extends Migration
         Schema::create('teachers', function (Blueprint $table) {
             $table->id();
             $table->foreignId('period_id')->constrained('academic_periods')->restrictOnDelete();
-            $table->char('teacher_key', 64);
+            $table->char('teacher_key', 64);            // seudónimo HMAC para unir archivos y períodos
+            $table->string('document_type', 5)->nullable(); // CC | TI | CE | PA | PEP
+            $table->text('document_number')->nullable(); // CIFRADO
+            $table->text('full_name')->nullable();       // CIFRADO
+            $table->text('email')->nullable();           // CIFRADO
+            $table->text('phone')->nullable();           // CIFRADO
             $table->foreignId('dependency_id')->nullable()->constrained()->nullOnDelete(); // departamento académico
             $table->string('contract_type', 20);        // carrera | catedra | ocasional | otra
             $table->string('max_education', 20)->nullable(); // profesional | especializacion | maestria | doctorado
@@ -96,7 +107,12 @@ return new class extends Migration
         // GRADUADOS: un registro por título otorgado (una persona puede tener varios → personas = claves distintas)
         Schema::create('graduations', function (Blueprint $table) {
             $table->id();
-            $table->char('graduate_key', 64);
+            $table->char('graduate_key', 64);            // seudónimo HMAC para unir archivos y períodos
+            $table->string('document_type', 5)->nullable(); // CC | TI | CE | PA | PEP
+            $table->text('document_number')->nullable(); // CIFRADO
+            $table->text('full_name')->nullable();       // CIFRADO
+            $table->text('email')->nullable();           // CIFRADO
+            $table->text('phone')->nullable();           // CIFRADO
             $table->foreignId('program_id')->constrained()->restrictOnDelete();
             $table->foreignId('cat_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('period_id')->constrained('academic_periods')->restrictOnDelete(); // período de grado
@@ -117,12 +133,20 @@ return new class extends Migration
         Schema::create('administrative_staff', function (Blueprint $table) {
             $table->id();
             $table->foreignId('period_id')->constrained('academic_periods')->restrictOnDelete();
-            $table->char('staff_key', 64);
+            $table->char('staff_key', 64);            // seudónimo HMAC para unir archivos y períodos
+            $table->string('document_type', 5)->nullable(); // CC | TI | CE | PA | PEP
+            $table->text('document_number')->nullable(); // CIFRADO
+            $table->text('full_name')->nullable();       // CIFRADO
+            $table->text('email')->nullable();           // CIFRADO
+            $table->text('phone')->nullable();           // CIFRADO
             $table->string('staff_type', 20);           // administrativo | contratista
             $table->string('contract_type', 30)->nullable(); // carrera_administrativa | libre_nombramiento | provisional | temporal | prestacion_servicios
             $table->string('position', 120)->nullable(); // cargo
             $table->string('grade', 20)->nullable();
             $table->string('main_function', 255)->nullable();
+            $table->string('contract_number', 60)->nullable(); // contratistas
+            $table->date('contract_start')->nullable();
+            $table->date('contract_end')->nullable();
             $table->foreignId('dependency_id')->nullable()->constrained()->nullOnDelete();
             $table->foreignId('cat_id')->nullable()->constrained()->nullOnDelete();
             $table->string('sex', 20)->nullable();

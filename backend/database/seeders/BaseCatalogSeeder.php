@@ -39,6 +39,7 @@ class BaseCatalogSeeder extends Seeder
             'indicators.publish' => 'Publicar y despublicar datos de indicadores',
             'indicators.catalog.manage' => 'Editar la ficha técnica de los indicadores (metodología, autorización)',
             'scope.all_dependencies' => 'Alcance sobre todas las dependencias',
+            'records.view_personal' => 'Ver datos personales de estudiantes, docentes, graduados y personal (parte privada)',
         ],
         'Informes' => [
             'reports.internal.export' => 'Exportar informes internos',
@@ -85,7 +86,7 @@ class BaseCatalogSeeder extends Seeder
     public const ROLES = [
         'director' => ['Director del IDEAD', 'Consulta general, supervisión, revisión y publicación de información institucional.', [
             'indicators.view_internal', 'indicators.review', 'indicators.publish', 'indicators.catalog.manage', 'scope.all_dependencies',
-            'reports.internal.export', 'reports.financial.view', 'documents.view.internal', 'documents.view.restricted', 'documents.view.financial',
+            'records.view_personal', 'reports.internal.export', 'reports.financial.view', 'documents.view.internal', 'documents.view.restricted', 'documents.view.financial',
             'agreements.view', 'petty_cash.view', 'content.publish', 'entities.publish', 'audit.view',
         ]],
         'administracion_documental' => ['Administración documental', 'Registro, clasificación y control de versiones de documentos, contratos y convenios.', [

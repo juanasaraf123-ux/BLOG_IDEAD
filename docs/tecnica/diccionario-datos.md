@@ -24,11 +24,19 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
 | `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
 | `staff_key` | char(64) | no |  |  |  |
+| `document_type` | varchar(5) | sí |  | NULL |  |
+| `document_number` | text | sí |  | NULL |  |
+| `full_name` | text | sí |  | NULL |  |
+| `email` | text | sí |  | NULL |  |
+| `phone` | text | sí |  | NULL |  |
 | `staff_type` | varchar(20) | no |  |  |  |
 | `contract_type` | varchar(30) | sí |  | NULL |  |
 | `position` | varchar(120) | sí |  | NULL |  |
 | `grade` | varchar(20) | sí |  | NULL |  |
 | `main_function` | varchar(255) | sí |  | NULL |  |
+| `contract_number` | varchar(60) | sí |  | NULL |  |
+| `contract_start` | date | sí |  | NULL |  |
+| `contract_end` | date | sí |  | NULL |  |
 | `dependency_id` | bigint(20) unsigned | sí | MUL | NULL | dependencies.id |
 | `cat_id` | bigint(20) unsigned | sí | MUL | NULL | cats.id |
 | `sex` | varchar(20) | sí |  | NULL |  |
@@ -375,6 +383,11 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
 | `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
 | `student_key` | char(64) | no | MUL |  |  |
+| `document_type` | varchar(5) | sí |  | NULL |  |
+| `document_number` | text | sí |  | NULL |  |
+| `full_name` | text | sí |  | NULL |  |
+| `email` | text | sí |  | NULL |  |
+| `phone` | text | sí |  | NULL |  |
 | `program_id` | bigint(20) unsigned | no | MUL |  | programs.id |
 | `cat_id` | bigint(20) unsigned | no | MUL |  | cats.id |
 | `enrollment_status` | varchar(20) | no |  | 'matriculado' |  |
@@ -443,6 +456,11 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 |---|---|---|---|---|---|
 | `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
 | `graduate_key` | char(64) | no | MUL |  |  |
+| `document_type` | varchar(5) | sí |  | NULL |  |
+| `document_number` | text | sí |  | NULL |  |
+| `full_name` | text | sí |  | NULL |  |
+| `email` | text | sí |  | NULL |  |
+| `phone` | text | sí |  | NULL |  |
 | `program_id` | bigint(20) unsigned | no | MUL |  | programs.id |
 | `cat_id` | bigint(20) unsigned | sí | MUL | NULL | cats.id |
 | `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
@@ -901,6 +919,11 @@ Las tablas técnicas de Laravel (sesiones, caché, colas, migraciones) se omiten
 | `id` | bigint(20) unsigned auto_increment | no | PRI |  |  |
 | `period_id` | bigint(20) unsigned | no | MUL |  | academic_periods.id |
 | `teacher_key` | char(64) | no |  |  |  |
+| `document_type` | varchar(5) | sí |  | NULL |  |
+| `document_number` | text | sí |  | NULL |  |
+| `full_name` | text | sí |  | NULL |  |
+| `email` | text | sí |  | NULL |  |
+| `phone` | text | sí |  | NULL |  |
 | `dependency_id` | bigint(20) unsigned | sí | MUL | NULL | dependencies.id |
 | `contract_type` | varchar(20) | no |  |  |  |
 | `max_education` | varchar(20) | sí |  | NULL |  |

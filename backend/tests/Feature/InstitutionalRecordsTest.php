@@ -52,6 +52,20 @@ class InstitutionalRecordsTest extends IdeadTestCase
         $this->assertStringNotContainsString('victima', $e->fresh()->toJson());
     }
 
+    public function test_personal_data_is_stored_encrypted_and_hidden(): void
+    {
+        $e = Enrollment::create(['period_id' => $this->period, 'student_key' => Pseudonym::key('1110555123'), 'program_id' => $this->program->id, 'cat_id' => $this->cat->id,
+            'document_type' => 'CC', 'document_number' => '1110555123', 'full_name' => 'Ana Pérez', 'email' => 'ana@example.com', 'phone' => '3000000000']);
+        $raw = (array) DB::table('enrollments')->first();
+        foreach (['document_number' => '1110555123', 'full_name' => 'Ana Pérez', 'email' => 'ana@example.com', 'phone' => '3000000000'] as $col => $plain) {
+            $this->assertStringNotContainsString($plain, (string) $raw[$col], "$col debe estar cifrado en la base");
+        }
+        $fresh = $e->fresh();
+        $this->assertSame('Ana Pérez', $fresh->full_name);
+        $this->assertStringNotContainsString('Ana', $fresh->toJson());
+        $this->assertStringNotContainsString('1110555123', $fresh->toJson());
+    }
+
     public function test_student_cannot_be_enrolled_twice_in_same_program_and_period(): void
     {
         $row = ['period_id' => $this->period, 'student_key' => Pseudonym::key('77'), 'program_id' => $this->program->id, 'cat_id' => $this->cat->id];

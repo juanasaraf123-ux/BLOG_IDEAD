@@ -11,6 +11,10 @@ class Enrollment extends Model
     protected $guarded = ['id'];
 
     protected $casts = [
+        'document_number' => 'encrypted',
+        'full_name' => 'encrypted',
+        'email' => 'encrypted',
+        'phone' => 'encrypted',
         'is_new' => 'boolean',
         'is_student_representative' => 'boolean',
         'academic_average' => 'float',
@@ -18,7 +22,7 @@ class Enrollment extends Model
     ];
 
     /** Datos sensibles: nunca se serializan por defecto. */
-    protected $hidden = ['special_population'];
+    protected $hidden = ['document_number', 'full_name', 'email', 'phone', 'special_population'];
 
     public function period() { return $this->belongsTo(AcademicPeriod::class, 'period_id'); }
     public function program() { return $this->belongsTo(Program::class); }
