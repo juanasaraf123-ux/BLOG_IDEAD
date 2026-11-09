@@ -137,7 +137,7 @@ export function IndicatorCard({ meta, filters }: { meta: IndicatorMeta; filters:
               {view === 'chart' ? (Visual({ m: meta, d }) ?? <DataTable rows={d.rows} columns={columns} caption={meta.name} searchable={false} />)
                 : <DataTable rows={d.rows} columns={columns} caption={meta.name} csvName={meta.code} />}
             </div>
-            {d.breakdown.length > 0 && view === 'chart' && <p className="mt-2 text-xs text-muted">Desagregación del período {d.selected_period}. Use el filtro «Período» para consultar otros.</p>}
+            {d.breakdown.length > 0 && view === 'chart' && !['line', 'stacked'].includes(meta.chart_type) && <p className="mt-2 text-xs text-muted">Desagregación del período {d.selected_period}. Use el filtro «Período» para consultar otros.</p>}
           </>
         )}
         {meta.widget && <div className={numeric ? 'mt-6' : ''}><Widget type={meta.widget} filters={filters} /></div>}

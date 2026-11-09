@@ -64,7 +64,8 @@ abstract class ResourceController extends Controller
         if ($this->viewPermission === '') {
             return; // catálogo de referencia legible por cualquier funcionario autenticado
         }
-        abort_unless($request->user()->hasPermission($this->viewPermission) || $request->user()->hasPermission($this->editPermission), 403, 'No tiene permiso para consultar este recurso.');
+        $u = $request->user();
+        abort_unless($u->hasPermission($this->viewPermission) || $u->hasPermission($this->editPermission) || ($this->publishPermission && $u->hasPermission($this->publishPermission)), 403, 'No tiene permiso para consultar este recurso.');
     }
 
     protected function authorizeEdit(Request $request, ?Model $item = null): void

@@ -93,7 +93,11 @@ class IndicatorQuery
                     'value' => $r->is_suppressed ? null : $r->value,
                     'suppressed' => (bool) $r->is_suppressed,
                     'department_code' => $groupCol === 'department_id' ? $r->department?->code : null,
-                ])->sortByDesc('value')->values()->all();
+                ]);
+            // Categorías de un clasificador conservan su orden natural (edad, estrato, semestre…); el resto se ordena por valor.
+            $breakdown = ($groupCol === 'classifier_item_id'
+                ? $breakdown->sortBy(fn ($b) => $classifier?->items->firstWhere('id', $b['key'])?->sort ?? 0)
+                : $breakdown->sortByDesc('value'))->values()->all();
         }
 
         // Serie por grupo (para líneas múltiples o barras apiladas en el tiempo), limitada a 12 grupos.

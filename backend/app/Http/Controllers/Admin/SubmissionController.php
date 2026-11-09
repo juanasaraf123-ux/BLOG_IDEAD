@@ -50,7 +50,9 @@ class SubmissionController extends Controller
     public function show(Request $request, int $id)
     {
         $this->canSee($request);
-        $s = $this->scoped($request)->with(['values', 'reviews.reviewer:id,name', 'indicator.classifier.items', 'sourceFile', 'publisher:id,name'])->findOrFail($id);
+        $s = $this->scoped($request)->with(['values', 'reviews.reviewer:id,name', 'sourceFile', 'publisher:id,name'])->findOrFail($id);
+        // Ficha completa del indicador (dimensiones admitidas y categorías) para el editor de valores.
+        $s->setRelation('indicator', Indicator::with('classifier.items')->find($s->indicator_id));
 
         return $s;
     }

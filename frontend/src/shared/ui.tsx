@@ -1,17 +1,17 @@
 import { useCallback, useEffect, useRef, useState, type ReactNode } from 'react';
 import { Icon } from './icons';
-import { errorText } from './api';
+import { ApiError, errorText } from './api';
 
 /** Hook de carga de datos con estados (cargando / error / datos) y recarga. */
 export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]) {
-  const [state, setState] = useState<{ data: T | null; error: string | null; loading: boolean }>({ data: null, error: null, loading: true });
+  const [state, setState] = useState<{ data: T | null; error: string | null; loading: boolean; status: number | null }>({ data: null, error: null, loading: true, status: null });
   const seq = useRef(0);
   const run = useCallback(() => {
     const id = ++seq.current;
     setState((s) => ({ ...s, loading: true, error: null }));
     fn().then(
-      (data) => id === seq.current && setState({ data, error: null, loading: false }),
-      (e) => id === seq.current && setState({ data: null, error: errorText(e), loading: false }),
+      (data) => id === seq.current && setState({ data, error: null, loading: false, status: 200 }),
+      (e) => id === seq.current && setState({ data: null, error: e instanceof ApiError && e.status === 404 ? 'No encontrado' : errorText(e), loading: false, status: e instanceof ApiError ? e.status : 0 }),
     );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps);

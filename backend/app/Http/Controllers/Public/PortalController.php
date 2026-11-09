@@ -369,7 +369,7 @@ class PortalController extends Controller
         $data['figures'] = $figures;
         $data['projects'] = $this->publishedEntity(Project::query())->whereHas('cats', fn ($q) => $q->where('cats.id', $c->id))->get(['id', 'slug', 'name', 'status', 'progress_pct', 'is_demo']);
         $data['news'] = $this->newsQuery()->where('cat_id', $c->id)->orderByDesc('publish_at')->limit(4)->get()->map(fn ($n) => $this->newsCard($n));
-        $data['events'] = $this->published(Event::query())->where('cat_id', $c->id)->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(4)->get()->map(fn ($e) => $this->eventCard($e));
+        $data['activities'] = $this->published(Event::query())->where('cat_id', $c->id)->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(4)->get()->map(fn ($e) => $this->eventCard($e));
         $data['media'] = $this->published(MediaItem::query())->with('file')->where('cat_id', $c->id)->latest('publish_at')->limit(8)->get()->map(fn ($m) => $this->mediaCard($m));
 
         return $data;

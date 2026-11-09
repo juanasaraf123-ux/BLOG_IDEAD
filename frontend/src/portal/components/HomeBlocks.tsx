@@ -92,7 +92,9 @@ export function KpiGrid({ items }: { items: Highlight[] }) {
 
 /** Panel «CAT IBAGUÉ» + mapa (boceto): selección de CAT o departamento y cifras del centro. */
 export function CatCoverage({ cats }: { cats: CatSummary[] }) {
-  const [slug, setSlug] = useState<string>(cats[0]?.slug ?? '');
+  // CAT inicial: el de mayor matrícula publicada (en el boceto, CAT Ibagué).
+  const initial = [...cats].sort((a, b) => (b.summary.students?.value ?? -1) - (a.summary.students?.value ?? -1))[0];
+  const [slug, setSlug] = useState<string>(initial?.slug ?? '');
   const [dept, setDept] = useState<string | null>(null);
   const cat = cats.find((c) => c.slug === slug) ?? cats[0];
   const byDept = useMemo(() => {

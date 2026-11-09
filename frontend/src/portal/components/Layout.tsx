@@ -7,9 +7,9 @@ import { useSite } from '../site';
 export function Logo() {
   const site = useSite();
   return (
-    <Link to="/" className="flex items-center gap-3" aria-label="Inicio — IDEAD, Universidad del Tolima">
+    <Link to="/" className="flex shrink-0 items-center gap-3" aria-label="Inicio — IDEAD, Universidad del Tolima">
       <img src={site?.settings.logo_url ?? '/img/logo-ut-temporal.png'} alt="Universidad del Tolima — Conocimiento que transforma" className="h-11 w-auto md:h-14" />
-      <span className="hidden border-l border-gray-300 pl-3 text-[0.72rem] leading-tight font-medium text-ink uppercase sm:block md:text-[0.8rem]">
+      <span className="hidden shrink-0 border-l border-gray-300 pl-3 text-[0.72rem] leading-tight font-medium whitespace-nowrap text-ink uppercase sm:block md:text-[0.78rem]">
         Instituto de<br />Educación<br />a Distancia
       </span>
     </Link>
@@ -41,11 +41,11 @@ function StatsMenu({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <li ref={ref} className="relative" onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}>
       <button type="button" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)}
-        className={`flex items-center gap-1 py-2 text-[0.92rem] font-medium hover:text-ut-red ${active ? 'text-ut-red' : 'text-[#4a4f55]'}`}>
+        className={`flex items-center gap-1 py-2 text-[0.9rem] font-medium whitespace-nowrap hover:text-ut-red ${active ? 'text-ut-red' : 'text-[#4a4f55]'}`}>
         Estadísticas <Icon name="chevronDown" className={`transition ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="fade-in z-40 mt-1 w-full rounded-xl border border-line bg-white p-2 shadow-xl lg:absolute lg:left-1/2 lg:w-[34rem] lg:-translate-x-1/2">
+        <div className="fade-in z-40 mt-1 w-full rounded-xl border border-line bg-white p-2 shadow-xl min-[1360px]:absolute min-[1360px]:left-1/2 min-[1360px]:w-[34rem] min-[1360px]:-translate-x-1/2">
           <Link to="/estadisticas" onClick={onNavigate} className="mb-1 block rounded-lg px-3 py-2 font-semibold text-ut-red hover:bg-ut-red-50">Todos los indicadores →</Link>
           <ul className="grid gap-0.5 sm:grid-cols-2">
             {site?.modules.map((m) => (
@@ -84,29 +84,29 @@ export function Header() {
   const { pathname } = useLocation();
   useEffect(() => setOpen(false), [pathname]);
   const linkCls = ({ isActive }: { isActive: boolean }) =>
-    `relative block py-2 text-[0.92rem] font-medium hover:text-ut-red ${isActive ? 'text-ut-red after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:bg-ut-red' : 'text-[#4a4f55]'}`;
+    `relative block py-2 text-[0.9rem] font-medium whitespace-nowrap hover:text-ut-red ${isActive ? 'text-ut-red after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:bg-ut-red' : 'text-[#4a4f55]'}`;
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-white/95 backdrop-blur">
       <div className="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 lg:px-8">
         <Logo />
-        <nav aria-label="Menú principal" className="ml-auto hidden xl:block">
-          <ul className="flex items-center gap-6 2xl:gap-8">
+        <nav aria-label="Menú principal" className="ml-auto hidden min-[1360px]:block">
+          <ul className="flex items-center gap-4 2xl:gap-7">
             {NAV.map((n) => <li key={n.to}><NavLink to={n.to} end={n.end} className={linkCls}>{n.label}</NavLink></li>)}
             <StatsMenu />
             <li><NavLink to="/transparencia" className={linkCls}>Transparencia</NavLink></li>
             <li><NavLink to="/sobre-idead" className={linkCls}>Sobre IDEAD</NavLink></li>
           </ul>
         </nav>
-        <SearchBox className="ml-auto hidden w-60 xl:ml-4 xl:flex 2xl:w-64" />
-        <a href="/admin/" className="hidden items-center gap-1.5 rounded-full border border-ut-red px-3 py-1.5 text-sm font-semibold text-ut-red hover:bg-ut-red hover:text-white xl:flex" title="Acceso para funcionarios autorizados">
-          <Icon name="lock" /> Funcionarios
+        <SearchBox className="ml-auto hidden w-48 min-[1360px]:ml-3 min-[1360px]:flex 2xl:w-64" />
+        <a href="/admin/" className="hidden shrink-0 items-center gap-1.5 rounded-full border border-ut-red p-2 text-sm font-semibold text-ut-red hover:bg-ut-red hover:text-white min-[1360px]:flex 2xl:px-3 2xl:py-1.5" title="Acceso para funcionarios autorizados" aria-label="Acceso funcionarios">
+          <Icon name="lock" /> <span className="hidden 2xl:inline">Funcionarios</span>
         </a>
-        <button className="ml-auto rounded-lg p-2 text-2xl text-ink xl:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setOpen((o) => !o)}>
+        <button className="ml-auto rounded-lg p-2 text-2xl text-ink min-[1360px]:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setOpen((o) => !o)}>
           <Icon name={open ? 'close' : 'menu'} />
         </button>
       </div>
       {open && (
-        <div id="mobile-menu" className="fade-in max-h-[80vh] overflow-y-auto border-t border-line bg-white px-4 pb-6 xl:hidden">
+        <div id="mobile-menu" className="fade-in max-h-[80vh] overflow-y-auto border-t border-line bg-white px-4 pb-6 min-[1360px]:hidden">
           <SearchBox className="my-3 flex" />
           <nav aria-label="Menú principal móvil">
             <ul className="divide-y divide-line">

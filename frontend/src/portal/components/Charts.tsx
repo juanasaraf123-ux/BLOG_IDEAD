@@ -30,7 +30,7 @@ export function TrendChart({ data, valueType, name }: { data: { period: string; 
         <XAxis dataKey="period" tick={AXIS} tickLine={false} axisLine={{ stroke: '#d6d3d1' }} />
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={64} tickFormatter={shortAxis(valueType)} />
         <Tooltip {...tip(valueType)} />
-        <Line type="monotone" dataKey="value" name={name} stroke={SERIES[0]} strokeWidth={2} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }} connectNulls={false} isAnimationActive={false} />
+        <Line type="linear" dataKey="value" name={name} stroke={SERIES[0]} strokeWidth={2} dot={false} activeDot={{ r: 5, strokeWidth: 2, stroke: '#fff' }} connectNulls={false} isAnimationActive={false} />
       </LineChart>
     </ResponsiveContainer>
   );
@@ -61,7 +61,7 @@ export function GroupSeriesChart({ data, keys, valueType, stacked }: { data: Rec
         <YAxis tick={AXIS} tickLine={false} axisLine={false} width={64} tickFormatter={shortAxis(valueType)} />
         <Tooltip {...tip(valueType)} />
         <Legend wrapperStyle={{ fontSize: 13 }} iconType="plainline" />
-        {shown.map((k, i) => <Line key={k} type="monotone" dataKey={k} stroke={SERIES[i]} strokeWidth={2} dot={false} activeDot={{ r: 5 }} isAnimationActive={false} />)}
+        {shown.map((k, i) => <Line key={k} type="linear" dataKey={k} stroke={SERIES[i]} strokeWidth={2} dot={false} activeDot={{ r: 5 }} isAnimationActive={false} />)}
       </LineChart>
     </ResponsiveContainer>
   );
@@ -99,19 +99,21 @@ export function DistributionBars({ data, valueType }: { data: { label: string; v
     <div className="space-y-5">
       {[...groups.entries()].map(([g, items]) => {
         const total = items.reduce((s, x) => s + (x.value ?? 0), 0);
+        // Más de 8 categorías (p. ej. semestres, ordinales): rampa secuencial de un solo tono en lugar de repetir colores.
+        const color = (i: number) => (items.length <= SERIES.length ? SERIES[i] : `color-mix(in oklab, #c51718 ${Math.round(25 + (75 * i) / (items.length - 1))}%, #f6e3e3)`);
         return (
           <div key={g}>
             <p className="mb-1.5 text-sm font-bold text-ink">{g}</p>
             <div className="flex h-7 w-full gap-[2px] overflow-hidden rounded" role="img" aria-label={`${g}: ${items.map((x) => `${x.label} ${total ? Math.round(((x.value ?? 0) / total) * 100) : 0}%`).join(', ')}`}>
               {items.map((x, i) => {
                 const pct = total ? ((x.value ?? 0) / total) * 100 : 0;
-                return pct > 0 ? <div key={x.label} title={`${x.label}: ${fmtValue(x.value, valueType)} (${pct.toFixed(1)} %)`} style={{ width: `${pct}%`, background: SERIES[i % SERIES.length] }} /> : null;
+                return pct > 0 ? <div key={x.label} title={`${x.label}: ${fmtValue(x.value, valueType)} (${pct.toFixed(1)} %)`} style={{ width: `${pct}%`, background: color(i) }} /> : null;
               })}
             </div>
             <ul className="mt-1.5 flex flex-wrap gap-x-4 gap-y-1 text-xs text-ink">
               {items.map((x, i) => (
                 <li key={x.label} className="flex items-center gap-1.5">
-                  <span className="h-2.5 w-2.5 rounded-sm" style={{ background: SERIES[i % SERIES.length] }} aria-hidden />
+                  <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color(i) }} aria-hidden />
                   {x.label}: <strong>{x.value === null ? 'Reservado' : `${total ? (((x.value ?? 0) / total) * 100).toFixed(1) : 0} %`}</strong>
                   <span className="text-muted">({fmtValue(x.value, valueType)})</span>
                 </li>
