@@ -1,0 +1,1323 @@
+{
+ "tipo_acceso": {
+  "name": "Etapa del proceso de acceso",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "inscritos",
+    "label": "Inscritos"
+   },
+   {
+    "code": "admitidos",
+    "label": "Admitidos"
+   },
+   {
+    "code": "nuevos",
+    "label": "Nuevos matriculados"
+   }
+  ]
+ },
+ "tasa_acceso": {
+  "name": "Indicador de acceso",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "admision",
+    "label": "Admitidos / inscritos (%)"
+   },
+   {
+    "code": "ocupacion",
+    "label": "Nuevos / cupos aprobados (%)"
+   }
+  ]
+ },
+ "perfil_estudiante": {
+  "name": "Variable sociodemográfica",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "sexo_f",
+    "label": "Sexo: Femenino"
+   },
+   {
+    "code": "sexo_m",
+    "label": "Sexo: Masculino"
+   },
+   {
+    "code": "sexo_ni",
+    "label": "Sexo: Otro / no informa"
+   },
+   {
+    "code": "edad_m20",
+    "label": "Edad: Menos de 20"
+   },
+   {
+    "code": "edad_20_24",
+    "label": "Edad: 20 a 24"
+   },
+   {
+    "code": "edad_25_29",
+    "label": "Edad: 25 a 29"
+   },
+   {
+    "code": "edad_30_34",
+    "label": "Edad: 30 a 34"
+   },
+   {
+    "code": "edad_35_39",
+    "label": "Edad: 35 a 39"
+   },
+   {
+    "code": "edad_40m",
+    "label": "Edad: 40 o más"
+   },
+   {
+    "code": "ecivil_soltero",
+    "label": "Estado civil: Soltero(a)"
+   },
+   {
+    "code": "ecivil_casado",
+    "label": "Estado civil: Casado(a)"
+   },
+   {
+    "code": "ecivil_union",
+    "label": "Estado civil: Unión libre"
+   },
+   {
+    "code": "ecivil_separado",
+    "label": "Estado civil: Separado(a)/divorciado(a)"
+   },
+   {
+    "code": "ecivil_viudo",
+    "label": "Estado civil: Viudo(a)"
+   },
+   {
+    "code": "ecivil_ni",
+    "label": "Estado civil: No informa"
+   },
+   {
+    "code": "estrato_1",
+    "label": "Estrato: 1"
+   },
+   {
+    "code": "estrato_2",
+    "label": "Estrato: 2"
+   },
+   {
+    "code": "estrato_3",
+    "label": "Estrato: 3"
+   },
+   {
+    "code": "estrato_4",
+    "label": "Estrato: 4"
+   },
+   {
+    "code": "estrato_5",
+    "label": "Estrato: 5"
+   },
+   {
+    "code": "estrato_6",
+    "label": "Estrato: 6"
+   },
+   {
+    "code": "estrato_ni",
+    "label": "Estrato: No informa"
+   },
+   {
+    "code": "zona_urbana",
+    "label": "Zona de residencia: Urbana"
+   },
+   {
+    "code": "zona_rural",
+    "label": "Zona de residencia: Rural"
+   }
+  ]
+ },
+ "procedencia": {
+  "name": "Procedencia y avance",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "proc_mismo",
+    "label": "Residencia: Mismo municipio del CAT"
+   },
+   {
+    "code": "proc_otro",
+    "label": "Residencia: Otro municipio"
+   },
+   {
+    "code": "sem_1",
+    "label": "Semestre cursado: Semestre 1"
+   },
+   {
+    "code": "sem_2",
+    "label": "Semestre cursado: Semestre 2"
+   },
+   {
+    "code": "sem_3",
+    "label": "Semestre cursado: Semestre 3"
+   },
+   {
+    "code": "sem_4",
+    "label": "Semestre cursado: Semestre 4"
+   },
+   {
+    "code": "sem_5",
+    "label": "Semestre cursado: Semestre 5"
+   },
+   {
+    "code": "sem_6",
+    "label": "Semestre cursado: Semestre 6"
+   },
+   {
+    "code": "sem_7",
+    "label": "Semestre cursado: Semestre 7"
+   },
+   {
+    "code": "sem_8",
+    "label": "Semestre cursado: Semestre 8"
+   },
+   {
+    "code": "sem_9",
+    "label": "Semestre cursado: Semestre 9"
+   },
+   {
+    "code": "sem_10",
+    "label": "Semestre cursado: Semestre 10"
+   }
+  ]
+ },
+ "poblacion": {
+  "name": "Población de especial protección",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "indigena",
+    "label": "Comunidades indígenas"
+   },
+   {
+    "code": "afro",
+    "label": "Población negra, afrocolombiana"
+   },
+   {
+    "code": "raizal",
+    "label": "Población raizal"
+   },
+   {
+    "code": "palenquera",
+    "label": "Población palenquera"
+   },
+   {
+    "code": "rrom",
+    "label": "Pueblo Rrom"
+   },
+   {
+    "code": "discapacidad",
+    "label": "Personas con discapacidad"
+   },
+   {
+    "code": "victima",
+    "label": "Víctimas del conflicto armado"
+   },
+   {
+    "code": "otra",
+    "label": "Otras poblaciones registradas"
+   }
+  ]
+ },
+ "desempeno": {
+  "name": "Medida de desempeño y representación",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "promedio",
+    "label": "Promedio académico general"
+   },
+   {
+    "code": "representantes",
+    "label": "Representantes estudiantiles"
+   }
+  ]
+ },
+ "no_continuidad": {
+  "name": "Situación de no continuidad",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "abandono",
+    "label": "Abandono o interrupción"
+   },
+   {
+    "code": "desercion",
+    "label": "Deserción"
+   },
+   {
+    "code": "movilidad",
+    "label": "Movilidad"
+   },
+   {
+    "code": "perdida",
+    "label": "Pérdida de la condición de estudiante"
+   }
+  ]
+ },
+ "reintegro": {
+  "name": "Reintegros y requisitos de grado",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "reintegros",
+    "label": "Reintegros"
+   },
+   {
+    "code": "pendientes",
+    "label": "Con requisitos pendientes para graduarse"
+   }
+  ]
+ },
+ "prueba_estado": {
+  "name": "Prueba de Estado",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "saber_pro",
+    "label": "Saber Pro — puntaje global promedio"
+   },
+   {
+    "code": "saber_tyt",
+    "label": "Saber TyT — puntaje global promedio"
+   }
+  ]
+ },
+ "opcion_grado": {
+  "name": "Opción de grado",
+  "is_partition": true,
+  "items": []
+ },
+ "vinculacion_docente": {
+  "name": "Tipo de vinculación docente",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "carrera",
+    "label": "Profesores de carrera (planta)"
+   },
+   {
+    "code": "catedra",
+    "label": "Catedráticos"
+   },
+   {
+    "code": "otra",
+    "label": "Otra modalidad"
+   }
+  ]
+ },
+ "formacion": {
+  "name": "Nivel máximo de formación",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "profesional",
+    "label": "Profesional"
+   },
+   {
+    "code": "especializacion",
+    "label": "Especialización"
+   },
+   {
+    "code": "maestria",
+    "label": "Maestría"
+   },
+   {
+    "code": "doctorado",
+    "label": "Doctorado"
+   }
+  ]
+ },
+ "perfil_docente": {
+  "name": "Variable de perfil docente",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "sexo_f",
+    "label": "Sexo: Femenino"
+   },
+   {
+    "code": "sexo_m",
+    "label": "Sexo: Masculino"
+   },
+   {
+    "code": "sexo_ni",
+    "label": "Sexo: Otro / no informa"
+   },
+   {
+    "code": "edad_m30",
+    "label": "Edad: Menos de 30"
+   },
+   {
+    "code": "edad_30_39",
+    "label": "Edad: 30 a 39"
+   },
+   {
+    "code": "edad_40_49",
+    "label": "Edad: 40 a 49"
+   },
+   {
+    "code": "edad_50_59",
+    "label": "Edad: 50 a 59"
+   },
+   {
+    "code": "edad_60m",
+    "label": "Edad: 60 o más"
+   },
+   {
+    "code": "cat_auxiliar",
+    "label": "Categoría (carrera): Auxiliar"
+   },
+   {
+    "code": "cat_asistente",
+    "label": "Categoría (carrera): Asistente"
+   },
+   {
+    "code": "cat_asociado",
+    "label": "Categoría (carrera): Asociado"
+   },
+   {
+    "code": "cat_titular",
+    "label": "Categoría (carrera): Titular"
+   },
+   {
+    "code": "antig_m5",
+    "label": "Antigüedad (carrera): Menos de 5 años"
+   },
+   {
+    "code": "antig_5_9",
+    "label": "Antigüedad (carrera): 5 a 9 años"
+   },
+   {
+    "code": "antig_10_19",
+    "label": "Antigüedad (carrera): 10 a 19 años"
+   },
+   {
+    "code": "antig_20m",
+    "label": "Antigüedad (carrera): 20 años o más"
+   }
+  ]
+ },
+ "carga": {
+  "name": "Medida de carga académica",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "cursos",
+    "label": "Cursos asignados"
+   },
+   {
+    "code": "docentes_con_carga",
+    "label": "Docentes con carga asignada"
+   }
+  ]
+ },
+ "relacion_ed": {
+  "name": "Relación estudiantes-docentes",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "total",
+    "label": "Estudiantes por docente (total)"
+   },
+   {
+    "code": "carrera",
+    "label": "Estudiantes por docente de carrera"
+   },
+   {
+    "code": "catedra",
+    "label": "Estudiantes por docente catedrático"
+   }
+  ]
+ },
+ "part_investigacion": {
+  "name": "Tipo de participación investigativa",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "grupos",
+    "label": "Grupos de investigación"
+   },
+   {
+    "code": "semilleros",
+    "label": "Semilleros"
+   },
+   {
+    "code": "proyectos",
+    "label": "Proyectos"
+   },
+   {
+    "code": "eventos",
+    "label": "Eventos académicos"
+   },
+   {
+    "code": "produccion",
+    "label": "Producción intelectual"
+   }
+  ]
+ },
+ "cualificacion": {
+  "name": "Cualificación y estímulos",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "seminario",
+    "label": "Seminario de docencia / cursos"
+   },
+   {
+    "code": "convocatorias",
+    "label": "Beneficiarios de convocatorias"
+   },
+   {
+    "code": "bienestar",
+    "label": "Bienestar"
+   },
+   {
+    "code": "estimulos",
+    "label": "Estímulos"
+   },
+   {
+    "code": "reconocimientos",
+    "label": "Reconocimientos"
+   }
+  ]
+ },
+ "medida_graduados": {
+  "name": "Medida de graduación",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "personas",
+    "label": "Personas graduadas"
+   },
+   {
+    "code": "titulos",
+    "label": "Títulos otorgados"
+   }
+  ]
+ },
+ "perfil_graduado": {
+  "name": "Variable de perfil del graduado",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "sexo_f",
+    "label": "Sexo: Femenino"
+   },
+   {
+    "code": "sexo_m",
+    "label": "Sexo: Masculino"
+   },
+   {
+    "code": "sexo_ni",
+    "label": "Sexo: Otro / no informa"
+   },
+   {
+    "code": "promedio",
+    "label": "Promedio académico final"
+   }
+  ]
+ },
+ "trayectoria": {
+  "name": "Medida de trayectoria",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "graduacion_cohorte",
+    "label": "Graduación por cohorte (%)"
+   },
+   {
+    "code": "tiempo_titulo",
+    "label": "Tiempo promedio hasta el título (semestres)"
+   },
+   {
+    "code": "vinculados",
+    "label": "Graduados con vinculación laboral"
+   },
+   {
+    "code": "emprendimiento",
+    "label": "Graduados con emprendimiento"
+   }
+  ]
+ },
+ "part_graduados": {
+  "name": "Participación de graduados",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "eventos",
+    "label": "Eventos"
+   },
+   {
+    "code": "bienestar",
+    "label": "Bienestar"
+   },
+   {
+    "code": "actividades",
+    "label": "Actividades institucionales"
+   }
+  ]
+ },
+ "tipo_personal": {
+  "name": "Tipo de personal",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "administrativo",
+    "label": "Personal administrativo vinculado"
+   },
+   {
+    "code": "contratista",
+    "label": "Contratistas de prestación de servicios"
+   }
+  ]
+ },
+ "vinculacion_admin": {
+  "name": "Tipo de vinculación administrativa",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "carrera",
+    "label": "Carrera administrativa"
+   },
+   {
+    "code": "libre",
+    "label": "Libre nombramiento y remoción"
+   },
+   {
+    "code": "provisional",
+    "label": "Provisional"
+   },
+   {
+    "code": "temporal",
+    "label": "Temporal"
+   },
+   {
+    "code": "contratista",
+    "label": "Contratista"
+   }
+  ]
+ },
+ "perfil_admin": {
+  "name": "Variable de perfil administrativo",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "sexo_f",
+    "label": "Sexo: Femenino"
+   },
+   {
+    "code": "sexo_m",
+    "label": "Sexo: Masculino"
+   },
+   {
+    "code": "sexo_ni",
+    "label": "Sexo: Otro / no informa"
+   },
+   {
+    "code": "edad_m30",
+    "label": "Edad: Menos de 30"
+   },
+   {
+    "code": "edad_30_39",
+    "label": "Edad: 30 a 39"
+   },
+   {
+    "code": "edad_40_49",
+    "label": "Edad: 40 a 49"
+   },
+   {
+    "code": "edad_50_59",
+    "label": "Edad: 50 a 59"
+   },
+   {
+    "code": "edad_60m",
+    "label": "Edad: 60 o más"
+   },
+   {
+    "code": "formacion_bachiller",
+    "label": "Formación: Bachiller"
+   },
+   {
+    "code": "formacion_tecnico",
+    "label": "Formación: Técnico/tecnólogo"
+   },
+   {
+    "code": "formacion_profesional",
+    "label": "Formación: Profesional"
+   },
+   {
+    "code": "formacion_posgrado",
+    "label": "Formación: Posgrado"
+   },
+   {
+    "code": "antig_m5",
+    "label": "Antigüedad: Menos de 5 años"
+   },
+   {
+    "code": "antig_5_9",
+    "label": "Antigüedad: 5 a 9 años"
+   },
+   {
+    "code": "antig_10_19",
+    "label": "Antigüedad: 10 a 19 años"
+   },
+   {
+    "code": "antig_20m",
+    "label": "Antigüedad: 20 años o más"
+   }
+  ]
+ },
+ "desarrollo_personal": {
+  "name": "Medida de desarrollo del personal",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "total",
+    "label": "Total de personal"
+   },
+   {
+    "code": "capacitacion",
+    "label": "Participantes en capacitaciones"
+   },
+   {
+    "code": "bienestar",
+    "label": "Participantes en bienestar"
+   }
+  ]
+ },
+ "medida_cobertura": {
+  "name": "Medida de cobertura territorial",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "cat",
+    "label": "CAT con actividad académica"
+   },
+   {
+    "code": "municipios",
+    "label": "Municipios con presencia"
+   },
+   {
+    "code": "departamentos",
+    "label": "Departamentos con presencia"
+   }
+  ]
+ },
+ "tipo_sede": {
+  "name": "Carácter de la sede",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "publica",
+    "label": "Pública"
+   },
+   {
+    "code": "privada",
+    "label": "Privada"
+   },
+   {
+    "code": "propia",
+    "label": "Propia"
+   }
+  ]
+ },
+ "espacio": {
+  "name": "Tipo de espacio",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "aula",
+    "label": "Aulas"
+   },
+   {
+    "code": "laboratorio",
+    "label": "Laboratorios"
+   },
+   {
+    "code": "sala_computo",
+    "label": "Salas de cómputo"
+   },
+   {
+    "code": "biblioteca",
+    "label": "Bibliotecas"
+   },
+   {
+    "code": "auditorio",
+    "label": "Auditorios"
+   },
+   {
+    "code": "deportivo",
+    "label": "Espacios deportivos"
+   },
+   {
+    "code": "bienestar",
+    "label": "Espacios de bienestar"
+   }
+  ]
+ },
+ "tecnologia": {
+  "name": "Recurso tecnológico",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "equipos",
+    "label": "Equipos de cómputo"
+   },
+   {
+    "code": "conectividad_mbps",
+    "label": "Conectividad (Mbps)"
+   },
+   {
+    "code": "capacidad",
+    "label": "Capacidad de los espacios (puestos)"
+   }
+  ]
+ },
+ "hito_cat": {
+  "name": "Tipo de hito",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "apertura",
+    "label": "Apertura"
+   },
+   {
+    "code": "reactivacion",
+    "label": "Reactivación"
+   },
+   {
+    "code": "cierre",
+    "label": "Cierre"
+   }
+  ]
+ },
+ "beneficiarios_bienestar": {
+  "name": "Beneficiarios por estamento",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "unicas_est",
+    "label": "Personas únicas: Estudiantes"
+   },
+   {
+    "code": "unicas_doc",
+    "label": "Personas únicas: Docentes"
+   },
+   {
+    "code": "unicas_adm",
+    "label": "Personas únicas: Administrativos"
+   },
+   {
+    "code": "unicas_grad",
+    "label": "Personas únicas: Graduados"
+   },
+   {
+    "code": "part_est",
+    "label": "Participaciones: Estudiantes"
+   },
+   {
+    "code": "part_doc",
+    "label": "Participaciones: Docentes"
+   },
+   {
+    "code": "part_adm",
+    "label": "Participaciones: Administrativos"
+   },
+   {
+    "code": "part_grad",
+    "label": "Participaciones: Graduados"
+   }
+  ]
+ },
+ "servicio_bienestar": {
+  "name": "Servicio de bienestar / TUIDEAD",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "orientacion",
+    "label": "Orientación"
+   },
+   {
+    "code": "psicologia",
+    "label": "Psicología"
+   },
+   {
+    "code": "enfermeria",
+    "label": "Enfermería"
+   },
+   {
+    "code": "crai",
+    "label": "CRAI"
+   },
+   {
+    "code": "deporte",
+    "label": "Deporte"
+   },
+   {
+    "code": "cultura",
+    "label": "Cultura"
+   },
+   {
+    "code": "otros",
+    "label": "Otras líneas vigentes"
+   }
+  ]
+ },
+ "tipo_actividad": {
+  "name": "Tipo de actividad",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "deportiva",
+    "label": "Deportiva"
+   },
+   {
+    "code": "cultural",
+    "label": "Cultural"
+   },
+   {
+    "code": "semana_idead",
+    "label": "Semana del IDEAD"
+   },
+   {
+    "code": "otro",
+    "label": "Otros eventos institucionales"
+   }
+  ]
+ },
+ "apoyos": {
+  "name": "Apoyo o medición",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "socioeconomico",
+    "label": "Apoyos socioeconómicos"
+   },
+   {
+    "code": "estimulos",
+    "label": "Estímulos"
+   },
+   {
+    "code": "satisfaccion",
+    "label": "Satisfacción con los servicios (%)"
+   }
+  ]
+ },
+ "grupos_semilleros": {
+  "name": "Tipo",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "grupos",
+    "label": "Grupos de investigación"
+   },
+   {
+    "code": "semilleros",
+    "label": "Semilleros de investigación"
+   }
+  ]
+ },
+ "participantes_inv": {
+  "name": "Participantes",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "docentes",
+    "label": "Docentes"
+   },
+   {
+    "code": "estudiantes",
+    "label": "Estudiantes"
+   }
+  ]
+ },
+ "estado_inv": {
+  "name": "Estado del proyecto",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "desarrollo",
+    "label": "En desarrollo"
+   },
+   {
+    "code": "vigente",
+    "label": "Vigente"
+   },
+   {
+    "code": "finalizado",
+    "label": "Finalizado"
+   }
+  ]
+ },
+ "tipo_producto": {
+  "name": "Tipo de producto",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "articulo",
+    "label": "Artículos"
+   },
+   {
+    "code": "libro",
+    "label": "Libros"
+   },
+   {
+    "code": "capitulo",
+    "label": "Capítulos de libro"
+   },
+   {
+    "code": "ponencia",
+    "label": "Ponencias"
+   },
+   {
+    "code": "creacion",
+    "label": "Productos de creación"
+   }
+  ]
+ },
+ "inv_formativa": {
+  "name": "Medida",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "trabajos_grado",
+    "label": "Trabajos de grado"
+   },
+   {
+    "code": "resultados",
+    "label": "Resultados de proyectos"
+   },
+   {
+    "code": "recursos",
+    "label": "Recursos destinados a investigación ($)"
+   }
+  ]
+ },
+ "extension": {
+  "name": "Tipo de iniciativa",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "proyectos",
+    "label": "Proyectos"
+   },
+   {
+    "code": "actividades",
+    "label": "Actividades"
+   }
+  ]
+ },
+ "beneficiarios_ext": {
+  "name": "Beneficiarios",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "personas",
+    "label": "Personas"
+   },
+   {
+    "code": "comunidades",
+    "label": "Comunidades"
+   },
+   {
+    "code": "municipios",
+    "label": "Municipios"
+   },
+   {
+    "code": "cat",
+    "label": "CAT"
+   }
+  ]
+ },
+ "formacion_continua": {
+  "name": "Tipo de oferta",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "diplomado",
+    "label": "Diplomados"
+   },
+   {
+    "code": "seminario",
+    "label": "Seminarios"
+   },
+   {
+    "code": "curso",
+    "label": "Cursos"
+   },
+   {
+    "code": "otra",
+    "label": "Otras actividades"
+   }
+  ]
+ },
+ "part_fc": {
+  "name": "Participación en formación continua",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "part_diplomado",
+    "label": "Participantes: Diplomados"
+   },
+   {
+    "code": "part_seminario",
+    "label": "Participantes: Seminarios"
+   },
+   {
+    "code": "part_curso",
+    "label": "Participantes: Cursos"
+   },
+   {
+    "code": "part_otra",
+    "label": "Participantes: Otras"
+   },
+   {
+    "code": "cert_diplomado",
+    "label": "Certificados: Diplomados"
+   },
+   {
+    "code": "cert_seminario",
+    "label": "Certificados: Seminarios"
+   },
+   {
+    "code": "cert_curso",
+    "label": "Certificados: Cursos"
+   },
+   {
+    "code": "cert_otra",
+    "label": "Certificados: Otras"
+   }
+  ]
+ },
+ "estado_presupuesto": {
+  "name": "Estado de los recursos",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "asignado",
+    "label": "Asignado"
+   },
+   {
+    "code": "comprometido",
+    "label": "Comprometido"
+   },
+   {
+    "code": "ejecutado",
+    "label": "Ejecutado"
+   }
+  ]
+ },
+ "destino": {
+  "name": "Destino del presupuesto",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "funcionamiento",
+    "label": "Funcionamiento académico"
+   },
+   {
+    "code": "infraestructura",
+    "label": "Infraestructura"
+   },
+   {
+    "code": "tecnologia",
+    "label": "Tecnología"
+   },
+   {
+    "code": "bienestar",
+    "label": "Bienestar"
+   },
+   {
+    "code": "otros",
+    "label": "Otros"
+   }
+  ]
+ },
+ "inversion": {
+  "name": "Tipo de inversión",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "infraestructura",
+    "label": "Inversión en infraestructura"
+   },
+   {
+    "code": "conectividad",
+    "label": "Inversión en conectividad"
+   },
+   {
+    "code": "por_estudiante",
+    "label": "Inversión por estudiante"
+   },
+   {
+    "code": "costo_estudiante",
+    "label": "Costo real por estudiante"
+   }
+  ]
+ },
+ "estado_proyecto": {
+  "name": "Estado del proyecto",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "radicado",
+    "label": "Radicados"
+   },
+   {
+    "code": "aprobado",
+    "label": "Aprobados"
+   },
+   {
+    "code": "en_ejecucion",
+    "label": "En ejecución"
+   },
+   {
+    "code": "finalizado",
+    "label": "Finalizados"
+   }
+  ]
+ },
+ "linea_inversion": {
+  "name": "Línea de inversión",
+  "is_partition": true,
+  "items": [
+   {
+    "code": "infraestructura",
+    "label": "Infraestructura"
+   },
+   {
+    "code": "equipos",
+    "label": "Equipos"
+   },
+   {
+    "code": "tecnologia",
+    "label": "Tecnología"
+   },
+   {
+    "code": "academia",
+    "label": "Academia"
+   },
+   {
+    "code": "bienestar",
+    "label": "Bienestar"
+   },
+   {
+    "code": "otra",
+    "label": "Otras líneas"
+   }
+  ]
+ },
+ "financiacion": {
+  "name": "Medida",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "aprobado",
+    "label": "Valor aprobado"
+   },
+   {
+    "code": "ejecutado",
+    "label": "Valor ejecutado"
+   },
+   {
+    "code": "beneficiarios",
+    "label": "Beneficiarios"
+   }
+  ]
+ },
+ "convenios": {
+  "name": "Estado del convenio",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "vigente",
+    "label": "Vigentes"
+   },
+   {
+    "code": "terminado",
+    "label": "Terminados"
+   },
+   {
+    "code": "celebrado",
+    "label": "Celebrados en el período"
+   }
+  ]
+ },
+ "metas": {
+  "name": "Eje del plan operativo",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "general",
+    "label": "Cumplimiento general"
+   }
+  ]
+ },
+ "calidad": {
+  "name": "Condición de calidad",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "registro",
+    "label": "Programas con registro calificado vigente"
+   },
+   {
+    "code": "acreditacion",
+    "label": "Programas con acreditación de alta calidad"
+   }
+  ]
+ },
+ "plan_mejora": {
+  "name": "Tipo de plan",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "institucional",
+    "label": "Plan de mejoramiento institucional"
+   },
+   {
+    "code": "academico",
+    "label": "Planes de mejoramiento académico"
+   }
+  ]
+ },
+ "plataforma": {
+  "name": "Plataforma",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "tuaula",
+    "label": "TuAula"
+   },
+   {
+    "code": "cloudlabs",
+    "label": "CloudLabs"
+   },
+   {
+    "code": "otra",
+    "label": "Otras plataformas"
+   }
+  ]
+ },
+ "satisfaccion": {
+  "name": "Medida",
+  "is_partition": false,
+  "items": [
+   {
+    "code": "satisfaccion",
+    "label": "Satisfacción con servicios académicos (%)"
+   },
+   {
+    "code": "atendidas",
+    "label": "Solicitudes atendidas (%)"
+   }
+  ]
+ }
+}

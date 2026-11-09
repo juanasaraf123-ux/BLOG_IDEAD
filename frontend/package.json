@@ -1,0 +1,39 @@
+{
+  "name": "idead-frontend",
+  "private": true,
+  "version": "1.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc -b && vite build",
+    "preview": "vite preview",
+    "test": "vitest run",
+    "typecheck": "tsc -b"
+  },
+  "dependencies": {
+    "d3-geo": "^3.1.2",
+    "qrcode": "^1.5.4",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "react-router-dom": "^7.18.5",
+    "recharts": "^3.10.1",
+    "topojson-client": "^3.1.0"
+  },
+  "devDependencies": {
+    "@tailwindcss/vite": "^4.3.5",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/d3-geo": "^3.1.1",
+    "@types/geojson": "^7946.0.16",
+    "@types/qrcode": "^1.5.6",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "@types/topojson-client": "^3.1.5",
+    "@vitejs/plugin-react": "^6.3.0",
+    "jsdom": "^31.0.0",
+    "tailwindcss": "^4.3.5",
+    "typescript": "^7.0.2",
+    "vite": "^8.3.7",
+    "vitest": "^5.1.0"
+  }
+}

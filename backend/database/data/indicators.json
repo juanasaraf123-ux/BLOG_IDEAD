@@ -1,0 +1,2187 @@
+[
+ {
+  "code": "M01-I01",
+  "module": 1,
+  "sort": 1,
+  "name": "Oferta de programas académicos",
+  "information_required": "Programas de pregrado y posgrado que oferta el IDEAD, por nivel de formación y área de conocimiento",
+  "suggested_visualization": "Cifras destacadas y listado de programas",
+  "source_text": "Página web",
+  "unit": "programas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "level",
+  "allowed_dimensions": [
+   "level",
+   "area"
+  ],
+  "classifier": null,
+  "widget": "programs",
+  "filters_text": "Nivel, Área",
+  "publication_level": "PUB",
+  "observations": "Área de conocimiento: definir clasificación (NBC SNIES / CINE-F) — validar con DARCA/SAIDEAD.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "PAGINA_WEB"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M01-I02",
+  "module": 1,
+  "sort": 2,
+  "name": "Programas disponibles por CAT",
+  "information_required": "Programas disponibles en cada CAT, diferenciando los que reciben estudiantes nuevos de los que solo tienen cohortes en curso",
+  "suggested_visualization": "Tabla consultable",
+  "source_text": "Página web y BD Matriculados",
+  "unit": "programas",
+  "value_type": "count",
+  "chart_type": "table",
+  "group_by": "cat",
+  "allowed_dimensions": [
+   "cat",
+   "department",
+   "level",
+   "program"
+  ],
+  "classifier": null,
+  "widget": "offerings",
+  "filters_text": "CAT, Depto, Nivel, Programa",
+  "publication_level": "PUB",
+  "observations": "Definir regla institucional de 'recibe estudiantes nuevos' vs. 'solo cohortes en curso'.",
+  "responsible": "DARCA",
+  "sources": [
+   "PAGINA_WEB",
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M01-I03",
+  "module": 1,
+  "sort": 3,
+  "name": "Cupos de primer ingreso",
+  "information_required": "Cupos aprobados para nuevos estudiantes por semestre, programa y CAT",
+  "suggested_visualization": "Barras o evolución histórica",
+  "source_text": "BD matriculados comparando",
+  "unit": "cupos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "program",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "level"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Fuente en Excel: 'BD matriculados comparando'. Aclarar si los cupos aprobados provienen de acuerdos del CDIDEAD.",
+  "responsible": "CDIDEAD",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M01-I04",
+  "module": 1,
+  "sort": 4,
+  "name": "Inscripción, admisión e ingreso",
+  "information_required": "Aspirantes inscritos, admitidos y nuevos matriculados por semestre",
+  "suggested_visualization": "Barras comparativas",
+  "source_text": "DARCA",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "stacked",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "level",
+   "classifier"
+  ],
+  "classifier": "tipo_acceso",
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT, Nivel",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "DARCA",
+  "sources": [
+   "DARCA"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M01-I05",
+  "module": 1,
+  "sort": 5,
+  "name": "Indicadores de acceso y ocupación de cupos",
+  "information_required": "Relación entre admitidos e inscritos, y entre estudiantes nuevos y cupos aprobados",
+  "suggested_visualization": "Porcentajes o cifras destacadas",
+  "source_text": "DARCA",
+  "unit": "porcentaje",
+  "value_type": "percent",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "tasa_acceso",
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Fórmulas propuestas (admitidos/inscritos; nuevos/cupos) PENDIENTES de validación por DARCA.",
+  "responsible": "DARCA",
+  "sources": [
+   "DARCA"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M01-I06",
+  "module": 1,
+  "sort": 6,
+  "name": "Evolución y proyección de la oferta",
+  "information_required": "Evolución de la oferta, nuevas cohortes y reapertura de programas o CAT; programas proyectados para futuras ofertas",
+  "suggested_visualization": "Línea de tiempo y listado",
+  "source_text": "Acuerdos",
+  "unit": "programas",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "program",
+  "allowed_dimensions": [
+   "program",
+   "cat"
+  ],
+  "classifier": null,
+  "widget": "list:hitos_oferta",
+  "filters_text": "Año, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Programas 'proyectados' solo si están aprobados por acto administrativo.",
+  "responsible": "CDIDEAD",
+  "sources": [
+   "ACUERDOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I01",
+  "module": 2,
+  "sort": 1,
+  "name": "Matrícula total",
+  "information_required": "Total de estudiantes matriculados, diferenciado entre pregrado y posgrado",
+  "suggested_visualization": "Cifra destacada y barras",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "level",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "cat"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Nivel, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Definir fecha de corte y tipo de matrícula (académica/financiera).",
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I02",
+  "module": 2,
+  "sort": 2,
+  "name": "Evolución de la matrícula",
+  "information_required": "Evolución de la matrícula y su crecimiento o disminución por semestre",
+  "suggested_visualization": "Gráfico de líneas",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "level",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "cat"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Nivel, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I03",
+  "module": 2,
+  "sort": 3,
+  "name": "Distribución de estudiantes",
+  "information_required": "Estudiantes por programa, CAT, municipio y departamento",
+  "suggested_visualization": "Barras, tabla o mapa",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "cat",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "department",
+   "municipality"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT, Municipio, Depto",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I04",
+  "module": 2,
+  "sort": 4,
+  "name": "Estudiantes nuevos",
+  "information_required": "Estudiantes nuevos por semestre y proporción frente al total de matriculados",
+  "suggested_visualization": "Barras y porcentaje",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "program",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "level"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I05",
+  "module": 2,
+  "sort": 5,
+  "name": "Perfil sociodemográfico estudiantil",
+  "information_required": "Caracterización: sexo, edad, estado civil, estrato y zona de residencia (rural o urbana)",
+  "suggested_visualization": "Barras o distribución porcentual",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "perfil_estudiante",
+  "widget": null,
+  "filters_text": "Semestre, Nivel, Programa, CAT",
+  "publication_level": "AGR",
+  "observations": "Supresión de celdas pequeñas (umbral k a definir).",
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I06",
+  "module": 2,
+  "sort": 6,
+  "name": "Procedencia y avance académico",
+  "information_required": "Estudiantes que viven en el mismo municipio del CAT o en otros municipios; semestre cursado",
+  "suggested_visualization": "Barras comparativas",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "procedencia",
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I07",
+  "module": 2,
+  "sort": 7,
+  "name": "Caracterización poblacional",
+  "information_required": "Caracterización poblacional agregada: comunidades étnicas, discapacidad, víctimas y otras poblaciones registradas (Especial protección constitucional)",
+  "suggested_visualization": "Barras o tabla agregada",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "poblacion",
+  "widget": null,
+  "filters_text": "Semestre, Nivel, CAT",
+  "publication_level": "AGR_S",
+  "observations": "Datos sensibles (Ley 1581/2012). Solo agregados con supresión; publicar víctimas/discapacidad requiere autorización expresa.",
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": false,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M02-I08",
+  "module": 2,
+  "sort": 8,
+  "name": "Desempeño académico y representación estudiantil",
+  "information_required": "Promedios académicos generales y número de representantes estudiantiles por programa o CAT",
+  "suggested_visualization": "Cifras y tablas",
+  "source_text": "BD matriculados, BD representantes, Acuerdo CDIDEAD / Resolución",
+  "unit": "número",
+  "value_type": "number",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "desempeno",
+  "widget": "list:representacion_estudiantil",
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "AGR",
+  "observations": "Promedios de grupos pequeños pueden identificar personas. Representantes: publicar número; nombres solo si el acto es público.",
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS",
+   "BD_REPRESENTANTES",
+   "CDIDEAD",
+   "ACUERDOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M03-I01",
+  "module": 3,
+  "sort": 1,
+  "name": "Continuidad estudiantil",
+  "information_required": "Estudiantes que continúan matriculados de un semestre a otro; evolución de la permanencia",
+  "suggested_visualization": "Gráfico de líneas",
+  "source_text": "BD matriculados",
+  "unit": "porcentaje",
+  "value_type": "percent",
+  "chart_type": "line",
+  "group_by": "program",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "cat"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Nivel, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Fórmula de tasa de continuidad PENDIENTE de validación.",
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M03-I02",
+  "module": 3,
+  "sort": 2,
+  "name": "Deserción y no continuidad",
+  "information_required": "Deserción y estudiantes que dejan de matricularse (no contar los graduados y egresados) (abandono o interrupción, Deserción, Movilidad, Pérdida condición estudiante)",
+  "suggested_visualization": "Líneas o barras",
+  "source_text": "BD matriculados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "stacked",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "no_continuidad",
+  "widget": null,
+  "filters_text": "Semestre, Nivel, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Excluir graduados y egresados. Tipos: abandono/interrupción, deserción, movilidad, pérdida de calidad de estudiante. Metodología (institucional vs. SPADIES) PENDIENTE.",
+  "responsible": "DARCA",
+  "sources": [
+   "BD_MATRICULADOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M03-I03",
+  "module": 3,
+  "sort": 3,
+  "name": "Reintegros y condiciones para graduarse",
+  "information_required": "Reintegros y estudiantes con requisitos pendientes para graduarse, con motivos agregados cuando estén disponibles",
+  "suggested_visualization": "Barras y tabla",
+  "source_text": "BD matriculados y SAIDEAD",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "reintegro",
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "SAIDEAD",
+  "sources": [
+   "BD_MATRICULADOS",
+   "SAIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M03-I04",
+  "module": 3,
+  "sort": 4,
+  "name": "Resultados de pruebas de Estado",
+  "information_required": "Resultados históricos de las pruebas Saber Pro y Saber TyT, con consulta por programa y CAT",
+  "suggested_visualization": "Líneas comparativas",
+  "source_text": "ICFES",
+  "unit": "puntaje",
+  "value_type": "number",
+  "chart_type": "line",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "prueba_estado",
+  "widget": null,
+  "filters_text": "Año, Nivel, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Verificar condiciones de uso/publicación de resultados ICFES por programa y CAT.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "ICFES"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M03-I05",
+  "module": 3,
+  "sort": 5,
+  "name": "Opciones y trabajos de grado",
+  "information_required": "Opciones de grado utilizadas y trabajos de grado aprobados",
+  "suggested_visualization": "Barras o tabla",
+  "source_text": "Acuerdo 015 de 2008 CDIDEAD y DP / SAIDEAD",
+  "unit": "trabajos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "classifier"
+  ],
+  "classifier": "opcion_grado",
+  "widget": "list:opciones_grado",
+  "filters_text": "Año, Semestre, Programa",
+  "publication_level": "PUB",
+  "observations": "Catálogo de opciones según Acuerdo 015 de 2008 CDIDEAD — verificar vigencia.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "CDIDEAD",
+   "ACUERDOS",
+   "SAIDEAD",
+   "DP"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I01",
+  "module": 4,
+  "sort": 1,
+  "name": "Docentes por tipo de vinculación",
+  "information_required": "Número de docentes por semestre y modalidad de vinculación, diferenciando profesores de carrera y catedráticos",
+  "suggested_visualization": "Cifras destacadas y barras",
+  "source_text": "BD departamentos",
+  "unit": "docentes",
+  "value_type": "count",
+  "chart_type": "stacked",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "program",
+   "classifier"
+  ],
+  "classifier": "vinculacion_docente",
+  "widget": null,
+  "filters_text": "Semestre, CAT, Programa",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "DEPTOS",
+  "sources": [
+   "BD_DEPARTAMENTOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I02",
+  "module": 4,
+  "sort": 2,
+  "name": "Evolución del cuerpo docente",
+  "information_required": "Evolución de docentes de planta y de cátedra en el tiempo",
+  "suggested_visualization": "Gráfico de líneas",
+  "source_text": "Departamentos",
+  "unit": "docentes",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "vinculacion_docente",
+  "widget": null,
+  "filters_text": "Semestre",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "DEPTOS",
+  "sources": [
+   "DEPTOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I03",
+  "module": 4,
+  "sort": 3,
+  "name": "Distribución y formación docente",
+  "information_required": "Docentes por CAT, programa y nivel máximo de formación (profesional, especialización, maestría o doctorado)",
+  "suggested_visualization": "Barras o tabla",
+  "source_text": "BD departamentos",
+  "unit": "docentes",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "program",
+   "classifier"
+  ],
+  "classifier": "formacion",
+  "widget": null,
+  "filters_text": "Semestre, CAT, Programa",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "DEPTOS",
+  "sources": [
+   "BD_DEPARTAMENTOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I04",
+  "module": 4,
+  "sort": 4,
+  "name": "Perfil y trayectoria docente",
+  "information_required": "Caracterización general por sexo o género y rangos de edad; categoría y antigüedad de docentes de carrera",
+  "suggested_visualization": "Barras",
+  "source_text": "BD departamentos",
+  "unit": "docentes",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "perfil_docente",
+  "widget": null,
+  "filters_text": "Semestre",
+  "publication_level": "AGR",
+  "observations": "Categoría y antigüedad solo para docentes de carrera; supresión de celdas pequeñas.",
+  "responsible": "DEPTOS",
+  "sources": [
+   "BD_DEPARTAMENTOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I05",
+  "module": 4,
+  "sort": 5,
+  "name": "Asignación y carga académica",
+  "information_required": "Cursos asignados y distribución de carga académica",
+  "suggested_visualization": "Barras y cifras",
+  "source_text": "BD departamentos",
+  "unit": "número",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "carga",
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "AGR",
+  "observations": "No publicar carga individual.",
+  "responsible": "DEPTOS",
+  "sources": [
+   "BD_DEPARTAMENTOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I06",
+  "module": 4,
+  "sort": 6,
+  "name": "Relación estudiantes-docentes",
+  "information_required": "Relación entre estudiantes matriculados y docentes, con distinción de tipo de vinculación",
+  "suggested_visualization": "Cifra o tabla comparativa",
+  "source_text": "BD departamentos y BD matriculados",
+  "unit": "razón",
+  "value_type": "ratio",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "relacion_ed",
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Definir si la relación es por personas o por tiempo completo equivalente (TCE).",
+  "responsible": "DEPTOS",
+  "sources": [
+   "BD_MATRICULADOS",
+   "BD_DEPARTAMENTOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I07",
+  "module": 4,
+  "sort": 7,
+  "name": "Participación docente en investigación",
+  "information_required": "Docentes participantes en grupos de investigación, semilleros, proyectos, eventos académicos y producción intelectual",
+  "suggested_visualization": "Barras y cifras",
+  "source_text": "Departamentos, SAIDEAD y profesor Llanos",
+  "unit": "docentes",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "part_investigacion",
+  "widget": null,
+  "filters_text": "Año, Programa, CAT",
+  "publication_level": "PUB",
+  "observations": "Fuente 'profesor Llanos' es una persona, no una dependencia: formalizar fuente institucional.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "DEPTOS",
+   "PROF_LLANOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M04-I08",
+  "module": 4,
+  "sort": 8,
+  "name": "Cualificación, bienestar y reconocimientos docentes",
+  "information_required": "Docentes formados en seminarios o cursos (seminario de docencia), beneficiarios de convocatorias, bienestar (SNIES), estímulos y reconocimientos",
+  "suggested_visualization": "Barras o tabla",
+  "source_text": "Departamentos e Informe SNIES",
+  "unit": "docentes",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "cualificacion",
+  "widget": null,
+  "filters_text": "Año",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "DEPTOS",
+  "sources": [
+   "DEPTOS",
+   "INFORME_SNIES"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M05-I01",
+  "module": 5,
+  "sort": 1,
+  "name": "Graduados y títulos otorgados",
+  "information_required": "Número histórico de personas graduadas y cantidad de títulos otorgados; presentar ambos datos por separado",
+  "suggested_visualization": "Dos cifras destacadas",
+  "source_text": "SGUT, SAIDEAD y Oficina de Graduados",
+  "unit": "personas / títulos",
+  "value_type": "count",
+  "chart_type": "kpi",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "classifier"
+  ],
+  "classifier": "medida_graduados",
+  "widget": null,
+  "filters_text": "Año, Semestre, Nivel, Programa",
+  "publication_level": "PUB",
+  "observations": "Personas únicas ≠ títulos otorgados.",
+  "responsible": "OG",
+  "sources": [
+   "SAIDEAD",
+   "SGUT",
+   "OG"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M05-I02",
+  "module": 5,
+  "sort": 2,
+  "name": "Evolución de la graduación",
+  "information_required": "Graduados por año o semestre y evolución histórica",
+  "suggested_visualization": "Gráfico de líneas",
+  "source_text": "SGUT, SAIDEAD y Oficina de Graduados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "level",
+  "allowed_dimensions": [
+   "level",
+   "program"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Año, Semestre, Nivel, Programa",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "OG",
+  "sources": [
+   "SAIDEAD",
+   "SGUT",
+   "OG"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M05-I03",
+  "module": 5,
+  "sort": 3,
+  "name": "Distribución de graduados",
+  "information_required": "Graduados por programa, nivel de formación, área de conocimiento, CAT y departamento",
+  "suggested_visualization": "Barras y mapa",
+  "source_text": "SGUT, SAIDEAD y Oficina de Graduados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "map",
+  "group_by": "department",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "area",
+   "cat",
+   "department"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Año, Nivel, Programa, Área, CAT, Depto",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "OG",
+  "sources": [
+   "SAIDEAD",
+   "SGUT",
+   "OG"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M05-I04",
+  "module": 5,
+  "sort": 4,
+  "name": "Perfil de los graduados",
+  "information_required": "Caracterización por sexo o género y promedio académico final",
+  "suggested_visualization": "Barras o distribución",
+  "source_text": "SGUT, SAIDEAD y Oficina de Graduados",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "program",
+   "classifier"
+  ],
+  "classifier": "perfil_graduado",
+  "widget": null,
+  "filters_text": "Año, Nivel, Programa",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "OG",
+  "sources": [
+   "SAIDEAD",
+   "SGUT",
+   "OG"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M05-I05",
+  "module": 5,
+  "sort": 5,
+  "name": "Trayectoria académica y laboral",
+  "information_required": "Graduación por cohorte, tiempo hasta obtener el título y seguimiento laboral o de emprendimiento, cuando existan datos",
+  "suggested_visualization": "Líneas y barras",
+  "source_text": "SGUT, SAIDEAD y Oficina de Graduados",
+  "unit": "número",
+  "value_type": "number",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "classifier"
+  ],
+  "classifier": "trayectoria",
+  "widget": null,
+  "filters_text": "Cohorte, Programa",
+  "publication_level": "AGR",
+  "observations": "Seguimiento laboral solo si existen datos (posible fuente externa: OLE-MEN, por validar).",
+  "responsible": "OG",
+  "sources": [
+   "SAIDEAD",
+   "SGUT",
+   "OG"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M05-I06",
+  "module": 5,
+  "sort": 6,
+  "name": "Participación de graduados en la vida institucional",
+  "information_required": "Participación de graduados en eventos, bienestar y actividades institucionales",
+  "suggested_visualization": "Cifras o barras",
+  "source_text": "SAIDEAD, Oficina de Graduados e informe SNIES",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "part_graduados",
+  "widget": null,
+  "filters_text": "Año",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "OG",
+  "sources": [
+   "SAIDEAD",
+   "INFORME_SNIES",
+   "OG"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M06-I01",
+  "module": 6,
+  "sort": 1,
+  "name": "Personal administrativo y contratistas",
+  "information_required": "Total de personal administrativo vinculado al IDEAD y contratistas de prestación de servicios, informados por separado",
+  "suggested_visualization": "Cifras y barras",
+  "source_text": "CRIDEAD",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "tipo_personal",
+  "widget": null,
+  "filters_text": "Año, Semestre",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M06-I02",
+  "module": 6,
+  "sort": 2,
+  "name": "Vinculación y funciones administrativas",
+  "information_required": "Personal por tipo de vinculación, cargo, grado, función y dependencia",
+  "suggested_visualization": "Barras o tabla",
+  "source_text": "CRIDEAD",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "vinculacion_admin",
+  "widget": null,
+  "filters_text": "Año, Dependencia",
+  "publication_level": "AGR",
+  "observations": "No publicar cargos unipersonales que identifiquen a la persona.",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M06-I03",
+  "module": 6,
+  "sort": 3,
+  "name": "Distribución territorial del personal",
+  "information_required": "Distribución del personal por CAT y departamento",
+  "suggested_visualization": "Tabla o mapa",
+  "source_text": "CRIDEAD",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "map",
+  "group_by": "department",
+  "allowed_dimensions": [
+   "cat",
+   "department"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Año, CAT, Depto",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M06-I04",
+  "module": 6,
+  "sort": 4,
+  "name": "Perfil del personal administrativo",
+  "information_required": "Caracterización por sexo o género, edad, nivel de formación y antigüedad",
+  "suggested_visualization": "Barras",
+  "source_text": "CRIDEAD",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "perfil_admin",
+  "widget": null,
+  "filters_text": "Año",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M06-I05",
+  "module": 6,
+  "sort": 5,
+  "name": "Evolución y desarrollo del personal",
+  "information_required": "Evolución del personal y participación en capacitaciones o actividades de bienestar",
+  "suggested_visualization": "Líneas y barras",
+  "source_text": "CRIDEAD e Informe SNIES",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "desarrollo_personal",
+  "widget": null,
+  "filters_text": "Año",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "INFORME_SNIES",
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M07-I01",
+  "module": 7,
+  "sort": 1,
+  "name": "Cobertura territorial de los CAT",
+  "information_required": "Número de CAT con actividad académica y su distribución por municipio y departamento",
+  "suggested_visualization": "Cifras y mapa de Colombia",
+  "source_text": "CRIDEAD",
+  "unit": "número",
+  "value_type": "count",
+  "chart_type": "kpi",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "department",
+   "classifier"
+  ],
+  "classifier": "medida_cobertura",
+  "widget": "cats_map",
+  "filters_text": "Depto, Municipio",
+  "publication_level": "PUB",
+  "observations": "Requiere coordenadas verificadas de cada CAT.",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M07-I02",
+  "module": 7,
+  "sort": 2,
+  "name": "CAT y sedes de funcionamiento",
+  "information_required": "Listado de CAT y sedes físicas utilizadas, indicando el carácter público, privado o propio de cada sede",
+  "suggested_visualization": "Tabla y mapa",
+  "source_text": "CRIDEAD",
+  "unit": "sedes",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "department",
+   "classifier"
+  ],
+  "classifier": "tipo_sede",
+  "widget": "cats_table",
+  "filters_text": "Depto, Municipio, Tipo de sede",
+  "publication_level": "PUB",
+  "observations": "Clasificación de sede: pública / privada / propia.",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M07-I03",
+  "module": 7,
+  "sort": 3,
+  "name": "Espacios físicos de apoyo académico",
+  "information_required": "Cantidad de aulas, laboratorios, salas de cómputo, bibliotecas, auditorios y espacios deportivos o de bienestar por CAT",
+  "suggested_visualization": "Tabla comparativa",
+  "source_text": "CRIDEAD",
+  "unit": "espacios",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "classifier"
+  ],
+  "classifier": "espacio",
+  "widget": "cat_facilities",
+  "filters_text": "CAT, Depto",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M07-I04",
+  "module": 7,
+  "sort": 4,
+  "name": "Tecnología, conectividad y capacidad instalada",
+  "information_required": "Equipos tecnológicos, conectividad y capacidad de los espacios académicos por CAT",
+  "suggested_visualization": "Barras o tabla",
+  "source_text": "CRIDEAD",
+  "unit": "número",
+  "value_type": "number",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "classifier"
+  ],
+  "classifier": "tecnologia",
+  "widget": null,
+  "filters_text": "CAT, Depto",
+  "publication_level": "PUB",
+  "observations": "No publicar detalles técnicos de red (riesgo de seguridad).",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M07-I05",
+  "module": 7,
+  "sort": 5,
+  "name": "Expansión de la red de CAT",
+  "information_required": "Apertura, reactivación y evolución de la presencia de CAT en los territorios",
+  "suggested_visualization": "Línea de tiempo",
+  "source_text": "CRIDEAD",
+  "unit": "CAT",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "department",
+   "classifier"
+  ],
+  "classifier": "hito_cat",
+  "widget": "cat_timeline",
+  "filters_text": "Año, Depto",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M07-I06",
+  "module": 7,
+  "sort": 6,
+  "name": "Información institucional de cada CAT",
+  "information_required": "Ficha informativa de cada CAT: breve historia, fotos autorizadas, ubicación, contactos, horarios, estructura y responsables",
+  "suggested_visualization": "Ficha informativa",
+  "source_text": "CRIDEAD, Coordinadores, Actores Claves",
+  "unit": "fichas",
+  "value_type": "count",
+  "chart_type": "table",
+  "group_by": null,
+  "allowed_dimensions": [],
+  "classifier": null,
+  "widget": "cat_cards",
+  "filters_text": "—",
+  "publication_level": "MIX",
+  "observations": "Fotos y datos de responsables solo con autorización. Fuente incluye 'Actores claves' (no formalizada).",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "COORDINADORES_CAT",
+   "ACTORES_CLAVES"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M07-I07",
+  "module": 7,
+  "sort": 7,
+  "name": "Cifras integradas por CAT",
+  "information_required": "Consulta integrada de programas, matrícula, docentes, graduados, bienestar y proyectos asociados a cada CAT",
+  "suggested_visualization": "Resumen por CAT con tablas o gráficos",
+  "source_text": "Información previamente recolectada",
+  "unit": "varios",
+  "value_type": "number",
+  "chart_type": "table",
+  "group_by": null,
+  "allowed_dimensions": [
+   "cat"
+  ],
+  "classifier": null,
+  "widget": "cat_cards",
+  "filters_text": "Semestre, CAT",
+  "publication_level": "PUB",
+  "observations": "Se compone de valores ya publicados en otros módulos (no requiere carga propia).",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "INFO_RECOLECTADA"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M08-I01",
+  "module": 8,
+  "sort": 1,
+  "name": "Beneficiarios de bienestar",
+  "information_required": "Número de estudiantes, docentes, administrativos y graduados beneficiarios de bienestar; personas únicas y participaciones",
+  "suggested_visualization": "Cifras y barras",
+  "source_text": "Informe SNIES",
+  "unit": "personas / participaciones",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "beneficiarios_bienestar",
+  "widget": null,
+  "filters_text": "Año, Semestre, Estamento",
+  "publication_level": "AGR",
+  "observations": "Medir por separado personas únicas y participaciones.",
+  "responsible": "TUIDEAD",
+  "sources": [
+   "INFORME_SNIES"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M08-I02",
+  "module": 8,
+  "sort": 2,
+  "name": "Cobertura territorial de bienestar",
+  "information_required": "Beneficiarios de actividades de bienestar por programa, CAT y período",
+  "suggested_visualization": "Barras o mapa",
+  "source_text": "Informe SNIES",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "cat",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "department"
+  ],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Semestre, Programa, CAT",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "TUIDEAD",
+  "sources": [
+   "INFORME_SNIES"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M08-I03",
+  "module": 8,
+  "sort": 3,
+  "name": "Servicios de Bienestar y TUIDEAD",
+  "information_required": "Servicios y actividades de TUIDEAD: orientación, psicología, enfermería, CRAI, deporte, cultura y otras líneas vigentes",
+  "suggested_visualization": "Cifras por tipo de servicio",
+  "source_text": "TUIDEAD, Informes Operadores y Biblioteca",
+  "unit": "atenciones",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "classifier"
+  ],
+  "classifier": "servicio_bienestar",
+  "widget": "list:servicios_bienestar",
+  "filters_text": "Semestre, CAT, Servicio",
+  "publication_level": "AGR_S",
+  "observations": "Psicología/enfermería: solo conteos agregados (datos de salud).",
+  "responsible": "TUIDEAD",
+  "sources": [
+   "TUIDEAD",
+   "INFORMES_OPERADORES",
+   "BIBLIOTECA"
+  ],
+  "publication_authorized": false,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M08-I04",
+  "module": 8,
+  "sort": 4,
+  "name": "Participación en actividades institucionales",
+  "information_required": "Participación en actividades deportivas, culturales, Semana del IDEAD y otros eventos institucionales",
+  "suggested_visualization": "Barras y evolución",
+  "source_text": "CRIDEAD y TUIDEAD",
+  "unit": "participaciones",
+  "value_type": "count",
+  "chart_type": "stacked",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "classifier"
+  ],
+  "classifier": "tipo_actividad",
+  "widget": null,
+  "filters_text": "Año, Semestre, CAT, Tipo de evento",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "TUIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "TUIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M08-I05",
+  "module": 8,
+  "sort": 5,
+  "name": "Apoyos y satisfacción con bienestar",
+  "information_required": "Apoyos socioeconómicos, estímulos y nivel de satisfacción con los servicios",
+  "suggested_visualization": "Barras o porcentajes",
+  "source_text": "Permanencia Estudiantes, TUIDEAD y CRIDEAD",
+  "unit": "número",
+  "value_type": "number",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "classifier"
+  ],
+  "classifier": "apoyos",
+  "widget": null,
+  "filters_text": "Semestre, CAT",
+  "publication_level": "PUB",
+  "observations": "Instrumento y escala de satisfacción PENDIENTES.",
+  "responsible": "TUIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "TUIDEAD",
+   "PERMANENCIA"
+  ],
+  "publication_authorized": true,
+  "periodicity": "semestral"
+ },
+ {
+  "code": "M09-I01",
+  "module": 9,
+  "sort": 1,
+  "name": "Grupos y semilleros de investigación",
+  "information_required": "Grupos y semilleros de investigación con participación del IDEAD",
+  "suggested_visualization": "Cifras y listado",
+  "source_text": "SAIDEAD y profesor Llanos",
+  "unit": "grupos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "grupos_semilleros",
+  "widget": "list:grupos_investigacion",
+  "filters_text": "Año, Categoría",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "PROF_LLANOS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M09-I02",
+  "module": 9,
+  "sort": 2,
+  "name": "Participación en investigación",
+  "information_required": "Docentes y estudiantes participantes en grupos o semilleros, por programa y CAT",
+  "suggested_visualization": "Barras",
+  "source_text": "SAIDEAD, profesor Llanos, VICIEPS",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "cat",
+   "classifier"
+  ],
+  "classifier": "participantes_inv",
+  "widget": null,
+  "filters_text": "Año, Programa, CAT, Estamento",
+  "publication_level": "AGR",
+  "observations": null,
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "PROF_LLANOS",
+   "VICIEPS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M09-I03",
+  "module": 9,
+  "sort": 3,
+  "name": "Proyectos de investigación",
+  "information_required": "Proyectos de investigación desarrollados, vigentes y finalizados",
+  "suggested_visualization": "Cifras y barras",
+  "source_text": "SAIDEAD, DP y VICIEPS",
+  "unit": "proyectos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "estado_inv",
+  "widget": null,
+  "filters_text": "Año, Estado",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "DP",
+   "VICIEPS"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M09-I04",
+  "module": 9,
+  "sort": 4,
+  "name": "Producción académica y creación",
+  "information_required": "Producción académica: artículos, libros, capítulos, ponencias y productos de creación",
+  "suggested_visualization": "Barras por tipo de producto",
+  "source_text": "SAIDEAD, PIDEAD, DP, CP, VICIEPS",
+  "unit": "productos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "classifier"
+  ],
+  "classifier": "tipo_producto",
+  "widget": null,
+  "filters_text": "Año, Tipo, Programa",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "DP",
+   "CP",
+   "VICIEPS",
+   "PIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M09-I05",
+  "module": 9,
+  "sort": 5,
+  "name": "Investigación formativa y recursos",
+  "information_required": "Trabajos de grado e investigación formativa, resultados de proyectos y recursos destinados a investigación",
+  "suggested_visualization": "Tabla y cifras",
+  "source_text": "SAIDEAD, PIDEAD, DP, CP, VICIEPS",
+  "unit": "número",
+  "value_type": "number",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "classifier"
+  ],
+  "classifier": "inv_formativa",
+  "widget": null,
+  "filters_text": "Año, Programa",
+  "publication_level": "MIX",
+  "observations": "Recursos financieros solo agregados.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "DP",
+   "CP",
+   "VICIEPS",
+   "PIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M10-I01",
+  "module": 10,
+  "sort": 1,
+  "name": "Proyectos de extensión y proyección social",
+  "information_required": "Proyectos y actividades de extensión o proyección social realizados por el IDEAD",
+  "suggested_visualization": "Cifras y barras",
+  "source_text": "PSIDEAD",
+  "unit": "iniciativas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "classifier"
+  ],
+  "classifier": "extension",
+  "widget": null,
+  "filters_text": "Año, Estado, CAT",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "PSIDEAD",
+  "sources": [
+   "PSIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M10-I02",
+  "module": 10,
+  "sort": 2,
+  "name": "Beneficiarios y cobertura territorial",
+  "information_required": "Personas, comunidades, municipios y CAT beneficiados por dichas iniciativas",
+  "suggested_visualization": "Cifras, mapa y barras",
+  "source_text": "PSIDEAD",
+  "unit": "número",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "cat",
+   "department",
+   "municipality",
+   "classifier"
+  ],
+  "classifier": "beneficiarios_ext",
+  "widget": null,
+  "filters_text": "Año, Municipio, Depto, CAT",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "PSIDEAD",
+  "sources": [
+   "PSIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M10-I03",
+  "module": 10,
+  "sort": 3,
+  "name": "Oferta de formación continua",
+  "information_required": "Diplomados, seminarios, cursos y actividades de formación continua ofrecidos",
+  "suggested_visualization": "Listado y cifras",
+  "source_text": "DP y ECIDEAD",
+  "unit": "ofertas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "formacion_continua",
+  "widget": "list:formacion_continua",
+  "filters_text": "Año, Tipo",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "ECIDEAD",
+  "sources": [
+   "DP",
+   "ECIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M10-I04",
+  "module": 10,
+  "sort": 4,
+  "name": "Participación y certificación en formación continua",
+  "information_required": "Participantes y personas certificadas o graduadas en procesos de formación continua",
+  "suggested_visualization": "Barras y evolución",
+  "source_text": "DP y ECIDEAD",
+  "unit": "personas",
+  "value_type": "count",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "part_fc",
+  "widget": null,
+  "filters_text": "Año, Tipo",
+  "publication_level": "PUB",
+  "observations": "Participantes ≠ certificados.",
+  "responsible": "ECIDEAD",
+  "sources": [
+   "DP",
+   "ECIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M11-I01",
+  "module": 11,
+  "sort": 1,
+  "name": "Presupuesto institucional",
+  "information_required": "Presupuesto anual atribuido al IDEAD y su evolución histórica",
+  "suggested_visualization": "Cifras y gráfico de líneas",
+  "source_text": "PRIDEAD",
+  "unit": "pesos",
+  "value_type": "currency",
+  "chart_type": "line",
+  "group_by": null,
+  "allowed_dimensions": [],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Año (vigencia)",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "PRIDEAD",
+  "sources": [
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "vigencia"
+ },
+ {
+  "code": "M11-I02",
+  "module": 11,
+  "sort": 2,
+  "name": "Asignación y ejecución de recursos",
+  "information_required": "Recursos asignados, comprometidos y ejecutados durante cada vigencia, según las cifras oficiales disponibles",
+  "suggested_visualization": "Barras comparativas",
+  "source_text": "PRIDEAD",
+  "unit": "pesos",
+  "value_type": "currency",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "estado_presupuesto",
+  "widget": null,
+  "filters_text": "Año (vigencia)",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "PRIDEAD",
+  "sources": [
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "vigencia"
+ },
+ {
+  "code": "M11-I03",
+  "module": 11,
+  "sort": 3,
+  "name": "Ejecución presupuestal porcentual",
+  "information_required": "Porcentaje de ejecución presupuestal anual",
+  "suggested_visualization": "Porcentaje o barra de avance",
+  "source_text": "PRIDEAD",
+  "unit": "porcentaje",
+  "value_type": "percent",
+  "chart_type": "progress",
+  "group_by": null,
+  "allowed_dimensions": [],
+  "classifier": null,
+  "widget": null,
+  "filters_text": "Año (vigencia)",
+  "publication_level": "PUB",
+  "observations": "Fórmula (ejecutado/asignado u obligado/apropiado) PENDIENTE con PRIDEAD.",
+  "responsible": "PRIDEAD",
+  "sources": [
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "vigencia"
+ },
+ {
+  "code": "M11-I04",
+  "module": 11,
+  "sort": 4,
+  "name": "Distribución del presupuesto por destino",
+  "information_required": "Distribución de los recursos por destino: funcionamiento académico, infraestructura, tecnología, bienestar y otros",
+  "suggested_visualization": "Barras o distribución porcentual",
+  "source_text": "PRIDEAD",
+  "unit": "pesos",
+  "value_type": "currency",
+  "chart_type": "distribution",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "destino",
+  "widget": null,
+  "filters_text": "Año, Destino",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "PRIDEAD",
+  "sources": [
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "vigencia"
+ },
+ {
+  "code": "M11-I05",
+  "module": 11,
+  "sort": 5,
+  "name": "Inversión territorial y por estudiante",
+  "information_required": "Inversiones por CAT, especialmente infraestructura y conectividad; inversión por estudiante, costo real de estudiantes del IDEAD por CAT y Programa",
+  "suggested_visualization": "Tabla, barras o mapa",
+  "source_text": "PRIDEAD",
+  "unit": "pesos",
+  "value_type": "currency",
+  "chart_type": "bar",
+  "group_by": "cat",
+  "allowed_dimensions": [
+   "cat",
+   "program",
+   "classifier"
+  ],
+  "classifier": "inversion",
+  "widget": null,
+  "filters_text": "Año, CAT, Programa",
+  "publication_level": "MIX",
+  "observations": "'Costo real por estudiante' requiere metodología de costeo validada y autorización de publicación.",
+  "responsible": "PRIDEAD",
+  "sources": [
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "vigencia"
+ },
+ {
+  "code": "M12-I01",
+  "module": 12,
+  "sort": 1,
+  "name": "Estado de los proyectos de inversión",
+  "information_required": "Número de proyectos radicados, aprobados, en ejecución y finalizados",
+  "suggested_visualization": "Cifras y barras por estado",
+  "source_text": "CRIDEAD, PRIDEAD y OPDI",
+  "unit": "proyectos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "estado_proyecto",
+  "widget": "projects",
+  "filters_text": "Año, Estado",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "OPDI",
+  "sources": [
+   "CRIDEAD",
+   "PRIDEAD",
+   "OPDI"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M12-I02",
+  "module": 12,
+  "sort": 2,
+  "name": "Líneas de inversión",
+  "information_required": "Proyectos por finalidad: infraestructura, equipos, tecnología, academia, bienestar y demás líneas institucionales",
+  "suggested_visualization": "Barras por categoría",
+  "source_text": "CRIDEAD y PRIDEAD",
+  "unit": "proyectos",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "linea_inversion",
+  "widget": null,
+  "filters_text": "Año, Línea",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M12-I03",
+  "module": 12,
+  "sort": 3,
+  "name": "Cobertura territorial de los proyectos",
+  "information_required": "Proyectos según CAT, municipio o departamento beneficiado",
+  "suggested_visualization": "Tabla y mapa",
+  "source_text": "CRIDEAD y PRIDEAD",
+  "unit": "proyectos",
+  "value_type": "count",
+  "chart_type": "map",
+  "group_by": "department",
+  "allowed_dimensions": [
+   "cat",
+   "municipality",
+   "department"
+  ],
+  "classifier": null,
+  "widget": "projects_map",
+  "filters_text": "CAT, Municipio, Depto",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M12-I04",
+  "module": 12,
+  "sort": 4,
+  "name": "Financiación, avance y beneficiarios de proyectos",
+  "information_required": "Valor aprobado, valor ejecutado, avance y beneficiarios de cada proyecto",
+  "suggested_visualization": "Tabla resumen o barras",
+  "source_text": "CRIDEAD y PRIDEAD",
+  "unit": "pesos / personas",
+  "value_type": "currency",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "financiacion",
+  "widget": "projects_progress",
+  "filters_text": "Año, Estado, CAT",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "PRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M12-I05",
+  "module": 12,
+  "sort": 5,
+  "name": "Información de cada proyecto",
+  "information_required": "Ficha de cada proyecto con nombre, objetivo, lugar de ejecución, inversión y resultados",
+  "suggested_visualization": "Ficha informativa",
+  "source_text": "CRIDEAD",
+  "unit": "fichas",
+  "value_type": "count",
+  "chart_type": "table",
+  "group_by": null,
+  "allowed_dimensions": [],
+  "classifier": null,
+  "widget": "projects",
+  "filters_text": "—",
+  "publication_level": "MIX",
+  "observations": "Documentos soporte restringidos salvo publicación autorizada.",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M12-I06",
+  "module": 12,
+  "sort": 6,
+  "name": "Convenios institucionales",
+  "information_required": "Convenios celebrados, vigentes y terminados, con información general y recursos aportados cuando corresponda",
+  "suggested_visualization": "Tabla y cifras",
+  "source_text": "CIBAGUE, CAT, CRIDEAD",
+  "unit": "convenios",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "convenios",
+  "widget": "agreements",
+  "filters_text": "Año, Estado",
+  "publication_level": "MIX",
+  "observations": "Fuente 'CIBAGUE' no definida en el glosario — aclarar. Texto completo de convenios restringido salvo publicación oficial.",
+  "responsible": "CRIDEAD",
+  "sources": [
+   "CRIDEAD",
+   "CIBAGUE",
+   "CAT_FUENTE"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M12-I07",
+  "module": 12,
+  "sort": 7,
+  "name": "Cumplimiento de metas institucionales",
+  "information_required": "Cumplimiento de metas del plan operativo de la Dirección",
+  "suggested_visualization": "Porcentajes o barras",
+  "source_text": "PIDEAD",
+  "unit": "porcentaje",
+  "value_type": "percent",
+  "chart_type": "progress",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "metas",
+  "widget": null,
+  "filters_text": "Año, Eje del plan",
+  "publication_level": "PUB",
+  "observations": "Fuente 'PIDEAD' figura en el glosario como 'Publicaciones IDEAD' — posible inconsistencia (¿Planeación?).",
+  "responsible": "PIDEAD",
+  "sources": [
+   "PIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M13-I01",
+  "module": 13,
+  "sort": 1,
+  "name": "Registros calificados y acreditación",
+  "information_required": "Programas con registro calificado vigente y con acreditación de alta calidad",
+  "suggested_visualization": "Cifras y listado",
+  "source_text": "ACIDEAD",
+  "unit": "programas",
+  "value_type": "count",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "level",
+   "classifier"
+  ],
+  "classifier": "calidad",
+  "widget": "accreditation",
+  "filters_text": "Nivel, Programa",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "ACIDEAD",
+  "sources": [
+   "ACIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M13-I02",
+  "module": 13,
+  "sort": 2,
+  "name": "Planes de mejoramiento",
+  "information_required": "Avance general de planes de mejoramiento institucional y académico",
+  "suggested_visualization": "Barras o porcentaje",
+  "source_text": "ACIDEAD",
+  "unit": "porcentaje",
+  "value_type": "percent",
+  "chart_type": "progress",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "plan_mejora",
+  "widget": "list:planes_mejoramiento",
+  "filters_text": "Año, Tipo de plan",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "ACIDEAD",
+  "sources": [
+   "ACIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M13-I03",
+  "module": 13,
+  "sort": 3,
+  "name": "Plataformas y recursos digitales",
+  "information_required": "Plataformas y aplicativos disponibles para el aprendizaje, como TuAula o CloudLabs, según su vigencia",
+  "suggested_visualization": "Listado de recursos",
+  "source_text": "SAIDEAD",
+  "unit": "plataformas",
+  "value_type": "count",
+  "chart_type": "table",
+  "group_by": null,
+  "allowed_dimensions": [],
+  "classifier": null,
+  "widget": "list:plataformas_digitales",
+  "filters_text": "—",
+  "publication_level": "PUB",
+  "observations": "Confirmar vigencia de TuAula y CloudLabs.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M13-I04",
+  "module": 13,
+  "sort": 4,
+  "name": "Uso de herramientas digitales",
+  "information_required": "Usuarios y utilización de plataformas o recursos educativos, por período y programa",
+  "suggested_visualization": "Líneas y barras",
+  "source_text": "SAIDEAD y CRIDEAD",
+  "unit": "usuarios",
+  "value_type": "count",
+  "chart_type": "line",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "program",
+   "classifier"
+  ],
+  "classifier": "plataforma",
+  "widget": null,
+  "filters_text": "Semestre, Programa, Plataforma",
+  "publication_level": "PUB",
+  "observations": null,
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "CRIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ },
+ {
+  "code": "M13-I05",
+  "module": 13,
+  "sort": 5,
+  "name": "Satisfacción y atención de solicitudes académicas",
+  "information_required": "Satisfacción con servicios académicos y atención de solicitudes",
+  "suggested_visualization": "Barras o porcentajes",
+  "source_text": "SAIDEAD y ACIDEAD",
+  "unit": "porcentaje",
+  "value_type": "percent",
+  "chart_type": "bar",
+  "group_by": "classifier",
+  "allowed_dimensions": [
+   "classifier"
+  ],
+  "classifier": "satisfaccion",
+  "widget": null,
+  "filters_text": "Semestre",
+  "publication_level": "PUB",
+  "observations": "Instrumento y escala PENDIENTES.",
+  "responsible": "SAIDEAD",
+  "sources": [
+   "SAIDEAD",
+   "ACIDEAD"
+  ],
+  "publication_authorized": true,
+  "periodicity": "anual"
+ }
+]
