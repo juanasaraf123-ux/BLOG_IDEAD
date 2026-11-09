@@ -28,6 +28,7 @@ use App\Models\StoredFile;
 use App\Models\TeamUnit;
 use App\Services\IndicatorQuery;
 use App\Services\Settings;
+use App\Support\PublicCache;
 use App\Support\TableExporter;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -118,85 +119,89 @@ class PortalController extends Controller
 
     // ------------------------------------------------------------------ sitio e inicio
 
-    public function site()
+    public function site(Request $request)
     {
-        $settings = Settings::publicValues();
-        $settings['logo_url'] = $this->fileUrl(isset($settings['logo_file_id']) ? (int) $settings['logo_file_id'] : null);
-        unset($settings['logo_file_id']);
-        foreach (['official_links', 'social_links'] as $k) {
-            $settings[$k] = json_decode($settings[$k] ?? '[]', true) ?: [];
-        }
-
-        return [
-            'settings' => $settings,
-            'demo_mode' => (bool) config('idead.demo_data'),
-            'modules' => IndicatorModule::orderBy('number')->get(['number', 'slug', 'name', 'icon', 'description']),
-            'pages' => Page::where('status', 'publicado')->get(['slug', 'title']),
-        ];
-    }
-
-    public function home()
-    {
-        $highlights = HomeHighlight::with('indicator.sources')->where('is_active', true)->orderBy('sort')->get()->map(function ($h) {
-            $value = null;
-            $period = null;
-            $source = null;
-            $isDemo = false;
-            switch ($h->metric_type) {
-                case 'indicator':
-                    if ($h->indicator) {
-                        $k = $this->kpiFor($h->indicator->code, $h->classifier_item_id ? ['classifier' => $h->classifier_item_id] : []);
-                        $value = $k['value'] ?? null;
-                        $period = $k['period'] ?? null;
-                        $isDemo = $k['is_demo'] ?? false;
-                        $source = $h->indicator->source_text;
-                    }
-                    break;
-                case 'events_year':
-                    $q = $this->published(Event::query())->whereYear('starts_at', now()->year);
-                    $value = $q->count();
-                    $isDemo = (clone $q)->where('is_demo', true)->exists();
-                    $period = (string) now()->year;
-                    $source = 'Agenda institucional publicada en el portal';
-                    break;
-                case 'cats_count':
-                    $q = $this->publishedEntity(Cat::query())->where('status', '!=', 'inactivo');
-                    $value = $q->count();
-                    $isDemo = (clone $q)->where('is_demo', true)->exists();
-                    $source = 'Registro de CAT publicado (CRIDEAD)';
-                    break;
-                case 'programs_count':
-                    $q = $this->publishedEntity(Program::query())->where('status', 'activo');
-                    $value = $q->count();
-                    $isDemo = (clone $q)->where('is_demo', true)->exists();
-                    $source = 'Catálogo de programas publicado';
-                    break;
+        return PublicCache::remember('site', function () use ($request) {
+            $settings = Settings::publicValues();
+            $settings['logo_url'] = $this->fileUrl(isset($settings['logo_file_id']) ? (int) $settings['logo_file_id'] : null);
+            unset($settings['logo_file_id']);
+            foreach (['official_links', 'social_links'] as $k) {
+                $settings[$k] = json_decode($settings[$k] ?? '[]', true) ?: [];
             }
-            if ($value === 0 && $h->metric_type !== 'indicator') {
-                $value = null; // sin registros publicados → pendiente
-            }
-
+    
             return [
-                'label' => $h->label, 'icon' => $h->icon, 'value' => $value, 'period' => $period, 'source' => $source,
-                'indicator_code' => $h->indicator?->code, 'link' => $h->link, 'is_demo' => $isDemo,
+                'settings' => $settings,
+                'demo_mode' => (bool) config('idead.demo_data'),
+                'modules' => IndicatorModule::orderBy('number')->get(['number', 'slug', 'name', 'icon', 'description']),
+                'pages' => Page::where('status', 'publicado')->get(['slug', 'title']),
             ];
         });
+    }
 
-        $slides = $this->demo(HeroSlide::query())->with('image')->where('is_active', true)
-            ->where(fn ($w) => $w->whereNull('starts_on')->orWhere('starts_on', '<=', now()->toDateString()))
-            ->where(fn ($w) => $w->whereNull('ends_on')->orWhere('ends_on', '>=', now()->toDateString()))
-            ->orderBy('sort')->get()->map(fn ($s) => [
-                'title' => $s->title, 'subtitle' => $s->subtitle, 'image_url' => $s->image?->url, 'link_url' => $s->link_url, 'is_demo' => $s->is_demo,
-            ]);
-
-        return [
-            'highlights' => $highlights,
-            'slides' => $slides,
-            'news' => $this->newsQuery()->orderByDesc('is_featured')->orderByDesc('publish_at')->limit(3)->get()->map(fn ($n) => $this->newsCard($n)),
-            'events' => $this->published(Event::query())->with('cat:id,name')->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(3)->get()->map(fn ($e) => $this->eventCard($e)),
-            'team' => TeamUnit::where('is_active', true)->orderBy('sort')->get(),
-            'cats' => $this->catSummaries(),
-        ];
+    public function home(Request $request)
+    {
+        return PublicCache::remember('home', function () use ($request) {
+            $highlights = HomeHighlight::with('indicator.sources')->where('is_active', true)->orderBy('sort')->get()->map(function ($h) {
+                $value = null;
+                $period = null;
+                $source = null;
+                $isDemo = false;
+                switch ($h->metric_type) {
+                    case 'indicator':
+                        if ($h->indicator) {
+                            $k = $this->kpiFor($h->indicator->code, $h->classifier_item_id ? ['classifier' => $h->classifier_item_id] : []);
+                            $value = $k['value'] ?? null;
+                            $period = $k['period'] ?? null;
+                            $isDemo = $k['is_demo'] ?? false;
+                            $source = $h->indicator->source_text;
+                        }
+                        break;
+                    case 'events_year':
+                        $q = $this->published(Event::query())->whereYear('starts_at', now()->year);
+                        $value = $q->count();
+                        $isDemo = (clone $q)->where('is_demo', true)->exists();
+                        $period = (string) now()->year;
+                        $source = 'Agenda institucional publicada en el portal';
+                        break;
+                    case 'cats_count':
+                        $q = $this->publishedEntity(Cat::query())->where('status', '!=', 'inactivo');
+                        $value = $q->count();
+                        $isDemo = (clone $q)->where('is_demo', true)->exists();
+                        $source = 'Registro de CAT publicado (CRIDEAD)';
+                        break;
+                    case 'programs_count':
+                        $q = $this->publishedEntity(Program::query())->where('status', 'activo');
+                        $value = $q->count();
+                        $isDemo = (clone $q)->where('is_demo', true)->exists();
+                        $source = 'Catálogo de programas publicado';
+                        break;
+                }
+                if ($value === 0 && $h->metric_type !== 'indicator') {
+                    $value = null; // sin registros publicados → pendiente
+                }
+    
+                return [
+                    'label' => $h->label, 'icon' => $h->icon, 'value' => $value, 'period' => $period, 'source' => $source,
+                    'indicator_code' => $h->indicator?->code, 'link' => $h->link, 'is_demo' => $isDemo,
+                ];
+            });
+    
+            $slides = $this->demo(HeroSlide::query())->with('image')->where('is_active', true)
+                ->where(fn ($w) => $w->whereNull('starts_on')->orWhere('starts_on', '<=', now()->toDateString()))
+                ->where(fn ($w) => $w->whereNull('ends_on')->orWhere('ends_on', '>=', now()->toDateString()))
+                ->orderBy('sort')->get()->map(fn ($s) => [
+                    'title' => $s->title, 'subtitle' => $s->subtitle, 'image_url' => $s->image?->url, 'link_url' => $s->link_url, 'is_demo' => $s->is_demo,
+                ]);
+    
+            return [
+                'highlights' => $highlights,
+                'slides' => $slides,
+                'news' => $this->newsQuery()->orderByDesc('is_featured')->orderByDesc('publish_at')->limit(3)->get()->map(fn ($n) => $this->newsCard($n)),
+                'events' => $this->published(Event::query())->with('cat:id,name')->where('starts_at', '>=', now()->startOfDay())->orderBy('starts_at')->limit(3)->get()->map(fn ($e) => $this->eventCard($e)),
+                'team' => TeamUnit::where('is_active', true)->orderBy('sort')->get(),
+                'cats' => $this->catSummaries(),
+            ];
+        });
     }
 
     private function catSummaries()
@@ -230,24 +235,28 @@ class PortalController extends Controller
         return IndicatorModule::withCount('indicators')->orderBy('number')->get();
     }
 
-    public function module(string $slug)
+    public function module(Request $request, string $slug)
     {
-        $m = IndicatorModule::where('slug', $slug)->firstOrFail();
-        $indicators = Indicator::with(['sources', 'responsibleDependency', 'classifier'])->where('module_id', $m->id)->where('is_active', true)->orderBy('sort')->get();
-
-        return ['module' => $m, 'indicators' => $indicators->map(fn ($i) => $this->indicatorMeta($i))];
+        return PublicCache::remember('module.'.$slug, function () use ($request, $slug) {
+            $m = IndicatorModule::where('slug', $slug)->firstOrFail();
+            $indicators = Indicator::with(['sources', 'responsibleDependency', 'classifier'])->where('module_id', $m->id)->where('is_active', true)->orderBy('sort')->get();
+    
+            return ['module' => $m, 'indicators' => $indicators->map(fn ($i) => $this->indicatorMeta($i))];
+        });
     }
 
     public function indicatorData(Request $request, string $code)
     {
-        $i = Indicator::with(['sources', 'responsibleDependency', 'classifier'])->where('code', $code)->where('is_active', true)->firstOrFail();
-        $meta = $this->indicatorMeta($i);
-        if (! $i->isPublishable()) {
-            return ['indicator' => $meta, 'data' => null, 'status' => 'pendiente_autorizacion'];
-        }
-        $data = $this->query->run($i, $this->filters($request));
-
-        return ['indicator' => $meta, 'data' => $data, 'status' => $data['row_count'] ? 'publicado' : 'pendiente'];
+        return PublicCache::remember('ind.'.$code.'.'.md5(json_encode($this->filters($request))), function () use ($request, $code) {
+            $i = Indicator::with(['sources', 'responsibleDependency', 'classifier'])->where('code', $code)->where('is_active', true)->firstOrFail();
+            $meta = $this->indicatorMeta($i);
+            if (! $i->isPublishable()) {
+                return ['indicator' => $meta, 'data' => null, 'status' => 'pendiente_autorizacion'];
+            }
+            $data = $this->query->run($i, $this->filters($request));
+    
+            return ['indicator' => $meta, 'data' => $data, 'status' => $data['row_count'] ? 'publicado' : 'pendiente'];
+        });
     }
 
     public function indicatorExport(Request $request, string $code)
@@ -265,33 +274,37 @@ class PortalController extends Controller
         ] + ($res['is_demo'] ? [5 => ['ADVERTENCIA', 'DATOS DE DEMOSTRACIÓN — NO SON CIFRAS OFICIALES']] : []));
     }
 
-    public function filterOptions()
+    public function filterOptions(Request $request)
     {
-        return [
-            'periods' => AcademicPeriod::orderByDesc('year')->orderByDesc('term')->get(['id', 'code', 'year', 'term', 'type']),
-            'years' => AcademicPeriod::distinct()->orderByDesc('year')->pluck('year'),
-            'programs' => $this->publishedEntity(Program::query())->orderBy('name')->get(['id', 'name', 'level_id', 'slug']),
-            'cats' => $this->publishedEntity(Cat::query())->with('municipality:id,department_id')->orderBy('name')->get(['id', 'name', 'slug', 'municipality_id'])
-                ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name, 'slug' => $c->slug, 'department_id' => $c->municipality?->department_id]),
-            'departments' => Department::orderBy('name')->get(['id', 'code', 'name']),
-            'levels' => EducationLevel::orderBy('sort')->get(['id', 'code', 'name', 'cycle']),
-            'areas' => KnowledgeArea::orderBy('name')->get(['id', 'code', 'name']),
-        ];
+        return PublicCache::remember('filters', function () use ($request) {
+            return [
+                'periods' => AcademicPeriod::orderByDesc('year')->orderByDesc('term')->get(['id', 'code', 'year', 'term', 'type']),
+                'years' => AcademicPeriod::distinct()->orderByDesc('year')->pluck('year'),
+                'programs' => $this->publishedEntity(Program::query())->orderBy('name')->get(['id', 'name', 'level_id', 'slug']),
+                'cats' => $this->publishedEntity(Cat::query())->with('municipality:id,department_id')->orderBy('name')->get(['id', 'name', 'slug', 'municipality_id'])
+                    ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name, 'slug' => $c->slug, 'department_id' => $c->municipality?->department_id]),
+                'departments' => Department::orderBy('name')->get(['id', 'code', 'name']),
+                'levels' => EducationLevel::orderBy('sort')->get(['id', 'code', 'name', 'cycle']),
+                'areas' => KnowledgeArea::orderBy('name')->get(['id', 'code', 'name']),
+            ];
+        });
     }
 
-    public function transparency()
+    public function transparency(Request $request)
     {
-        return [
-            'modules' => IndicatorModule::orderBy('number')->get()->map(fn ($m) => [
-                'number' => $m->number, 'slug' => $m->slug, 'name' => $m->name,
-                'indicators' => Indicator::with(['sources', 'responsibleDependency', 'classifier'])->where('module_id', $m->id)->orderBy('sort')->get()
-                    ->map(fn ($i) => $this->indicatorMeta($i) + [
-                        'last_published_at' => $i->submissions()->where('status', 'publicado')->when(! config('idead.demo_data'), fn ($q) => $q->where('is_demo', false))->max('published_at'),
-                    ]),
-            ]),
-            'documents' => $this->publicDocuments()->limit(50)->get()->map(fn ($d) => $this->documentCard($d)),
-            'agreements' => $this->demo(Agreement::query())->where('is_public', true)->orderByDesc('start_date')->limit(50)->get(['id', 'number', 'counterpart', 'object', 'start_date', 'end_date', 'status', 'contributed_amount', 'is_demo']),
-        ];
+        return PublicCache::remember('transparency', function () use ($request) {
+            return [
+                'modules' => IndicatorModule::orderBy('number')->get()->map(fn ($m) => [
+                    'number' => $m->number, 'slug' => $m->slug, 'name' => $m->name,
+                    'indicators' => Indicator::with(['sources', 'responsibleDependency', 'classifier'])->where('module_id', $m->id)->orderBy('sort')->get()
+                        ->map(fn ($i) => $this->indicatorMeta($i) + [
+                            'last_published_at' => $i->submissions()->where('status', 'publicado')->when(! config('idead.demo_data'), fn ($q) => $q->where('is_demo', false))->max('published_at'),
+                        ]),
+                ]),
+                'documents' => $this->publicDocuments()->limit(50)->get()->map(fn ($d) => $this->documentCard($d)),
+                'agreements' => $this->demo(Agreement::query())->where('is_public', true)->orderByDesc('start_date')->limit(50)->get(['id', 'number', 'counterpart', 'object', 'start_date', 'end_date', 'status', 'contributed_amount', 'is_demo']),
+            ];
+        });
     }
 
     public function lists(Request $request, string $type)
@@ -310,20 +323,22 @@ class PortalController extends Controller
 
     public function cats(Request $request)
     {
-        $list = $this->catSummaries();
-        if ($request->filled('department')) {
-            $list = $list->where('department_code', $request->query('department'))->values();
-        }
-        if ($request->query('with') === 'details') {
-            $details = $this->publishedEntity(Cat::query())->with(['sites' => fn ($q) => $q->where('is_active', true), 'facilities', 'events'])->get()->keyBy('slug');
-            $list = $list->map(fn ($c) => $c + [
-                'sites' => $details[$c['slug']]->sites->map->only(['name', 'ownership', 'address'])->values(),
-                'facilities' => $details[$c['slug']]->facilities->map->only(['facility_type', 'quantity', 'capacity'])->values(),
-                'events' => $details[$c['slug']]->events->map(fn ($e) => ['event_type' => $e->event_type, 'event_date' => $e->event_date?->toDateString(), 'description' => $e->description])->values(),
-            ])->values();
-        }
-
-        return $list;
+        return PublicCache::remember('cats.'.md5(json_encode($request->query())), function () use ($request) {
+            $list = $this->catSummaries();
+            if ($request->filled('department')) {
+                $list = $list->where('department_code', $request->query('department'))->values();
+            }
+            if ($request->query('with') === 'details') {
+                $details = $this->publishedEntity(Cat::query())->with(['sites' => fn ($q) => $q->where('is_active', true), 'facilities', 'events'])->get()->keyBy('slug');
+                $list = $list->map(fn ($c) => $c + [
+                    'sites' => $details[$c['slug']]->sites->map->only(['name', 'ownership', 'address'])->values(),
+                    'facilities' => $details[$c['slug']]->facilities->map->only(['facility_type', 'quantity', 'capacity'])->values(),
+                    'events' => $details[$c['slug']]->events->map(fn ($e) => ['event_type' => $e->event_type, 'event_date' => $e->event_date?->toDateString(), 'description' => $e->description])->values(),
+                ])->values();
+            }
+    
+            return $list;
+        });
     }
 
     public function agreements(Request $request)

@@ -22,7 +22,7 @@ export default defineConfig({
   plugins: [react(), tailwindcss(), adminFallback],
   build: {
     rollupOptions: {
-      input: { portal: resolve(__dirname, 'index.html'), admin: resolve(__dirname, 'admin/index.html') },
+      input: { portal: resolve(import.meta.dirname, 'index.html'), admin: resolve(import.meta.dirname, 'admin/index.html') },
     },
     chunkSizeWarningLimit: 900,
   },

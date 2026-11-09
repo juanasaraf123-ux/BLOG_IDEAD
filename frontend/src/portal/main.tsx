@@ -1,15 +1,24 @@
-import { StrictMode, useEffect } from 'react';
+import { lazy, StrictMode, Suspense, useEffect } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom';
 import '../styles.css';
 import { SiteProvider } from './site';
 import { DemoBanner, Footer, Header } from './components/Layout';
-import Home from './pages/Home';
-import { ModulePage, StatsIndex } from './pages/Stats';
-import { CatDetail, CatList } from './pages/Cats';
-import { EventDetail, Events, Multimedia, NewsDetail, NewsList, ProgramDetail, Programs, ProjectDetail, Projects } from './pages/Content';
-import { About, CmsPage, Search, SiteMap, Transparency } from './pages/Info';
+import { Spinner } from '../shared/ui';
 import NotFound from './pages/NotFound';
+
+// Carga diferida por sección: el inicio no descarga el código de los módulos estadísticos y viceversa.
+const Home = lazy(() => import('./pages/Home'));
+const named = <T extends string>(loader: () => Promise<Record<T, React.ComponentType>>, name: T) => lazy(() => loader().then((m) => ({ default: m[name] })));
+const stats = () => import('./pages/Stats');
+const cats = () => import('./pages/Cats');
+const content = () => import('./pages/Content');
+const info = () => import('./pages/Info');
+const StatsIndex = named(stats, 'StatsIndex'), ModulePage = named(stats, 'ModulePage');
+const CatList = named(cats, 'CatList'), CatDetail = named(cats, 'CatDetail');
+const Programs = named(content, 'Programs'), ProgramDetail = named(content, 'ProgramDetail'), NewsList = named(content, 'NewsList'), NewsDetail = named(content, 'NewsDetail');
+const Events = named(content, 'Events'), EventDetail = named(content, 'EventDetail'), Multimedia = named(content, 'Multimedia'), Projects = named(content, 'Projects'), ProjectDetail = named(content, 'ProjectDetail');
+const Transparency = named(info, 'Transparency'), About = named(info, 'About'), CmsPage = named(info, 'CmsPage'), Search = named(info, 'Search'), SiteMap = named(info, 'SiteMap');
 
 /** Desplaza al inicio (o al ancla) en cada cambio de ruta y mueve el foco al contenido para lectores de pantalla. */
 function ScrollManager() {
@@ -34,6 +43,7 @@ function App() {
         <DemoBanner />
         <Header />
         <main id="main" tabIndex={-1} className="min-h-[60vh] focus:outline-none">
+          <Suspense fallback={<div className="mx-auto max-w-[1500px] px-4"><Spinner /></div>}>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/estadisticas" element={<StatsIndex />} />
@@ -56,6 +66,7 @@ function App() {
             <Route path="/mapa-del-sitio" element={<SiteMap />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
+          </Suspense>
         </main>
         <Footer />
       </SiteProvider>

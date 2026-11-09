@@ -33,6 +33,8 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
+        // El panel solo admite sesión de navegador (cookie + CSRF); otras solicitudes se rechazan de forma controlada.
+        abort_unless($request->hasSession(), 400, 'El inicio de sesión solo está disponible desde el panel web.');
         $data = $request->validate(['email' => 'required|email', 'password' => 'required|string']);
         $key = 'login:'.Str::lower($data['email']).'|'.$request->ip();
         if (RateLimiter::tooManyAttempts($key, self::MAX_ATTEMPTS)) {
@@ -60,6 +62,7 @@ class AuthController extends Controller
 
     public function mfaChallenge(Request $request)
     {
+        abort_unless($request->hasSession(), 400, 'El inicio de sesión solo está disponible desde el panel web.');
         $data = $request->validate(['code' => 'required|digits:6']);
         $userId = $request->session()->get('mfa_pending_user');
         $at = (int) $request->session()->get('mfa_pending_at');

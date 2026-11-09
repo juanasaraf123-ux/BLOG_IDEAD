@@ -65,5 +65,6 @@ class Settings
     {
         Setting::updateOrCreate(['key' => $key], ['value' => $value, 'is_public' => self::DEFAULTS[$key][1] ?? false]);
         Cache::forget('settings.all');
+        \App\Support\PublicCache::bump();
     }
 }

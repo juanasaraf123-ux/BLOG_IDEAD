@@ -94,12 +94,12 @@ export function CatDetail() {
             <aside className="space-y-4 rounded-2xl border border-line bg-surface/60 p-5">
               <h2 className="text-lg font-extrabold text-ut-red">Información de contacto</h2>
               <dl className="space-y-3 text-sm">
-                <div className="flex gap-2"><Icon name="pin" className="mt-0.5 shrink-0 text-ut-red" /><div><dt className="font-bold">Ubicación</dt><dd>{c.address ?? 'Pendiente'} — {c.municipality.name}, {c.municipality.department.name}</dd></div></div>
-                <div className="flex gap-2"><Icon name="phone" className="mt-0.5 shrink-0 text-ut-red" /><div><dt className="font-bold">Teléfono</dt><dd>{c.phone ?? 'Pendiente'}</dd></div></div>
-                <div className="flex gap-2"><Icon name="mail" className="mt-0.5 shrink-0 text-ut-red" /><div><dt className="font-bold">Correo</dt><dd>{c.email ? <a href={`mailto:${c.email}`} className="text-ut-red underline">{c.email}</a> : 'Pendiente'}</dd></div></div>
-                <div className="flex gap-2"><Icon name="clock" className="mt-0.5 shrink-0 text-ut-red" /><div><dt className="font-bold">Horarios</dt><dd className="whitespace-pre-line">{c.schedule ?? 'Pendiente'}</dd></div></div>
-                <div className="flex gap-2"><Icon name="user" className="mt-0.5 shrink-0 text-ut-red" /><div><dt className="font-bold">Responsable institucional</dt><dd>{c.manager_name ?? 'Publicación no autorizada o pendiente'}</dd></div></div>
-                {c.opened_on && <div className="flex gap-2"><Icon name="calendar" className="mt-0.5 shrink-0 text-ut-red" /><div><dt className="font-bold">Inicio de actividades</dt><dd>{fmtDate(c.opened_on, { month: 'long', year: 'numeric' })}</dd></div></div>}
+                <div><dt className="flex items-center gap-2 font-bold"><Icon name="pin" className="shrink-0 text-ut-red" />Ubicación</dt><dd className="pl-6">{c.address ?? 'Pendiente'} — {c.municipality.name}, {c.municipality.department.name}</dd></div>
+                <div><dt className="flex items-center gap-2 font-bold"><Icon name="phone" className="shrink-0 text-ut-red" />Teléfono</dt><dd className="pl-6">{c.phone ?? 'Pendiente'}</dd></div>
+                <div><dt className="flex items-center gap-2 font-bold"><Icon name="mail" className="shrink-0 text-ut-red" />Correo</dt><dd className="pl-6">{c.email ? <a href={`mailto:${c.email}`} className="text-ut-red underline">{c.email}</a> : 'Pendiente'}</dd></div>
+                <div><dt className="flex items-center gap-2 font-bold"><Icon name="clock" className="shrink-0 text-ut-red" />Horarios</dt><dd className="pl-6 whitespace-pre-line">{c.schedule ?? 'Pendiente'}</dd></div>
+                <div><dt className="flex items-center gap-2 font-bold"><Icon name="user" className="shrink-0 text-ut-red" />Responsable institucional</dt><dd className="pl-6">{c.manager_name ?? 'Publicación no autorizada o pendiente'}</dd></div>
+                {c.opened_on && <div><dt className="flex items-center gap-2 font-bold"><Icon name="calendar" className="shrink-0 text-ut-red" />Inicio de actividades</dt><dd className="pl-6">{fmtDate(c.opened_on, { month: 'long', year: 'numeric' })}</dd></div>}
               </dl>
               {c.coverage?.length > 0 && <div><p className="text-sm font-bold">Municipios atendidos</p><p className="text-sm">{c.coverage.map((m: Any) => m.name).join(', ')}</p></div>}
             </aside>
