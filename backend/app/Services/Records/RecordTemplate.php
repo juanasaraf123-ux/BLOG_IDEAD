@@ -73,11 +73,13 @@ class RecordTemplate
         $types = array_column($cols, 'type');
         $lists = [];
         if (in_array('program', $types, true)) {
-            $lists['Programas (nombre)'] = Program::orderBy('name')->pluck('name')->all();
-            $lists['Programas (código SNIES)'] = Program::orderBy('name')->get(['snies_code'])->map(fn ($p) => (string) $p->snies_code)->all();
+            // Los datos de demostración nunca se incluyen en una plantilla.
+            $progs = Program::where('is_demo', false)->orderBy('name')->get(['name', 'snies_code']);
+            $lists['Programas (nombre)'] = $progs->pluck('name')->all() ?: ['(Escriba el nombre oficial del programa)'];
+            $lists['Programas (código SNIES)'] = $progs->map(fn ($p) => (string) $p->snies_code)->all();
         }
         if (in_array('cat', $types, true)) {
-            $lists['CAT'] = Cat::orderBy('name')->pluck('name')->all();
+            $lists['CAT'] = Cat::where('is_demo', false)->orderBy('name')->pluck('name')->all() ?: ['(Escriba el municipio sede del CAT)'];
         }
         if (in_array('dependency', $types, true)) {
             $lists['Dependencias'] = Dependency::orderBy('name')->pluck('name')->all();
