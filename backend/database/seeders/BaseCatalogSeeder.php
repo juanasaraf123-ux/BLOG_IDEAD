@@ -39,6 +39,10 @@ class BaseCatalogSeeder extends Seeder
             'indicators.publish' => 'Publicar y despublicar datos de indicadores',
             'indicators.catalog.manage' => 'Editar la ficha técnica de los indicadores (metodología, autorización)',
             'scope.all_dependencies' => 'Alcance sobre todas las dependencias',
+        ],
+        'Bases de datos institucionales' => [
+            'records.view' => 'Consultar las bases de estudiantes, docentes, graduados y personal (totales, sin datos personales)',
+            'records.import' => 'Cargar bases desde la plantilla de Excel/CSV y deshacer cargas',
             'records.view_personal' => 'Ver datos personales de estudiantes, docentes, graduados y personal (parte privada)',
         ],
         'Informes' => [
@@ -86,7 +90,7 @@ class BaseCatalogSeeder extends Seeder
     public const ROLES = [
         'director' => ['Director del IDEAD', 'Consulta general, supervisión, revisión y publicación de información institucional.', [
             'indicators.view_internal', 'indicators.review', 'indicators.publish', 'indicators.catalog.manage', 'scope.all_dependencies',
-            'records.view_personal', 'reports.internal.export', 'reports.financial.view', 'documents.view.internal', 'documents.view.restricted', 'documents.view.financial',
+            'records.view', 'records.import', 'records.view_personal', 'reports.internal.export', 'reports.financial.view', 'documents.view.internal', 'documents.view.restricted', 'documents.view.financial',
             'agreements.view', 'petty_cash.view', 'content.publish', 'entities.publish', 'audit.view',
         ]],
         'administracion_documental' => ['Administración documental', 'Registro, clasificación y control de versiones de documentos, contratos y convenios.', [
@@ -101,7 +105,7 @@ class BaseCatalogSeeder extends Seeder
         ]],
         'coordinador' => ['Coordinador / responsable de dependencia', 'Registro y actualización de indicadores e información de su dependencia; envío a revisión.', [
             'indicators.view_internal', 'indicators.submit', 'indicators.import', 'reports.internal.export', 'documents.view.internal', 'documents.upload',
-            'cats.edit', 'programs.edit', 'projects.edit', 'lists.edit',
+            'cats.edit', 'programs.edit', 'projects.edit', 'lists.edit', 'records.view', 'records.import',
         ]],
         'admin_tecnico' => ['Administrador técnico', 'Usuarios, roles, permisos, parámetros y auditoría. Sin acceso a documentos financieros ni restringidos.', [
             'users.view', 'users.manage', 'roles.manage', 'audit.view', 'settings.manage', 'catalogs.manage',

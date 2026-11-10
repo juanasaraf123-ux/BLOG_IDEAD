@@ -104,6 +104,19 @@ Route::prefix('admin/v1')->name('admin.')->group(function () {
         Route::post('documents/{id}/versions', [Admin\DocumentController::class, 'newVersion'])->whereNumber('id');
         Route::get('documents/{id}/download/{version?}', [Admin\DocumentController::class, 'download'])->whereNumber('id');
 
+        // Bases de datos institucionales (estudiantes, docentes, graduados, personal)
+        Route::get('records', [Admin\RecordController::class, 'index']);
+        Route::prefix('records/{entity}')->where(['entity' => 'estudiantes|docentes|graduados|personal'])->group(function () {
+            Route::get('/', [Admin\RecordController::class, 'show']);
+            Route::get('template', [Admin\RecordController::class, 'template']);
+            Route::post('analyze', [Admin\RecordController::class, 'analyze'])->middleware('throttle:uploads');
+            Route::post('import', [Admin\RecordController::class, 'import'])->middleware('throttle:uploads');
+            Route::get('summary', [Admin\RecordController::class, 'summary']);
+            Route::get('rows', [Admin\RecordController::class, 'rows']);
+            Route::get('imports', [Admin\RecordController::class, 'imports']);
+            Route::delete('imports/{id}', [Admin\RecordController::class, 'undo'])->whereNumber('id');
+        });
+
         // Informes
         Route::get('reports/indicators', [Admin\ReportController::class, 'indicators']);
         Route::get('reports/petty-cash', [Admin\ReportController::class, 'pettyCash']);

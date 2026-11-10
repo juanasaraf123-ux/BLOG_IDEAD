@@ -15,6 +15,8 @@ INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (5,'2026_11_09_0002
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (6,'2026_11_09_000300_create_indicator_tables',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (7,'2026_11_09_000400_create_content_management_tables',1);
 INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (8,'2026_11_09_000500_create_institutional_records_tables',1);
+INSERT INTO `migrations` (`id`, `migration`, `batch`) VALUES (9,'2026_11_10_000100_add_file_details_to_record_imports',1);
+-- Permisos records.view y records.import (bases de datos): ejecute después «php artisan db:seed --class=BaseCatalogSeeder» (idempotente) para registrarlos y asignarlos a los roles.
 INSERT INTO `permissions` (`id`, `code`, `group`, `description`) VALUES (1,'indicators.view_internal','Indicadores','Consultar indicadores y datos internos (no publicados)');
 INSERT INTO `permissions` (`id`, `code`, `group`, `description`) VALUES (2,'indicators.submit','Indicadores','Registrar lotes de datos y enviarlos a revisión');
 INSERT INTO `permissions` (`id`, `code`, `group`, `description`) VALUES (3,'indicators.import','Indicadores','Importar datos desde Excel/CSV');

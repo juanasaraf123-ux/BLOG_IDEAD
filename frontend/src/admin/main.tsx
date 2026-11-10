@@ -10,11 +10,13 @@ import { RESOURCES } from './resources';
 import { Account, Forgot, Login, Reset } from './pages/AuthPages';
 import { IndicatorDetail, IndicatorList, SubmissionDetail, SubmissionList } from './pages/Indicators';
 import { Audit, Dashboard, Documents, Reports, Roles, Settings, Users } from './pages/Admin';
+import { RecordDetail, RecordsHome } from './pages/Records';
 
 /** Menú lateral: cada entrada se muestra solo si el rol tiene alguno de los permisos indicados ([] = cualquiera). */
 const MENU: { group: string; items: { to: string; label: string; icon: string; perms: string[] }[] }[] = [
   { group: '', items: [{ to: '/', label: 'Inicio', icon: 'home', perms: [] }] },
   { group: 'Indicadores', items: [
+    { to: '/bases', label: 'Bases de datos', icon: 'table', perms: ['records.view', 'records.import'] },
     { to: '/indicadores', label: 'Catálogo de indicadores', icon: 'chart', perms: ['indicators.view_internal', 'indicators.submit', 'indicators.catalog.manage', 'indicators.review'] },
     { to: '/cargas', label: 'Cargas de datos', icon: 'upload', perms: ['indicators.submit', 'indicators.review', 'indicators.publish'] },
     { to: '/r/solicitudes', label: 'Solicitudes de actualización', icon: 'mail', perms: ['indicators.review', 'indicators.submit'] },
@@ -124,6 +126,8 @@ function Protected() {
         <Route path="/indicadores/:id" element={<IndicatorDetail />} />
         <Route path="/cargas" element={<SubmissionList />} />
         <Route path="/cargas/:id" element={<SubmissionDetail />} />
+        <Route path="/bases" element={<RecordsHome />} />
+        <Route path="/bases/:entity" element={<RecordDetail />} />
         <Route path="/informes" element={<Reports />} />
         <Route path="/documentos" element={<Documents />} />
         <Route path="/usuarios" element={<Users />} />

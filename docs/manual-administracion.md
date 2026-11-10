@@ -23,6 +23,18 @@ Acceso: `https://<dominio>/admin` (enlace «Funcionarios» del portal). El menú
 
 Los roles son configurables en *Roles y permisos*; nadie puede modificar sus propios roles.
 
+## 3a. Bases de datos (estudiantes, docentes, graduados, personal)
+
+Menú **Bases de datos**. Cada base tiene una tarjeta con su total y la fecha de la última carga.
+
+1. **Plantilla:** botón «Descargar plantilla». Es un Excel con tres hojas: *Datos* (encabezados; los obligatorios en rojo), *Instrucciones* y *Valores válidos* (programas, CAT, dependencias y opciones). Se envía a la oficina con el correo de solicitud.
+2. **Cargar:** pestaña «Cargar archivo» → elegir el semestre (estudiantes, docentes y personal) → arrastrar el archivo (.xlsx o .csv) → «Revisar archivo». Revisar no guarda nada: muestra filas leídas, filas correctas y una tabla con cada error (fila, columna y qué corregir).
+3. **Confirmar:** «Cargar N registros». Si ya había datos de ese semestre, se reemplazan. Se pueden cargar solo las filas correctas y pedir a la oficina las demás.
+4. **Consultar:** totales por CAT, programa, sexo, vinculación, etc., con filtros. Los nombres y documentos solo se ven con el permiso «Ver datos personales» y cada consulta queda en la auditoría.
+5. **Historial:** cada carga con quién la hizo y cuándo; la carga vigente se puede **deshacer**.
+
+Permisos: `records.view` (consultar), `records.import` (cargar y deshacer), `records.view_personal` (ver datos personales). El archivo original no se guarda; los datos personales quedan cifrados y la fecha de nacimiento solo se usa para calcular el rango de edad.
+
 ## 3. Registrar datos de un indicador (coordinadores)
 
 1. *Catálogo de indicadores* → abra el indicador (use «Solo mis dependencias»).
