@@ -41,7 +41,7 @@ export function IndicatorList() {
       {error && <ErrorBox message={error} />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
         <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Código</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Responsable</th><th className="px-3 py-2">Metodología</th><th className="px-3 py-2">Publicación</th><th className="px-3 py-2">Último lote</th><th /></tr></thead>
+          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Código</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Responsable</th><th className="px-3 py-2">Metodología</th><th className="px-3 py-2">Publicación</th><th className="px-3 py-2">Última carga</th><th /></tr></thead>
           <tbody className="divide-y divide-line">
             {data?.map((i) => (
               <tr key={i.id} className="hover:bg-surface/60">
@@ -78,7 +78,7 @@ export function IndicatorDetail() {
   );
   const save = async () => { setMsg(null); try { await admin.put(`indicators/${id}`, form); setMsg({ k: 'ok', t: 'Ficha técnica guardada.' }); reload(); } catch (e) { setMsg({ k: 'error', t: errorText(e) }); } };
   const newSub = async (supersedes?: number) => {
-    try { const s = await admin.post<Row>('submissions', { indicator_id: Number(id), title: supersedes ? 'Corrección de lote publicado' : 'Nueva carga', supersedes_id: supersedes ?? null }); nav(`/cargas/${s.id}`); } catch (e) { setMsg({ k: 'error', t: errorText(e) }); }
+    try { const s = await admin.post<Row>('submissions', { indicator_id: Number(id), title: supersedes ? 'Corrección de una carga publicada' : 'Nueva carga', supersedes_id: supersedes ?? null }); nav(`/cargas/${s.id}`); } catch (e) { setMsg({ k: 'error', t: errorText(e) }); }
   };
   const p = data.internal_preview;
   return (
@@ -91,7 +91,7 @@ export function IndicatorDetail() {
           {can('indicators.submit') && <a href={admin.url(`indicators/${id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="download" /> Plantilla Excel</a>}
         </div>
         <p className="mb-3 text-sm text-muted">Vista interna (incluye datos aprobados no publicados): {p.row_count} valores; último total {p.kpi ? `${fmtValue(p.kpi.value, data.value_type)} (${p.kpi.period})` : '—'}.</p>
-        <table className="w-full text-sm"><thead className="text-xs text-muted uppercase"><tr><th className="py-1 text-left">Lote</th><th className="text-left">Estado</th><th className="text-left">Valores</th><th className="text-left">Registró</th><th className="text-left">Publicado</th><th /></tr></thead>
+        <table className="w-full text-sm"><thead className="text-xs text-muted uppercase"><tr><th className="py-1 text-left">Carga</th><th className="text-left">Estado</th><th className="text-left">Datos</th><th className="text-left">Registró</th><th className="text-left">Publicado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{subs.data?.data.map((s) => (
             <tr key={s.id}><td className="py-1.5">#{s.id} {s.title}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td><StatusBadge s={s.status} /></td><td>{s.values_count}</td><td>{s.creator?.name}</td><td>{fmtDateTime(s.published_at)}</td>
               <td className="text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link>{s.status === 'publicado' && can('indicators.submit') && <button onClick={() => newSub(s.id)} className="ml-3 text-sm text-ut-red hover:underline">Corregir</button>}</td></tr>
@@ -154,9 +154,9 @@ export function SubmissionDetail() {
     <div className="space-y-5">
       <div>
         <Link to={`/indicadores/${ind.id}`} className="text-sm text-ut-red hover:underline">← {ind.code} {ind.name}</Link>
-        <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold text-ut-red">Lote #{s.id} <StatusBadge s={s.status} />{s.is_demo && <Badge tone="amber">Demo</Badge>}</h1>
+        <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold text-ut-red">Carga n.º {s.id} <StatusBadge s={s.status} />{s.is_demo && <Badge tone="amber">Demo</Badge>}</h1>
         <p className="text-sm text-muted">Registró: {s.creator?.name} · Envió: {s.submitter?.name ?? '—'} ({fmtDateTime(s.submitted_at)}) · Aprobó: {s.approver?.name ?? '—'} ({fmtDateTime(s.approved_at)}) · Publicó: {s.publisher?.name ?? '—'} ({fmtDateTime(s.published_at)})</p>
-        {s.supersedes_id && <p className="text-sm text-amber-800">Corrige y reemplazará al lote #{s.supersedes_id} al publicarse.</p>}
+        {s.supersedes_id && <p className="text-sm text-amber-800">Corrige y reemplazará a la carga n.º {s.supersedes_id} al publicarse.</p>}
       </div>
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
 
@@ -169,7 +169,7 @@ export function SubmissionDetail() {
               <a href={admin.url(`indicators/${ind.id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="download" /> Plantilla</a>
               {can('indicators.import') && (
                 <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="upload" /> Importar Excel/CSV
-                  <input type="file" accept=".xlsx,.csv" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) run(() => admin.upload(`submissions/${id}/import`, f), 'Archivo importado y validado. Los valores anteriores del lote fueron reemplazados.'); e.target.value = ''; }} />
+                  <input type="file" accept=".xlsx,.csv" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) run(() => admin.upload(`submissions/${id}/import`, f), 'Archivo importado y validado. Los datos anteriores de esta carga fueron reemplazados.'); e.target.value = ''; }} />
                 </label>
               )}
             </div>
@@ -203,14 +203,14 @@ export function SubmissionDetail() {
         <h2 className="font-bold">Flujo de revisión y publicación</h2>
         <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Comentario (obligatorio para devolver)" className={inputCls} />
         <div className="flex flex-wrap gap-2">
-          {editable && <Button disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/submit`, { comment }), 'Lote enviado a revisión.')}>Enviar a revisión</Button>}
+          {editable && <Button disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/submit`, { comment }), 'Carga enviada a revisión.')}>Enviar a revisión</Button>}
           {s.status === 'enviado' && can('indicators.review') && !ownSub && <>
-            <Button disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/review`, { decision: 'aprobado', comment }), 'Lote aprobado.')}>Aprobar</Button>
-            <Button variant="danger" disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/review`, { decision: 'devuelto', comment }), 'Lote devuelto para corrección.')}>Devolver</Button>
+            <Button disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/review`, { decision: 'aprobado', comment }), 'Carga aprobado.')}>Aprobar</Button>
+            <Button variant="danger" disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/review`, { decision: 'devuelto', comment }), 'Carga devuelta para corrección.')}>Devolver</Button>
           </>}
-          {s.status === 'enviado' && can('indicators.review') && ownSub && <Notice kind="info">Separación de funciones: otra persona debe revisar este lote.</Notice>}
-          {s.status === 'aprobado' && can('indicators.publish') && <Button disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/publish`), 'Lote publicado en el portal.')}>Publicar en el portal</Button>}
-          {s.status === 'publicado' && can('indicators.publish') && <Button variant="danger" disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/unpublish`, { comment }), 'Lote retirado del portal.')}>Retirar del portal</Button>}
+          {s.status === 'enviado' && can('indicators.review') && ownSub && <Notice kind="info">Separación de funciones: otra persona debe revisar esta carga.</Notice>}
+          {s.status === 'aprobado' && can('indicators.publish') && <Button disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/publish`), 'Carga publicada en el portal.')}>Publicar en el portal</Button>}
+          {s.status === 'publicado' && can('indicators.publish') && <Button variant="danger" disabled={busy} onClick={() => run(() => admin.post(`submissions/${id}/unpublish`, { comment }), 'Carga retirada del portal.')}>Retirar del portal</Button>}
           {s.status === 'borrador' && can('indicators.submit') && <Button variant="ghost" className="text-ut-red" onClick={async () => { if (confirm('¿Eliminar el borrador?')) { await admin.del(`submissions/${id}`); history.back(); } }}>Eliminar borrador</Button>}
         </div>
         <ol className="space-y-1 text-sm">{s.reviews.map((r: Row) => <li key={r.id}>{fmtDateTime(r.created_at)} · <StatusBadge s={r.decision} /> · {r.reviewer?.name}{r.comment ? ` — «${r.comment}»` : ''}</li>)}</ol>
@@ -245,7 +245,7 @@ export function SubmissionList() {
       {error && <ErrorBox message={error} />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
         <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Lote</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2">Valores</th><th className="px-3 py-2">Registró</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
+          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Carga</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2">Datos</th><th className="px-3 py-2">Registró</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((s: Row) => (
             <tr key={s.id}><td className="px-3 py-2">#{s.id}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td className="px-3 py-2">{s.indicator?.code} {s.indicator?.name}</td><td className="px-3 py-2"><StatusBadge s={s.status} /></td><td className="px-3 py-2">{s.values_count}</td><td className="px-3 py-2">{s.creator?.name}</td><td className="px-3 py-2">{fmtDateTime(s.updated_at)}</td><td className="px-3 py-2 text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link></td></tr>
           ))}</tbody>

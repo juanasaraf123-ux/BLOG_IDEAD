@@ -15,8 +15,8 @@ const CONF_TONE: Record<string, 'green' | 'gray' | 'amber' | 'red'> = { publico:
 // ------------------------------------------------------------------ Tablero
 
 const PENDING_LABELS: Record<string, [string, string, string]> = {
-  lotes_por_revisar: ['Lotes de datos por revisar', '/cargas', 'search'], lotes_por_publicar: ['Lotes aprobados por publicar', '/cargas', 'upload'],
-  mis_lotes_devueltos: ['Mis lotes devueltos para corrección', '/cargas', 'alert'], mis_borradores: ['Mis borradores', '/cargas', 'file'],
+  lotes_por_revisar: ['Cargas de indicadores por revisar', '/cargas', 'search'], lotes_por_publicar: ['Cargas aprobadas por publicar', '/cargas', 'upload'],
+  mis_lotes_devueltos: ['Mis cargas devueltas para corregir', '/cargas', 'alert'], mis_borradores: ['Mis cargas en borrador', '/cargas', 'file'],
   contenidos_en_revision: ['Contenidos en revisión', '/r/noticias', 'book'],
   solicitudes_abiertas: ['Solicitudes para mi dependencia', '/r/solicitudes', 'mail'],
   solicitudes_vencidas: ['Solicitudes vencidas', '/r/solicitudes', 'clock'],
@@ -123,7 +123,7 @@ export function Documents() {
         actions={can('documents.upload') ? <Button variant="primary" onClick={() => setOpen('new')}><Icon name="upload" /> Cargar documento</Button> : undefined} />
       <div className="mb-3 flex flex-wrap gap-3">
         <label className="text-xs font-bold text-muted uppercase">Buscar<input value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })} className={inputCls} /></label>
-        <label className="text-xs font-bold text-muted uppercase">Confidencialidad<select value={filters.confidentiality} onChange={(e) => setFilters({ ...filters, confidentiality: e.target.value })} className={inputCls}><option value="">Todas</option>{['publico', 'interno', 'restringido', 'financiero'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select></label>
+        <label className="text-xs font-bold text-muted uppercase">Reserva<select value={filters.confidentiality} onChange={(e) => setFilters({ ...filters, confidentiality: e.target.value })} className={inputCls}><option value="">Todas</option>{['publico', 'interno', 'restringido', 'financiero'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select></label>
         <label className="text-xs font-bold text-muted uppercase">Categoría<select value={filters.category_id} onChange={(e) => setFilters({ ...filters, category_id: e.target.value })} className={inputCls}><option value="">Todas</option>{cats.map((c) => <option key={String(c.id)} value={String(c.id)}>{String(c.name)}</option>)}</select></label>
         <label className="text-xs font-bold text-muted uppercase">Estado<select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })} className={inputCls}><option value="">Todos</option>{['borrador', 'vigente', 'archivado'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select></label>
       </div>
@@ -131,7 +131,7 @@ export function Documents() {
       {loading && <Spinner />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
         <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Documento</th><th className="px-3 py-2">Categoría</th><th className="px-3 py-2">Confidencialidad</th><th className="px-3 py-2">Dependencia</th><th className="px-3 py-2">Versión</th><th className="px-3 py-2">Cargó</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
+          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Documento</th><th className="px-3 py-2">Categoría</th><th className="px-3 py-2">Reserva</th><th className="px-3 py-2">Dependencia</th><th className="px-3 py-2">Versión</th><th className="px-3 py-2">Cargó</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">
             {data?.data.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-muted">Sin documentos visibles.</td></tr>}
             {data?.data.map((d: Row) => (
@@ -235,7 +235,7 @@ export function Users() {
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
         <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Nombre</th><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Roles</th><th className="px-3 py-2">Dependencias</th><th className="px-3 py-2">2FA</th><th className="px-3 py-2">Último acceso</th><th className="px-3 py-2">Estado</th><th /></tr></thead>
+          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Nombre</th><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Roles</th><th className="px-3 py-2">Dependencias</th><th className="px-3 py-2">Verificación en dos pasos</th><th className="px-3 py-2">Último acceso</th><th className="px-3 py-2">Estado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((u: Row) => (
             <tr key={u.id}><td className="px-3 py-2 font-semibold">{u.name}</td><td className="px-3 py-2">{u.email}</td><td className="px-3 py-2">{u.roles.map((r: Row) => r.name).join(', ')}</td><td className="px-3 py-2">{u.dependencies.map((d: Row) => d.code).join(', ')}</td><td className="px-3 py-2">{u.mfa_enabled ? <Badge tone="green">Activo</Badge> : <Badge>No</Badge>}</td><td className="px-3 py-2">{fmtDateTime(u.last_login_at) || '—'}</td><td className="px-3 py-2">{u.is_active ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Inactivo</Badge>}</td>
               <td className="px-3 py-2 text-right">{can('users.manage') && <button className="font-semibold text-ut-red hover:underline" onClick={() => { setMsg(null); setOpen({ ...u, password: '', role_ids: u.roles.map((r: Row) => r.id), dependency_ids: u.dependencies.map((d: Row) => d.id) }); }}>Editar</button>}</td></tr>
@@ -321,6 +321,25 @@ export function Roles() {
 
 // ------------------------------------------------------------------ Auditoría, configuración e informes
 
+const AUDIT_LABELS: Record<string, string> = {
+  'auth.login': 'Ingresó al panel', 'auth.logout': 'Salió del panel', 'auth.failed': 'Intento de ingreso fallido', 'auth.locked': 'Cuenta bloqueada por intentos fallidos',
+  'auth.mfa_enabled': 'Activó la verificación en dos pasos', 'auth.mfa_disabled': 'Desactivó la verificación en dos pasos', 'auth.mfa_failed': 'Código de verificación incorrecto',
+  'auth.password_changed': 'Cambió su contraseña', 'auth.password_reset': 'Restableció su contraseña', 'auth.password_reset_requested': 'Pidió recuperar la contraseña',
+  'content.enviar': 'Envió un contenido a revisión', 'content.publicar': 'Publicó un contenido', 'content.devolver': 'Devolvió un contenido con observaciones', 'content.despublicar': 'Retiró un contenido del portal',
+  'document.download': 'Descargó un documento', 'document.uploaded': 'Subió un documento', 'document.version_added': 'Subió una nueva versión de un documento', 'document.reclassified': 'Cambió la reserva de un documento',
+  'indicator.publish': 'Publicó datos de un indicador', 'indicator.unpublish': 'Retiró datos de un indicador', 'indicator.authorization_changed': 'Cambió la autorización de un indicador',
+  'records.import': 'Cargó una base de datos', 'records.undo': 'Deshizo la carga de una base', 'records.view_personal': 'Consultó datos personales',
+  'report.export': 'Descargó un informe', 'report.petty_cash': 'Descargó el informe de caja menor',
+  'role.permissions_changed': 'Cambió los permisos de un rol', 'role.deleted': 'Eliminó un rol', 'settings.updated': 'Cambió la configuración',
+  'user.created': 'Creó un usuario', 'user.created_cli': 'Creó un usuario (consola)', 'user.deactivated': 'Desactivó un usuario', 'user.roles_changed': 'Cambió el rol de un usuario', 'user.mfa_reset': 'Reinició la verificación de un usuario',
+};
+const ENTITY_LABELS: Record<string, string> = {
+  News: 'Noticia', Event: 'Actividad', Page: 'Página', MediaItem: 'Multimedia', Document: 'Documento', User: 'Usuario', Role: 'Rol', DataSubmission: 'Lote de indicador',
+  Indicator: 'Indicador', RecordImport: 'Carga de base', Project: 'Proyecto', Cat: 'CAT', Program: 'Programa', Publication: 'Publicación', Agreement: 'Convenio',
+};
+const META_KEYS: Record<string, string> = { entity: 'base', period: 'semestre', rows: 'registros', page: 'página', email: 'correo', format: 'formato', role: 'rol', roles: 'roles', status: 'estado', title: 'título', reason: 'motivo', from: 'antes', to: 'después', indicator: 'indicador', submission: 'carga' };
+const metaText = (m: Row | null) => (m ? Object.entries(m).map(([k, v]) => `${META_KEYS[k] ?? k}: ${typeof v === 'object' ? JSON.stringify(v) : v}`).join(' · ') : '');
+
 export function Audit() {
   const [f, setF] = useState({ action: '', from: '', to: '' });
   const [page, setPage] = useState(1);
@@ -329,14 +348,14 @@ export function Audit() {
     <div>
       <PageHeader title="Auditoría" icon="history" eyebrow="Administración" description="Quién hizo qué y cuándo: ingresos, intentos fallidos, cambios de permisos, publicaciones, descargas y consultas de datos personales. No se puede modificar." />
       <div className="mb-3 flex flex-wrap gap-3">
-        <label className="text-xs font-bold text-muted uppercase">Acción<input value={f.action} onChange={(e) => setF({ ...f, action: e.target.value })} placeholder="auth.login" className={inputCls} /></label>
+        <label className="text-xs font-bold text-muted uppercase">Qué pasó<select value={f.action} onChange={(e) => setF({ ...f, action: e.target.value })} className={`${inputCls} normal-case`}><option value="">Todo</option>{Object.entries(AUDIT_LABELS).map(([k, v]) => <option key={k} value={k}>{v}</option>)}</select></label>
         <label className="text-xs font-bold text-muted uppercase">Desde<input type="date" value={f.from} onChange={(e) => setF({ ...f, from: e.target.value })} className={inputCls} /></label>
         <label className="text-xs font-bold text-muted uppercase">Hasta<input type="date" value={f.to} onChange={(e) => setF({ ...f, to: e.target.value })} className={inputCls} /></label>
       </div>
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
-        <table className="w-full text-left text-sm"><thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Fecha</th><th className="px-3 py-2">Usuario</th><th className="px-3 py-2">Acción</th><th className="px-3 py-2">Entidad</th><th className="px-3 py-2">Detalle</th><th className="px-3 py-2">IP</th></tr></thead>
-          <tbody className="divide-y divide-line">{data?.data.map((a: Row) => <tr key={a.id}><td className="px-3 py-1.5 whitespace-nowrap">{fmtDateTime(a.created_at)}</td><td className="px-3 py-1.5">{a.user?.name ?? '—'}</td><td className="px-3 py-1.5"><code>{a.action}</code></td><td className="px-3 py-1.5">{a.entity_type ? `${a.entity_type} #${a.entity_id}` : '—'}</td><td className="max-w-xs truncate px-3 py-1.5 text-xs text-muted" title={JSON.stringify(a.meta)}>{a.meta ? JSON.stringify(a.meta) : ''}</td><td className="px-3 py-1.5">{a.ip}</td></tr>)}</tbody>
+        <table className="w-full text-left text-sm"><thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Fecha</th><th className="px-3 py-2">Usuario</th><th className="px-3 py-2">Qué pasó</th><th className="px-3 py-2">Sobre</th><th className="px-3 py-2">Detalle</th><th className="px-3 py-2">Equipo (IP)</th></tr></thead>
+          <tbody className="divide-y divide-line">{data?.data.map((a: Row) => <tr key={a.id}><td className="px-3 py-1.5 whitespace-nowrap">{fmtDateTime(a.created_at)}</td><td className="px-3 py-1.5">{a.user?.name ?? '—'}</td><td className="px-3 py-1.5">{AUDIT_LABELS[a.action] ?? a.action}</td><td className="px-3 py-1.5">{a.entity_type ? `${ENTITY_LABELS[a.entity_type] ?? a.entity_type} n.º ${a.entity_id}` : '—'}</td><td className="max-w-xs truncate px-3 py-1.5 text-xs text-muted" title={metaText(a.meta)}>{metaText(a.meta)}</td><td className="px-3 py-1.5">{a.ip}</td></tr>)}</tbody>
         </table>
       </div>
       {data && data.last_page > 1 && <div className="mt-3 flex justify-end gap-2"><Button variant="secondary" disabled={page <= 1} onClick={() => setPage(page - 1)}>Anterior</Button><span className="self-center text-sm">{page} / {data.last_page}</span><Button variant="secondary" disabled={page >= data.last_page} onClick={() => setPage(page + 1)}>Siguiente</Button></div>}

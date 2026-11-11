@@ -16,7 +16,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   noticias: {
     icon: 'book',
     title: 'Noticias', endpoint: 'news', entity: 'News', editPermission: CONTENT_EDIT, publishPermission: CONTENT_PUB, workflowField: 'status',
-    description: 'Borrador → revisión → publicación. La fecha de publicación futura programa la noticia.',
+    description: 'Noticias del IDEAD para el portal. Se escriben, pasan a revisión y la Dirección las publica. Si pone una fecha futura, la noticia sale sola ese día.',
     fields: [
       { name: 'title', label: 'Título', type: 'text', required: true, full: true },
       { name: 'summary', label: 'Resumen', type: 'textarea' },
@@ -28,11 +28,11 @@ export const RESOURCES: Record<string, ResourceConfig> = {
       { name: 'is_featured', label: 'Destacada en el inicio', type: 'checkbox' },
     ],
     imageUrls: (r) => ({ cover_file_id: r.cover?.url }),
-    columns: [{ key: 'title', label: 'Título' }, { key: 'category', label: 'Categoría', render: (r) => r.category?.name ?? '—' }, { key: 'publish_at', label: 'Publicación', render: (r) => fmtDateTime(r.publish_at) || '—' }, { key: 'author', label: 'Autor', render: (r) => r.author?.name ?? '—' }],
+    columns: [{ key: 'title', label: 'Título' }, { key: 'category', label: 'Categoría', render: (r) => r.category?.name ?? '—' }, { key: 'publish_at', label: 'Fecha de publicación', render: (r) => fmtDateTime(r.publish_at) || '—' }, { key: 'author', label: 'Autor', render: (r) => r.author?.name ?? '—' }],
   },
   actividades: {
     icon: 'calendar',
-    title: 'Actividades', endpoint: 'events', entity: 'Event', editPermission: CONTENT_EDIT, publishPermission: CONTENT_PUB, workflowField: 'status',
+    title: 'Actividades', description: 'Eventos y actividades (ferias, jornadas, encuentros) que aparecen en la agenda del portal.', endpoint: 'events', entity: 'Event', editPermission: CONTENT_EDIT, publishPermission: CONTENT_PUB, workflowField: 'status',
     fields: [
       { name: 'title', label: 'Título', type: 'text', required: true, full: true },
       { name: 'summary', label: 'Resumen', type: 'textarea' },
@@ -51,7 +51,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   multimedia: {
     icon: 'image',
     title: 'Multimedia', endpoint: 'media', entity: 'MediaItem', editPermission: ['media.manage'], publishPermission: CONTENT_PUB, workflowField: 'status',
-    description: 'Solo se publican fotografías con autorización de uso de imagen. Videos: enlaces de YouTube o Vimeo.',
+    description: 'Fotos y videos del portal. Las fotos deben tener autorización de uso de imagen; los videos se agregan con el enlace de YouTube o Vimeo.',
     fields: [
       { name: 'title', label: 'Título', type: 'text', required: true },
       { name: 'type', label: 'Tipo', type: 'select', required: true, options: [{ value: 'foto', label: 'Fotografía' }, { value: 'video', label: 'Video' }] },
@@ -70,17 +70,17 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   paginas: {
     icon: 'file',
     title: 'Páginas', endpoint: 'pages', entity: 'Page', editPermission: CONTENT_EDIT, publishPermission: CONTENT_PUB, workflowField: 'status',
-    description: 'Páginas institucionales: sobre-idead, privacidad, accesibilidad, contacto…',
+    description: 'Páginas fijas del portal: Sobre el IDEAD, contacto, privacidad y accesibilidad.',
     fields: [
       { name: 'slug', label: 'Identificador en la URL', type: 'text', required: true, help: 'Minúsculas y guiones. Se publica en /pagina/identificador (sobre-idead tiene su propia sección).' },
       { name: 'title', label: 'Título', type: 'text', required: true },
       { name: 'body', label: 'Contenido', type: 'html' },
     ],
-    columns: [{ key: 'title', label: 'Título' }, { key: 'slug', label: 'URL' }],
+    columns: [{ key: 'title', label: 'Título' }, { key: 'slug', label: 'Dirección en el portal', render: (r) => `/${r.slug}` }],
   },
   carrusel: {
     icon: 'image',
-    title: 'Carrusel del inicio', endpoint: 'hero-slides', entity: 'HeroSlide', editPermission: ['content.site'],
+    title: 'Carrusel', description: 'Imágenes grandes que rotan en la parte superior del inicio del portal.', endpoint: 'hero-slides', entity: 'HeroSlide', editPermission: ['content.site'],
     fields: [
       { name: 'title', label: 'Título (texto alternativo)', type: 'text', required: true, full: true },
       { name: 'subtitle', label: 'Subtítulo', type: 'text', full: true },
@@ -93,12 +93,12 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     ],
     defaults: { is_active: true, sort: 0 },
     imageUrls: (r) => ({ image_file_id: r.image?.url }),
-    columns: [{ key: 'title', label: 'Título' }, { key: 'sort', label: 'Orden' }, { key: 'is_active', label: 'Activa', render: (r) => (r.is_active ? 'Sí' : 'No') }],
+    columns: [{ key: 'title', label: 'Título' }, { key: 'sort', label: 'Orden' }, { key: 'is_active', label: '¿Se muestra?', render: (r) => (r.is_active ? 'Sí' : 'No') }],
   },
   destacados: {
     icon: 'chart',
-    title: 'Cifras destacadas del inicio', endpoint: 'highlights', entity: 'HomeHighlight', editPermission: ['content.site'],
-    description: 'Cada cifra se conecta a un indicador publicado (o a un conteo de registros publicados); nunca se escribe a mano.',
+    title: 'Cifras destacadas', endpoint: 'highlights', entity: 'HomeHighlight', editPermission: ['content.site'],
+    description: 'Las cifras grandes del inicio del portal (estudiantes, CAT, programas…). Se toman de los datos publicados; no se escriben a mano.',
     fields: [
       { name: 'label', label: 'Etiqueta', type: 'text', required: true },
       { name: 'icon', label: 'Ícono', type: 'select', required: true, options: ['building', 'students', 'teacher', 'pin', 'graduation', 'calendar', 'graduate', 'project', 'money', 'book'].map((v) => ({ value: v, label: v })) },
@@ -110,11 +110,11 @@ export const RESOURCES: Record<string, ResourceConfig> = {
       { name: 'is_active', label: 'Activa', type: 'checkbox' },
     ],
     defaults: { is_active: true, metric_type: 'indicator', sort: 0 },
-    columns: [{ key: 'label', label: 'Etiqueta' }, { key: 'metric_type', label: 'Origen' }, { key: 'indicator', label: 'Indicador', render: (r) => r.indicator?.code ?? '—' }, { key: 'sort', label: 'Orden' }],
+    columns: [{ key: 'label', label: 'Etiqueta' }, { key: 'metric_type', label: 'De dónde sale' }, { key: 'indicator', label: 'Indicador', render: (r) => r.indicator?.code ?? '—' }, { key: 'sort', label: 'Orden' }],
   },
   equipo: {
     icon: 'people',
-    title: 'Equipo IDEAD', endpoint: 'team-units', entity: 'TeamUnit', editPermission: ['content.site'],
+    title: 'Equipo IDEAD', description: 'Dependencias del IDEAD con su correo y teléfono, tal como aparecen en el portal.', endpoint: 'team-units', entity: 'TeamUnit', editPermission: ['content.site'],
     fields: [
       { name: 'name', label: 'Nombre de la unidad', type: 'text', required: true },
       { name: 'email', label: 'Correo institucional', type: 'email' },
@@ -129,14 +129,14 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   'categorias-noticias': {
     icon: 'filter',
-    title: 'Categorías de noticias', endpoint: 'news-categories', editPermission: ['content.site'],
+    title: 'Categorías de noticias', description: 'Temas para clasificar las noticias (académica, bienestar, investigación…).', endpoint: 'news-categories', editPermission: ['content.site'],
     fields: [{ name: 'name', label: 'Nombre', type: 'text', required: true }],
-    columns: [{ key: 'name', label: 'Nombre' }, { key: 'slug', label: 'Identificador' }],
+    columns: [{ key: 'name', label: 'Nombre' }, { key: 'slug', label: 'Nombre corto' }],
   },
   cat: {
     icon: 'building',
-    title: 'Centros de Atención Tutorial', endpoint: 'cats', entity: 'Cat', editPermission: ['cats.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
-    description: 'Ficha de cada CAT. Las coordenadas solo se muestran en el mapa si se marcan como verificadas; el responsable solo si su publicación está autorizada.',
+    title: 'Fichas de los CAT', endpoint: 'cats', entity: 'Cat', editPermission: ['cats.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
+    description: 'Información pública de cada Centro de Atención Tutorial: dirección, contacto, horario, fotos y ubicación en el mapa.',
     fields: [
       { name: 'name', label: 'Nombre', type: 'text', required: true },
       rel('municipality_id', 'Municipio', 'municipalities', { required: true, optionLabel: (o) => `${o.name} (${(o.department as Row)?.name ?? ''})` }),
@@ -175,7 +175,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   programas: {
     icon: 'graduation',
-    title: 'Programas académicos', endpoint: 'programs', entity: 'Program', editPermission: ['programs.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
+    title: 'Programas académicos', description: 'Ficha pública de cada programa: nivel, código SNIES, duración, créditos y registro calificado.', endpoint: 'programs', entity: 'Program', editPermission: ['programs.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
     fields: [
       { name: 'name', label: 'Nombre', type: 'text', required: true, full: true },
       { name: 'snies_code', label: 'Código SNIES', type: 'text' },
@@ -195,8 +195,8 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   oferta: {
     icon: 'table',
-    title: 'Oferta por CAT y período', endpoint: 'offerings', entity: 'ProgramOffering', editPermission: ['programs.edit'],
-    description: 'Programas disponibles en cada CAT por período, cupos aprobados y si reciben estudiantes nuevos.',
+    title: 'Programas ofrecidos por CAT', endpoint: 'offerings', entity: 'ProgramOffering', editPermission: ['programs.edit'],
+    description: 'Qué programas se ofrecen en cada CAT en cada semestre, con los cupos aprobados.',
     fields: [
       rel('program_id', 'Programa', 'programs', { required: true }), rel('cat_id', 'CAT', 'cats', { required: true }),
       rel('period_id', 'Período', 'periods', { required: true, optionLabel: (o) => String(o.code) }),
@@ -209,7 +209,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   proyectos: {
     icon: 'project',
-    title: 'Proyectos de inversión', endpoint: 'projects', entity: 'Project', editPermission: ['projects.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
+    title: 'Proyectos', description: 'Proyectos de inversión del IDEAD con su estado, valor y municipios beneficiados.', endpoint: 'projects', entity: 'Project', editPermission: ['projects.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
     fields: [
       { name: 'name', label: 'Nombre', type: 'text', required: true, full: true },
       { name: 'code', label: 'Código', type: 'text' },
@@ -236,19 +236,19 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   avances: {
     icon: 'chart',
-    title: 'Reportes de avance de proyectos', endpoint: 'project-progress', entity: 'ProjectProgress', editPermission: ['projects.edit'],
-    description: 'Cada reporte actualiza el avance y la ejecución del proyecto y conserva la serie histórica.',
+    title: 'Avances de proyectos', endpoint: 'project-progress', entity: 'ProjectProgress', editPermission: ['projects.edit'],
+    description: 'Cada avance que se registra actualiza el porcentaje y la ejecución del proyecto en el portal.',
     fields: [
       rel('project_id', 'Proyecto', 'projects', { required: true }), { name: 'reported_on', label: 'Fecha del reporte', type: 'date', required: true },
       { name: 'progress_pct', label: 'Avance (%)', type: 'number', required: true }, { name: 'executed_amount', label: 'Ejecutado acumulado ($)', type: 'number' },
       { name: 'note', label: 'Observación', type: 'text', full: true },
     ],
-    columns: [{ key: 'project_id', label: 'Proyecto (id)' }, { key: 'reported_on', label: 'Fecha', render: (r) => fmtDate(r.reported_on) }, { key: 'progress_pct', label: 'Avance %' }],
+    columns: [{ key: 'project_id', label: 'Proyecto', render: (r) => r.project?.name ?? '—' }, { key: 'reported_on', label: 'Fecha', render: (r) => fmtDate(r.reported_on) }, { key: 'progress_pct', label: 'Avance', render: (r) => `${r.progress_pct} %` }],
   },
   convenios: {
     icon: 'hands',
-    title: 'Convenios institucionales', endpoint: 'agreements', entity: 'Agreement', editPermission: ['agreements.manage'],
-    description: 'Solo los convenios marcados como públicos aparecen en el portal; el texto completo se gestiona en Documentos (restringido).',
+    title: 'Convenios', endpoint: 'agreements', entity: 'Agreement', editPermission: ['agreements.manage'],
+    description: 'Convenios del IDEAD con otras entidades. Solo los marcados como públicos se muestran en el portal; la copia firmada se guarda en Documentos.',
     fields: [
       { name: 'number', label: 'Número', type: 'text' }, { name: 'counterpart', label: 'Entidad contraparte', type: 'text', required: true },
       { name: 'object', label: 'Objeto', type: 'textarea', required: true },
@@ -264,7 +264,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   publicaciones: {
     icon: 'book',
     title: 'Publicaciones', endpoint: 'publications', entity: 'Publication', editPermission: ['lists.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
-    description: 'Producción académica (artículos, libros, capítulos, ponencias, creación) y publicaciones institucionales.',
+    description: 'Libros, artículos, capítulos y demás publicaciones del IDEAD que se muestran en el portal.',
     fields: [
       { name: 'title', label: 'Título', type: 'text', required: true, full: true },
       { name: 'publication_type', label: 'Tipo', type: 'select', required: true, options: [['articulo', 'Artículo'], ['libro', 'Libro'], ['capitulo', 'Capítulo de libro'], ['ponencia', 'Ponencia'], ['creacion', 'Producto de creación'], ['revista', 'Revista'], ['boletin', 'Boletín'], ['informe', 'Informe']].map(([value, l]) => ({ value, label: l })) },
@@ -283,8 +283,8 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   solicitudes: {
     icon: 'mail',
-    title: 'Solicitudes de actualización', endpoint: 'update-requests', entity: 'UpdateRequest', editPermission: ['indicators.review', 'indicators.submit'], createPermission: ['indicators.review'],
-    description: 'La Dirección solicita a una dependencia actualizar un indicador o información. Las dependencias responden indicando el lote de datos que la atiende.',
+    title: 'Solicitudes a oficinas', endpoint: 'update-requests', entity: 'UpdateRequest', editPermission: ['indicators.review', 'indicators.submit'], createPermission: ['indicators.review'],
+    description: 'Pedidos de la Dirección a una oficina para que envíe o actualice información, con fecha límite. La oficina responde aquí mismo.',
     fields: [
       { name: 'title', label: 'Asunto', type: 'text', required: true, full: true },
       rel('dependency_id', 'Dependencia', 'dependencies', { required: true, optionLabel: (o) => `${o.code} — ${o.name}` }),
@@ -302,8 +302,8 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   listados: {
     icon: 'book',
-    title: 'Listados institucionales', endpoint: 'catalog-items', entity: 'CatalogItem', editPermission: ['lists.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
-    description: 'Grupos y semilleros, plataformas digitales, formación continua, opciones de grado, hitos de la oferta, servicios de bienestar…',
+    title: 'Otros listados', endpoint: 'catalog-items', entity: 'CatalogItem', editPermission: ['lists.edit'], publishPermission: ['entities.publish'], workflowField: 'publication_status',
+    description: 'Listas cortas que muestra el portal: grupos y semilleros, plataformas digitales, cursos de educación continua, servicios de bienestar…',
     fields: [
       { name: 'list_type', label: 'Listado', type: 'select', required: true, options: [
         ['grupos_investigacion', 'Grupos de investigación'], ['semilleros', 'Semilleros'], ['plataformas_digitales', 'Plataformas digitales'], ['formacion_continua', 'Formación continua'],
@@ -321,14 +321,14 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   },
   'caja-menor': {
     icon: 'money',
-    title: 'Caja menor — presupuestos', endpoint: 'petty-cash-budgets', entity: 'PettyCashBudget', editPermission: ['petty_cash.manage'],
+    title: 'Presupuestos de caja menor', description: 'Valor asignado a la caja menor en cada vigencia y cuánto se ha gastado.', endpoint: 'petty-cash-budgets', entity: 'PettyCashBudget', editPermission: ['petty_cash.manage'],
     fields: [{ name: 'year', label: 'Vigencia', type: 'number', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }, { name: 'amount', label: 'Valor ($)', type: 'number', required: true }, { name: 'notes', label: 'Notas', type: 'textarea' }],
     columns: [{ key: 'year', label: 'Vigencia' }, { key: 'name', label: 'Presupuesto' }, { key: 'amount', label: 'Valor', render: (r) => fmtCurrency(r.amount, false) }, { key: 'spent', label: 'Gastado', render: (r) => fmtCurrency(Number(r.spent ?? 0), false) }],
   },
   'caja-menor-gastos': {
     icon: 'money',
-    title: 'Caja menor — gastos y facturas', endpoint: 'petty-cash-expenses', entity: 'PettyCashExpense', editPermission: ['petty_cash.manage'],
-    description: 'El soporte debe cargarse primero en Documentos con confidencialidad «financiero».',
+    title: 'Gastos de caja menor', endpoint: 'petty-cash-expenses', entity: 'PettyCashExpense', editPermission: ['petty_cash.manage'],
+    description: 'Cada gasto con su factura. Primero suba la factura en Documentos (tipo «financiero») y luego regístrela aquí.',
     fields: [
       rel('budget_id', 'Presupuesto', 'petty-cash-budgets', { required: true, optionLabel: (o) => `${o.year} — ${o.name}` }),
       { name: 'expense_date', label: 'Fecha', type: 'date', required: true }, { name: 'concept', label: 'Concepto', type: 'text', required: true },
@@ -343,64 +343,64 @@ export const RESOURCES: Record<string, ResourceConfig> = {
   // ---------------- catálogos
   periodos: {
     icon: 'calendar',
-    title: 'Períodos académicos', endpoint: 'periods', editPermission: ['catalogs.manage'],
+    title: 'Períodos', description: 'Semestres y años que se pueden elegir en formularios y plantillas (por ejemplo 2026-1).', endpoint: 'periods', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código (2027-1, 2027)', type: 'text', required: true }, { name: 'year', label: 'Año', type: 'number', required: true }, { name: 'term', label: 'Semestre', type: 'number' }, { name: 'type', label: 'Tipo', type: 'select', required: true, options: [{ value: 'semestre', label: 'Semestre' }, { value: 'anio', label: 'Año' }, { value: 'vigencia', label: 'Vigencia' }, { value: 'cohorte', label: 'Cohorte' }] }, { name: 'starts_on', label: 'Inicio', type: 'date' }, { name: 'ends_on', label: 'Fin', type: 'date' }],
     columns: [{ key: 'code', label: 'Código' }, { key: 'type', label: 'Tipo' }, { key: 'year', label: 'Año' }],
   },
   departamentos: {
     icon: 'pin',
-    title: 'Departamentos', endpoint: 'departments', editPermission: ['catalogs.manage'],
+    title: 'Departamentos', description: 'Departamentos de Colombia con su código DANE.', endpoint: 'departments', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código DANE', type: 'text', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }],
     columns: [{ key: 'code', label: 'DANE' }, { key: 'name', label: 'Nombre' }],
   },
   municipios: {
     icon: 'pin',
-    title: 'Municipios', endpoint: 'municipalities', editPermission: ['catalogs.manage'],
+    title: 'Municipios', description: 'Municipios de Colombia con su código DANE, para ubicar los CAT y la residencia de los estudiantes.', endpoint: 'municipalities', editPermission: ['catalogs.manage'],
     fields: [rel('department_id', 'Departamento', 'departments', { required: true }), { name: 'code', label: 'Código DANE (5 dígitos)', type: 'text' }, { name: 'name', label: 'Nombre', type: 'text', required: true }, { name: 'latitude', label: 'Latitud', type: 'number' }, { name: 'longitude', label: 'Longitud', type: 'number' }],
     columns: [{ key: 'code', label: 'DANE' }, { key: 'name', label: 'Municipio' }, { key: 'department', label: 'Departamento', render: (r) => r.department?.name }],
   },
   niveles: {
     icon: 'graduation',
-    title: 'Niveles de formación', endpoint: 'education-levels', editPermission: ['catalogs.manage'],
+    title: 'Niveles de formación', description: 'Técnico, tecnológico, profesional, especialización, maestría…', endpoint: 'education-levels', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }, { name: 'cycle', label: 'Ciclo', type: 'select', required: true, options: [{ value: 'pregrado', label: 'Pregrado' }, { value: 'posgrado', label: 'Posgrado' }] }, { name: 'sort', label: 'Orden', type: 'number' }],
     columns: [{ key: 'name', label: 'Nivel' }, { key: 'cycle', label: 'Ciclo' }],
   },
   areas: {
     icon: 'book',
-    title: 'Áreas de conocimiento', endpoint: 'knowledge-areas', editPermission: ['catalogs.manage'],
+    title: 'Áreas de conocimiento', description: 'Áreas a las que pertenece cada programa académico.', endpoint: 'knowledge-areas', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }, { name: 'classification', label: 'Clasificación', type: 'select', required: true, options: [{ value: 'NBC', label: 'NBC (SNIES)' }, { value: 'CINE-F', label: 'CINE-F' }, { value: 'pendiente', label: 'Pendiente' }] }],
     columns: [{ key: 'name', label: 'Área' }, { key: 'classification', label: 'Clasificación' }],
   },
   clasificadores: {
     icon: 'filter',
-    title: 'Clasificadores (desagregaciones)', endpoint: 'classifiers', editPermission: ['catalogs.manage'],
-    description: '«Partición»: las categorías suman el total (p. ej. sexo). Si no, son medidas distintas y nunca se suman.',
+    title: 'Variables para desagregar', endpoint: 'classifiers', editPermission: ['catalogs.manage'],
+    description: 'Formas de dividir un indicador: por sexo, por CAT, por estrato… «Partición» significa que las partes suman el total.',
     fields: [{ name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }, { name: 'is_partition', label: 'Las categorías forman una partición del total', type: 'checkbox' }],
     columns: [{ key: 'code', label: 'Código' }, { key: 'name', label: 'Nombre' }, { key: 'items', label: 'Categorías', render: (r) => String(r.items?.length ?? 0) }],
   },
   'categorias-clasificador': {
     icon: 'filter',
-    title: 'Categorías de clasificadores', endpoint: 'classifier-items', editPermission: ['catalogs.manage'],
-    description: 'Use «Variable: valor» (p. ej. «Sexo: Femenino») para agrupar varias distribuciones en un mismo indicador.',
+    title: 'Valores de las variables', endpoint: 'classifier-items', editPermission: ['catalogs.manage'],
+    description: 'Opciones de cada variable (por ejemplo, para Sexo: Femenino, Masculino).',
     fields: [rel('classifier_id', 'Clasificador', 'classifiers', { required: true }), { name: 'code', label: 'Código', type: 'text', required: true }, { name: 'label', label: 'Etiqueta', type: 'text', required: true }, { name: 'sort', label: 'Orden', type: 'number' }],
-    columns: [{ key: 'classifier_id', label: 'Clasificador (id)' }, { key: 'code', label: 'Código' }, { key: 'label', label: 'Etiqueta' }],
+    columns: [{ key: 'classifier_id', label: 'Variable', render: (r) => r.classifier?.name ?? '—' }, { key: 'code', label: 'Código' }, { key: 'label', label: 'Etiqueta' }],
   },
   fuentes: {
     icon: 'info',
-    title: 'Fuentes de información', endpoint: 'data-sources', editPermission: ['catalogs.manage'],
+    title: 'Fuentes de información', description: 'Oficinas o sistemas de donde sale cada indicador (DARCA, SAIDEAD, PRIDEAD…).', endpoint: 'data-sources', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nombre oficial', type: 'text', required: true }, { name: 'kind', label: 'Tipo', type: 'select', required: true, options: ['dependencia', 'sistema', 'base_datos', 'externo', 'acto_administrativo', 'persona'].map((v) => ({ value: v, label: v.replace('_', ' ') })) }, { name: 'official_name_status', label: 'Nombre oficial', type: 'select', required: true, options: [{ value: 'validado', label: 'Validado' }, { value: 'pendiente', label: 'Pendiente de validación' }] }],
-    columns: [{ key: 'code', label: 'Código' }, { key: 'name', label: 'Nombre' }, { key: 'official_name_status', label: 'Validación' }],
+    columns: [{ key: 'code', label: 'Código' }, { key: 'name', label: 'Nombre' }, { key: 'official_name_status', label: '¿Nombre confirmado?' }],
   },
   dependencias: {
     icon: 'building',
-    title: 'Dependencias', endpoint: 'dependencies', editPermission: ['catalogs.manage'],
+    title: 'Dependencias', description: 'Oficinas de la Universidad y del IDEAD. Se usan para asignar usuarios y solicitudes.', endpoint: 'dependencies', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }, rel('parent_id', 'Dependencia superior', 'dependencies'), { name: 'description', label: 'Descripción', type: 'textarea' }, { name: 'is_active', label: 'Activa', type: 'checkbox' }],
     defaults: { is_active: true },
     columns: [{ key: 'code', label: 'Código' }, { key: 'name', label: 'Nombre' }],
   },
   'categorias-documentales': {
     icon: 'file',
-    title: 'Categorías documentales', endpoint: 'document-categories', editPermission: ['catalogs.manage'],
+    title: 'Tipos de documento', description: 'Clases de documento (actas, resoluciones, contratos…) y su nivel de reserva.', endpoint: 'document-categories', editPermission: ['catalogs.manage'],
     fields: [{ name: 'code', label: 'Código', type: 'text', required: true }, { name: 'name', label: 'Nombre', type: 'text', required: true }, { name: 'default_confidentiality', label: 'Confidencialidad por defecto', type: 'select', required: true, options: opts('publico', 'interno', 'restringido', 'financiero') }],
     columns: [{ key: 'name', label: 'Categoría' }, { key: 'default_confidentiality', label: 'Confidencialidad', render: (r) => label(r.default_confidentiality) }],
   },

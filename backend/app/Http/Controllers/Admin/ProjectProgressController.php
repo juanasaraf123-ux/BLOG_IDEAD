@@ -10,6 +10,7 @@ class ProjectProgressController extends ResourceController
     protected string $model = \App\Models\ProjectProgress::class;
     protected string $viewPermission = 'projects.edit';
     protected string $editPermission = 'projects.edit';
+    protected array $with = ['project:id,name'];
     protected array $searchable = ['note'];
     protected array $filterable = ['project_id'];
     protected string $orderBy = 'reported_on';

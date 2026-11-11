@@ -63,9 +63,9 @@ export const HUBS: Record<string, { title: string; description: string; icon: st
       { key: 'departamentos', label: 'Departamentos', perms: ['catalogs.manage'] },
       { key: 'niveles', label: 'Niveles de formación', perms: ['catalogs.manage'] },
       { key: 'areas', label: 'Áreas de conocimiento', perms: ['catalogs.manage'] },
-      { key: 'clasificadores', label: 'Clasificadores', perms: ['catalogs.manage'] },
-      { key: 'categorias-clasificador', label: 'Categorías de clasificador', perms: ['catalogs.manage'] },
-      { key: 'categorias-documentales', label: 'Categorías documentales', perms: ['catalogs.manage'] },
+      { key: 'clasificadores', label: 'Variables para desagregar', perms: ['catalogs.manage'] },
+      { key: 'categorias-clasificador', label: 'Valores de las variables', perms: ['catalogs.manage'] },
+      { key: 'categorias-documentales', label: 'Tipos de documento', perms: ['catalogs.manage'] },
     ],
   },
 };
@@ -92,7 +92,7 @@ export function HubPage() {
           ))}
         </nav>
       )}
-      <ResourcePage key={active.key} cfg={RESOURCES[active.key]} embedded />
+      <ResourcePage key={active.key} cfg={RESOURCES[active.key]} embedded hideDescription={tabs.length === 1} />
     </div>
   );
 }

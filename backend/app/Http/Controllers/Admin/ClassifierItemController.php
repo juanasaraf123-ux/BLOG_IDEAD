@@ -10,6 +10,7 @@ class ClassifierItemController extends ResourceController
     protected string $model = \App\Models\ClassifierItem::class;
     protected string $viewPermission = '';
     protected string $editPermission = 'catalogs.manage';
+    protected array $with = ['classifier:id,name'];
     protected array $searchable = ['label', 'code'];
     protected array $filterable = ['classifier_id'];
     protected string $orderBy = 'sort';

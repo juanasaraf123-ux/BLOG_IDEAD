@@ -171,7 +171,7 @@ function Editor({ cfg, id, onClose, onSaved }: { cfg: ResourceConfig; id: number
 }
 
 /** Página CRUD genérica: listado con búsqueda, filtros, estado y paginación + editor lateral con flujo editorial e historial. */
-export function ResourcePage({ cfg, embedded = false }: { cfg: ResourceConfig; embedded?: boolean }) {
+export function ResourcePage({ cfg, embedded = false, hideDescription = false }: { cfg: ResourceConfig; embedded?: boolean; hideDescription?: boolean }) {
   const { can } = useAuth();
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
@@ -183,7 +183,7 @@ export function ResourcePage({ cfg, embedded = false }: { cfg: ResourceConfig; e
     <div>
       {embedded ? (
         <div className="mb-4 flex flex-wrap items-center gap-3">
-          {cfg.description && <p className="max-w-3xl text-sm text-muted">{cfg.description}</p>}
+          {cfg.description && !hideDescription && <p className="max-w-3xl text-sm text-muted">{cfg.description}</p>}
           {can(...(cfg.createPermission ?? cfg.editPermission)) && <Button className="ml-auto" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button>}
         </div>
       ) : (
