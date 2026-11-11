@@ -93,7 +93,7 @@ function Shell({ children }: { children: ReactNode }) {
   useEffect(() => setOpen(false), [pathname]);
 
   const link = (i: Item, end = false) => (
-    <NavLink key={i.to} to={i.to} end={end} className={({ isActive: a }) => `relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-[0.9rem] transition ${a ? 'bg-ut-red-50 font-semibold text-ut-red before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:rounded-full before:bg-ut-red' : 'text-[#4a4f55] hover:bg-surface hover:text-ut-red'}`}>
+    <NavLink key={i.to} to={i.to} end={end} className={({ isActive: a }) => `relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-[0.9rem] transition ${a ? 'bg-white font-semibold text-ut-red shadow-sm before:absolute before:inset-y-1.5 before:left-0 before:w-1 before:rounded-full before:bg-ut-red' : 'text-white/85 hover:bg-white/10 hover:text-white'}`}>
       <Icon name={i.icon} className="shrink-0 text-lg" />{i.label}
     </NavLink>
   );
@@ -103,7 +103,7 @@ function Shell({ children }: { children: ReactNode }) {
       {visible.map((g) => (
         <div key={g.group} className="pt-1">
           <button type="button" aria-expanded={isOpen(g.group)} onClick={() => setExpanded({ ...expanded, [g.group]: !isOpen(g.group) })}
-            className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[0.72rem] font-bold tracking-wider uppercase hover:bg-surface ${g.group === current ? 'text-ut-red' : 'text-muted'}`}>
+            className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[0.72rem] font-bold tracking-wider uppercase hover:bg-white/10 ${g.group === current ? 'text-white' : 'text-white/60'}`}>
             {g.group}
             <Icon name="chevronDown" className={`ml-auto text-base transition ${isOpen(g.group) ? 'rotate-180' : ''}`} />
           </button>
@@ -115,7 +115,7 @@ function Shell({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen bg-surface">
       <a href="#contenido" className="skip-link">Saltar al contenido</a>
-      <header className="sticky top-0 z-30 border-b border-line/70 bg-white/95 backdrop-blur">
+      <header className="sticky top-0 z-30 border-b-4 border-ut-red bg-white/95 shadow-sm backdrop-blur">
         <div className="flex items-center gap-3 px-4 py-2.5 lg:px-6">
           <button className="rounded-lg p-2 text-2xl text-ink lg:hidden" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} onClick={() => setOpen(!open)}><Icon name={open ? 'close' : 'menu'} /></button>
           <NavLink to="/" className="flex shrink-0 items-center gap-3" aria-label="Inicio del panel">
@@ -132,8 +132,9 @@ function Shell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <div className="lg:grid lg:grid-cols-[16.5rem_1fr]">
-        <aside className={`fixed inset-y-0 left-0 z-20 w-72 overflow-y-auto border-r border-line bg-white px-3 pt-20 pb-6 transition-transform lg:sticky lg:top-[65px] lg:z-0 lg:h-[calc(100vh-65px)] lg:w-auto lg:translate-x-0 lg:pt-4 ${open ? 'translate-x-0 shadow-xl' : '-translate-x-full'}`}>
+        <aside className={`fixed inset-y-0 left-0 z-20 w-72 overflow-y-auto bg-gradient-to-b from-green-dark to-[#123f39] px-3 pt-20 pb-6 transition-transform lg:sticky lg:top-[69px] lg:z-0 lg:h-[calc(100vh-69px)] lg:w-auto lg:translate-x-0 lg:pt-4 ${open ? 'translate-x-0 shadow-xl' : '-translate-x-full'}`}>
           {nav}
+          <p className="mt-8 px-3 text-[0.7rem] leading-snug text-white/50">Universidad del Tolima<br />Instituto de Educación a Distancia</p>
         </aside>
         <main id="contenido" className="min-w-0 p-4 md:p-7">{children}</main>
       </div>

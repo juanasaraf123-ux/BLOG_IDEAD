@@ -25,6 +25,14 @@ type Analysis = {
 
 const templateUrl = (entity: string) => admin.url(`records/${entity}/template`);
 
+/** Color de cada base (franja superior e ícono). */
+const BASE_COLOR: Record<string, [string, string]> = {
+  estudiantes: ['bg-ut-red', 'from-ut-red to-ut-red-dark'],
+  docentes: ['bg-green', 'from-green to-green-dark'],
+  graduados: ['bg-[#d4952e]', 'from-[#e0a43a] to-[#b7791f]'],
+  personal: ['bg-[#4d6079]', 'from-[#5b6f8a] to-[#3d4d63]'],
+};
+
 function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <section className={`rounded-2xl border border-line bg-white p-5 shadow-sm ${className}`}>{children}</section>;
 }
@@ -41,7 +49,8 @@ export function RecordsHome() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
-        <h1 className="text-2xl font-extrabold text-ut-red">Bases de datos</h1>
+        <p className="text-xs font-bold tracking-wider text-muted uppercase">Información e indicadores</p>
+        <h1 className="text-3xl font-extrabold text-ut-red">Bases de datos</h1>
         <p className="mt-1 max-w-3xl text-muted">Aquí se cargan las bases que envían las oficinas. Los datos personales quedan cifrados y solo los ven personas autorizadas; en el portal se publican únicamente totales.</p>
       </header>
 
@@ -66,9 +75,10 @@ export function RecordsHome() {
       {data && (
         <div className="grid gap-5 md:grid-cols-2">
           {data.data.map((b) => (
-            <Card key={b.entity} className="flex flex-col">
+            <Card key={b.entity} className="relative flex flex-col overflow-hidden">
+              <span className={`absolute inset-x-0 top-0 h-1.5 ${BASE_COLOR[b.entity]?.[0] ?? 'bg-teal'}`} aria-hidden />
               <div className="flex items-start gap-3">
-                <IconBubble name={b.icon} />
+                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow ${BASE_COLOR[b.entity]?.[1] ?? 'from-teal to-green'}`}><Icon name={b.icon} /></span>
                 <div className="min-w-0">
                   <h2 className="text-lg font-bold text-ink">{b.title}</h2>
                   <p className="text-sm text-muted">Envía: {b.source}</p>

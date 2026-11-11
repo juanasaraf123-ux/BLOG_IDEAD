@@ -13,43 +13,95 @@ const CONF_TONE: Record<string, 'green' | 'gray' | 'amber' | 'red'> = { publico:
 
 // ------------------------------------------------------------------ Tablero
 
-const PENDING_LABELS: Record<string, [string, string]> = {
-  lotes_por_revisar: ['Lotes de datos por revisar', '/cargas'], lotes_por_publicar: ['Lotes aprobados por publicar', '/cargas'],
-  mis_lotes_devueltos: ['Mis lotes devueltos para corrección', '/cargas'], mis_borradores: ['Mis borradores', '/cargas'],
-  contenidos_en_revision: ['Contenidos en revisión', '/r/noticias'],
-  solicitudes_abiertas: ['Solicitudes de actualización para mi dependencia', '/r/solicitudes'],
-  solicitudes_vencidas: ['Solicitudes de actualización vencidas', '/r/solicitudes'],
+const PENDING_LABELS: Record<string, [string, string, string]> = {
+  lotes_por_revisar: ['Lotes de datos por revisar', '/cargas', 'search'], lotes_por_publicar: ['Lotes aprobados por publicar', '/cargas', 'upload'],
+  mis_lotes_devueltos: ['Mis lotes devueltos para corrección', '/cargas', 'alert'], mis_borradores: ['Mis borradores', '/cargas', 'file'],
+  contenidos_en_revision: ['Contenidos en revisión', '/r/noticias', 'book'],
+  solicitudes_abiertas: ['Solicitudes para mi dependencia', '/r/solicitudes', 'mail'],
+  solicitudes_vencidas: ['Solicitudes vencidas', '/r/solicitudes', 'clock'],
 };
 
+/** Accesos rápidos del inicio (solo los que el rol puede usar). */
+const QUICK: { to: string; label: string; text: string; icon: string; color: string; perms: string[] }[] = [
+  { to: '/bases', label: 'Bases de datos', text: 'Cargar y consultar estudiantes, docentes, graduados y personal', icon: 'table', color: 'from-ut-red to-ut-red-dark', perms: ['records.view', 'records.import'] },
+  { to: '/indicadores', label: 'Indicadores', text: 'Los 76 indicadores del portal y su estado', icon: 'chart', color: 'from-green to-green-dark', perms: ['indicators.view_internal', 'indicators.submit'] },
+  { to: '/r/noticias', label: 'Noticias', text: 'Publicar noticias y novedades', icon: 'book', color: 'from-teal to-green', perms: ['content.create', 'content.publish'] },
+  { to: '/r/actividades', label: 'Actividades', text: 'Agenda de eventos del IDEAD', icon: 'calendar', color: 'from-[#e0a43a] to-[#b7791f]', perms: ['content.create', 'content.publish'] },
+  { to: '/documentos', label: 'Documentos', text: 'Actas, resoluciones, contratos y convenios', icon: 'file', color: 'from-[#5b6f8a] to-[#3d4d63]', perms: ['documents.view.internal', 'documents.upload'] },
+  { to: '/r/caja-menor-gastos', label: 'Caja menor', text: 'Gastos, facturas y soportes', icon: 'money', color: 'from-[#e0a43a] to-[#b7791f]', perms: ['petty_cash.view'] },
+  { to: '/r/cat', label: 'CAT', text: 'Fichas de los Centros de Atención Tutorial', icon: 'building', color: 'from-green to-green-dark', perms: ['cats.edit', 'entities.publish'] },
+  { to: '/usuarios', label: 'Usuarios', text: 'Cuentas, roles y permisos', icon: 'user', color: 'from-[#5b6f8a] to-[#3d4d63]', perms: ['users.view', 'users.manage'] },
+];
+
 export function Dashboard() {
-  const { me } = useAuth();
+  const { me, can } = useAuth();
   const { data, loading } = useAsync(() => admin.get<Row>('dashboard'), []);
+  const hour = new Date().getHours();
+  const greet = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
+  const today = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 6);
+  const pct = data?.indicators ? Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100) : 0;
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-extrabold text-ut-red">Hola, {me?.user.name}</h1>
-        <p className="text-muted">Roles: {me?.user.roles.map((r) => r.name).join(', ') || 'sin rol asignado'}</p>
-      </div>
-      {!me?.user.mfa_enabled && <Notice kind="info">Recomendación de seguridad: active la verificación en dos pasos en <Link to="/cuenta" className="underline">Mi cuenta</Link>.</Notice>}
-      {loading && <Spinner />}
-      {data && (
-        <>
-          <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
-              <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className="rounded-xl border border-line bg-white p-4 hover:border-green">
-                <p className={`text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-green-dark'}`}>{v}</p>
-                <p className="text-sm">{PENDING_LABELS[k]?.[0] ?? k}</p>
+    <div className="mx-auto max-w-6xl space-y-6">
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-dark via-green-dark to-green p-6 text-white shadow-lg md:p-8">
+        <span className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-teal/30" aria-hidden />
+        <span className="pointer-events-none absolute -right-24 bottom-[-6rem] h-64 w-64 rounded-full bg-ut-red/40" aria-hidden />
+        <span className="pointer-events-none absolute top-6 right-40 hidden h-16 w-16 rounded-full border-4 border-white/15 md:block" aria-hidden />
+        <div className="relative">
+          <p className="text-sm text-white/80 first-letter:uppercase">{today}</p>
+          <h1 className="mt-1 text-3xl font-extrabold md:text-4xl">{greet}, {me?.user.name}</h1>
+          <p className="mt-1 text-white/85">{me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
+          {data?.indicators && (
+            <div className="mt-5 max-w-xl rounded-2xl bg-white/10 p-4 backdrop-blur">
+              <div className="flex items-end justify-between gap-3">
+                <p className="text-sm font-semibold">Indicadores con datos publicados</p>
+                <p className="text-2xl font-extrabold whitespace-nowrap">{data.indicators.con_datos_publicados}<span className="text-base font-semibold text-white/70"> / {data.indicators.total}</span></p>
+              </div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-white" style={{ width: `${pct}%` }} /></div>
+              <p className="mt-1.5 text-xs text-white/75">{data.indicators.metodologia_validada} con metodología validada</p>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {!me?.user.mfa_enabled && <Notice kind="info">Recomendación de seguridad: active la verificación en dos pasos en <Link to="/cuenta" className="font-semibold underline">Mi cuenta</Link>.</Notice>}
+
+      {quick.length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-extrabold text-ut-red">Accesos rápidos</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {quick.map((q) => (
+              <Link key={q.to} to={q.to} className="group flex items-center gap-4 rounded-2xl border border-line bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
+                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow ${q.color}`}><Icon name={q.icon} /></span>
+                <span className="min-w-0">
+                  <span className="block font-bold text-ink group-hover:text-ut-red">{q.label}</span>
+                  <span className="block text-sm text-muted">{q.text}</span>
+                </span>
+                <Icon name="arrowRight" className="ml-auto shrink-0 text-xl text-line transition group-hover:text-ut-red" />
               </Link>
             ))}
-          </section>
-          {data.indicators && (
-            <section className="rounded-xl border border-line bg-white p-5">
-              <h2 className="mb-2 font-bold">Estado de los indicadores</h2>
-              <p>{data.indicators.con_datos_publicados} de {data.indicators.total} indicadores tienen datos publicados · {data.indicators.metodologia_validada} con metodología validada.</p>
-              <div className="mt-2 h-3 overflow-hidden rounded-full bg-surface"><div className="h-full bg-green" style={{ width: `${(data.indicators.con_datos_publicados / data.indicators.total) * 100}%` }} /></div>
-            </section>
-          )}
-        </>
+          </div>
+        </section>
+      )}
+
+      {loading && <Spinner />}
+      {data && Object.keys(data.pending).length > 0 && (
+        <section>
+          <h2 className="mb-3 text-lg font-extrabold text-ut-red">Pendientes</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
+              <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className={`relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md ${v > 0 ? 'border-ut-red/30' : 'border-line'}`}>
+                <span className={`absolute inset-x-0 top-0 h-1 ${v > 0 ? 'bg-ut-red' : 'bg-teal'}`} aria-hidden />
+                <div className="flex items-start justify-between">
+                  <p className={`text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-green-dark'}`}>{v}</p>
+                  <span className={`grid h-9 w-9 place-items-center rounded-full text-lg ${v > 0 ? 'bg-ut-red-50 text-ut-red' : 'bg-teal/15 text-green-dark'}`}><Icon name={PENDING_LABELS[k]?.[2] ?? 'info'} /></span>
+                </div>
+                <p className="mt-1 text-sm">{PENDING_LABELS[k]?.[0] ?? k}</p>
+                {v === 0 && <p className="text-xs text-muted">Al día</p>}
+              </Link>
+            ))}
+          </div>
+        </section>
       )}
     </div>
   );
