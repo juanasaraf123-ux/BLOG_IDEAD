@@ -6,7 +6,7 @@ import { Icon } from '../../shared/icons';
 import { Badge, ErrorBox, Spinner, useAsync } from '../../shared/ui';
 import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../auth';
-import { Button, FieldInput, inputCls, Notice, useOptions } from '../components/Form';
+import { Button, FieldInput, FilePicker, inputCls, Notice, useOptions } from '../components/Form';
 import { PASSWORD_HELP } from './AuthPages';
 
 type Row = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
@@ -181,22 +181,24 @@ function DocumentEditor({ id, onClose, onSaved }: { id: number | null; onClose: 
         <div className="mt-3 grid gap-4 md:grid-cols-2">
           <div className="md:col-span-2"><FieldInput def={{ name: 'title', label: 'Título', type: 'text', required: true }} value={form.title} onChange={set('title')} /></div>
           <FieldInput def={{ name: 'category_id', label: 'Categoría', type: 'relation', endpoint: 'document-categories', required: true }} value={form.category_id} onChange={set('category_id')} />
-          <FieldInput def={{ name: 'confidentiality', label: 'Confidencialidad', type: 'select', help: id ? undefined : 'Si se deja vacío se usa la de la categoría.', options: ['publico', 'interno', 'restringido', 'financiero'].map((v) => ({ value: v, label: label(v) })) }} value={form.confidentiality} onChange={set('confidentiality')} />
+          <FieldInput def={{ name: 'confidentiality', label: 'Reserva (quién puede verlo)', type: 'select', help: id ? undefined : 'Si se deja vacío se usa la del tipo de documento.', options: ['publico', 'interno', 'restringido', 'financiero'].map((v) => ({ value: v, label: label(v) })) }} value={form.confidentiality} onChange={set('confidentiality')} />
           <FieldInput def={{ name: 'dependency_id', label: 'Dependencia', type: 'relation', endpoint: 'dependencies', optionLabel: (o) => `${o.code} — ${o.name}` }} value={form.dependency_id} onChange={set('dependency_id')} />
           <FieldInput def={{ name: 'status', label: 'Estado', type: 'select', options: ['borrador', 'vigente', 'archivado'].map((v) => ({ value: v, label: label(v) })) }} value={form.status} onChange={set('status')} />
-          <FieldInput def={{ name: 'related_type', label: 'Asociado a', type: 'select', options: [['project', 'Proyecto'], ['agreement', 'Convenio'], ['cat', 'CAT'], ['submission', 'Lote de datos'], ['petty_cash', 'Caja menor']].map(([value, l]) => ({ value, label: l })) }} value={form.related_type} onChange={set('related_type')} />
-          <FieldInput def={{ name: 'related_id', label: 'Identificador del registro asociado', type: 'number' }} value={form.related_id} onChange={set('related_id')} />
+          <FieldInput def={{ name: 'related_type', label: 'Asociado a', type: 'select', options: [['project', 'Proyecto'], ['agreement', 'Convenio'], ['cat', 'CAT']].map(([value, l]) => ({ value, label: l })) }} value={form.related_type} onChange={(v) => { set('related_type')(v); set('related_id')(null); }} />
+          {form.related_type && ({ project: 'projects', agreement: 'agreements', cat: 'cats' } as Record<string, string>)[form.related_type] && (
+            <FieldInput key={form.related_type} def={{ name: 'related_id', label: form.related_type === 'project' ? '¿Cuál proyecto?' : form.related_type === 'agreement' ? '¿Cuál convenio?' : '¿Cuál CAT?', type: 'relation', endpoint: ({ project: 'projects', agreement: 'agreements', cat: 'cats' } as Record<string, string>)[form.related_type], optionLabel: (o) => String(o.name ?? ([o.number, o.counterpart].filter(Boolean).join(' — ') || o.id)) }} value={form.related_id} onChange={set('related_id')} />
+          )}
           <div className="md:col-span-2"><FieldInput def={{ name: 'description', label: 'Descripción', type: 'textarea' }} value={form.description} onChange={set('description')} /></div>
-          {!id && <label className="text-sm font-semibold md:col-span-2">Archivo (PDF, Word, Excel, PowerPoint, ODF, CSV, JPG, PNG)<input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className={inputCls} /></label>}
+          {!id && <div className="text-sm font-semibold md:col-span-2">Archivo (PDF, Word, Excel, PowerPoint, CSV, JPG o PNG)<FilePicker file={file} onPick={setFile} /></div>}
         </div>
-        {(can('documents.upload') || can('documents.edit')) && <Button className="mt-4 self-start" onClick={save}><Icon name="check" /> {id ? 'Guardar metadatos' : 'Cargar'}</Button>}
+        {(can('documents.upload') || can('documents.edit')) && <Button className="mt-4 self-start" onClick={save}><Icon name="check" /> {id ? 'Guardar cambios' : 'Subir documento'}</Button>}
         {id && doc && (
           <section className="mt-6">
             <h3 className="mb-2 font-bold">Versiones</h3>
             <ul className="space-y-1 text-sm">{doc.versions.map((v: Row) => <li key={v.id} className="flex flex-wrap gap-2"><strong>v{v.version_no}</strong> {v.file?.original_name} · {fmtBytes(v.file?.size_bytes)} · {v.uploader?.name} · {fmtDateTime(v.created_at)} · {v.change_note}<a href={admin.url(`documents/${id}/download/${v.version_no}`)} className="text-ut-red hover:underline">Descargar</a></li>)}</ul>
             {can('documents.upload') && (
               <div className="mt-3 grid gap-2 rounded-lg border border-dashed border-line p-3 md:grid-cols-[1fr_1fr_auto]">
-                <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" aria-label="Archivo de la nueva versión" />
+                <FilePicker file={file} onPick={setFile} label="Elegir nueva versión" />
                 <input value={note} onChange={(e) => setNote(e.target.value)} placeholder="Descripción del cambio" className="rounded border border-line px-2 py-1 text-sm" />
                 <Button variant="secondary" onClick={version}>Cargar versión</Button>
               </div>
@@ -237,7 +239,7 @@ export function Users() {
         <table className="w-full text-left text-sm">
           <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Nombre</th><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Roles</th><th className="px-3 py-2">Dependencias</th><th className="px-3 py-2">Verificación en dos pasos</th><th className="px-3 py-2">Último acceso</th><th className="px-3 py-2">Estado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((u: Row) => (
-            <tr key={u.id}><td className="px-3 py-2 font-semibold">{u.name}</td><td className="px-3 py-2">{u.email}</td><td className="px-3 py-2">{u.roles.map((r: Row) => r.name).join(', ')}</td><td className="px-3 py-2">{u.dependencies.map((d: Row) => d.code).join(', ')}</td><td className="px-3 py-2">{u.mfa_enabled ? <Badge tone="green">Activo</Badge> : <Badge>No</Badge>}</td><td className="px-3 py-2">{fmtDateTime(u.last_login_at) || '—'}</td><td className="px-3 py-2">{u.is_active ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Inactivo</Badge>}</td>
+            <tr key={u.id}><td className="px-3 py-2 font-semibold">{u.name}</td><td className="px-3 py-2">{u.email}</td><td className="px-3 py-2">{u.roles.map((r: Row) => r.name).join(', ')}</td><td className="px-3 py-2">{(u.dependencies.length > 4 ? `${u.dependencies.length} oficinas` : u.dependencies.map((d: Row) => d.name ?? d.code).join(', ')) || '—'}</td><td className="px-3 py-2">{u.mfa_enabled ? <Badge tone="green">Activo</Badge> : <Badge>No</Badge>}</td><td className="px-3 py-2">{fmtDateTime(u.last_login_at) || '—'}</td><td className="px-3 py-2">{u.is_active ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Inactivo</Badge>}</td>
               <td className="px-3 py-2 text-right">{can('users.manage') && <button className="font-semibold text-ut-red hover:underline" onClick={() => { setMsg(null); setOpen({ ...u, password: '', role_ids: u.roles.map((r: Row) => r.id), dependency_ids: u.dependencies.map((d: Row) => d.id) }); }}>Editar</button>}</td></tr>
           ))}</tbody>
         </table>
@@ -290,10 +292,10 @@ export function Roles() {
       <div className="mt-3 grid gap-4 md:grid-cols-2">
         {data?.map((r) => (
           <div key={r.id} className="rounded-xl border border-line bg-white p-4">
-            <div className="flex items-start gap-2"><div><p className="font-bold">{r.name}</p><p className="text-xs text-muted">{r.code} · {r.users_count} usuario(s)</p></div>
+            <div className="flex items-start gap-2"><div><p className="font-bold">{r.name}</p><p className="text-xs text-muted">{r.users_count} {r.users_count === 1 ? 'usuario' : 'usuarios'}</p></div>
               {can('roles.manage') && !mine.has(r.id) && <button className="ml-auto text-sm font-semibold text-ut-red hover:underline" onClick={() => setEdit({ ...r, permission_ids: r.permissions.map((p: Row) => p.id) })}>Editar</button>}</div>
             <p className="mt-1 text-sm text-muted">{r.description}</p>
-            <p className="mt-2 flex flex-wrap gap-1">{r.permissions.map((p: Row) => <Badge key={p.id}>{p.code}</Badge>)}</p>
+            <p className="mt-2 flex flex-wrap gap-1">{r.permissions.map((p: Row) => <Badge key={p.id}>{p.description ?? p.code}</Badge>)}</p>
           </div>
         ))}
       </div>
@@ -308,7 +310,7 @@ export function Roles() {
             </div>
             {Object.entries(groups).map(([g, ps]) => (
               <fieldset key={g} className="mt-4"><legend className="font-bold">{g}</legend>
-                {ps.map((p) => <label key={p.id} className="flex items-start gap-2 py-0.5 text-sm"><input type="checkbox" className="mt-1" checked={edit.permission_ids.includes(p.id)} onChange={(e) => setEdit({ ...edit, permission_ids: e.target.checked ? [...edit.permission_ids, p.id] : edit.permission_ids.filter((x: number) => x !== p.id) })} /><span><code className="text-xs">{p.code}</code> — {p.description}</span></label>)}
+                {ps.map((p) => <label key={p.id} className="flex items-start gap-2 py-0.5 text-sm"><input type="checkbox" className="mt-1" checked={edit.permission_ids.includes(p.id)} onChange={(e) => setEdit({ ...edit, permission_ids: e.target.checked ? [...edit.permission_ids, p.id] : edit.permission_ids.filter((x: number) => x !== p.id) })} /><span>{p.description}</span></label>)}
               </fieldset>
             ))}
             <div className="mt-4 flex gap-2"><Button onClick={save}><Icon name="check" /> Guardar</Button>{edit.id && edit.users_count === 0 && <Button variant="danger" onClick={async () => { await admin.del(`roles/${edit.id}`); setEdit(null); reload(); }}>Eliminar</Button>}</div>
@@ -367,7 +369,10 @@ export function Settings() {
   const { data, error } = useAsync(() => admin.get<Row>('settings'), []);
   const [form, setForm] = useState<Row | null>(null);
   const [msg, setMsg] = useState<{ k: 'ok' | 'error'; t: string } | null>(null);
-  useEffect(() => { if (data) setForm({ ...data, mfa_enforced: data.mfa_enforced === '1', news_requires_review: data.news_requires_review === '1' }); }, [data]);
+  useEffect(() => {
+    const arr = (v: unknown) => { try { const x = typeof v === 'string' ? JSON.parse(v || '[]') : v; return Array.isArray(x) ? x : []; } catch { return []; } };
+    if (data) setForm({ ...data, mfa_enforced: data.mfa_enforced === '1', news_requires_review: data.news_requires_review === '1', official_links: arr(data.official_links), social_links: arr(data.social_links) });
+  }, [data]);
   if (error) return <ErrorBox message={error} />;
   if (!form) return <Spinner />;
   const t = (k: string, l: string, type: 'text' | 'textarea' | 'number' | 'checkbox' | 'image' = 'text', help?: string) => <FieldInput def={{ name: k, label: l, type, help }} value={form[k]} onChange={(v) => setForm({ ...form, [k]: v })} />;
@@ -382,8 +387,8 @@ export function Settings() {
         <div className="md:col-span-2">{t('logo_file_id', 'Logotipo oficial (reemplaza el temporal extraído del boceto)', 'image')}</div>
         <div className="md:col-span-2">{t('hero_title', 'Título institucional del inicio')}</div>
         <div className="md:col-span-2">{t('hero_text', 'Descripción breve del inicio', 'textarea')}</div>
-        <div className="md:col-span-2">{t('official_links', 'Enlaces oficiales (JSON)', 'textarea', 'Formato: [{"label":"Universidad del Tolima","url":"https://www.ut.edu.co"}]')}</div>
-        <div className="md:col-span-2">{t('social_links', 'Redes sociales (JSON)', 'textarea', 'Mismo formato.')}</div>
+        <div className="md:col-span-2"><FieldInput def={{ name: 'official_links', label: 'Enlaces oficiales (pie de página del portal)', type: 'repeater', fields: [{ name: 'label', label: 'Nombre', type: 'text' }, { name: 'url', label: 'Dirección (https://…)', type: 'url' }] }} value={form.official_links} onChange={(v) => setForm({ ...form, official_links: v })} /></div>
+        <div className="md:col-span-2"><FieldInput def={{ name: 'social_links', label: 'Redes sociales', type: 'repeater', fields: [{ name: 'label', label: 'Red (Facebook, Instagram…)', type: 'text' }, { name: 'url', label: 'Dirección (https://…)', type: 'url' }] }} value={form.social_links} onChange={(v) => setForm({ ...form, social_links: v })} /></div>
       </section>
       <section className="grid gap-4 rounded-xl border border-line bg-white p-5 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">Seguridad y publicación</h2>
@@ -392,7 +397,7 @@ export function Settings() {
         {t('mfa_enforced', 'Exigir verificación en dos pasos a todos los usuarios del panel', 'checkbox')}
         {t('news_requires_review', 'Los contenidos requieren revisión antes de publicarse', 'checkbox')}
       </section>
-      <Button onClick={async () => { setMsg(null); try { const { logo_file_id, ...rest } = form; await admin.put('settings', { ...rest, logo_file_id: logo_file_id ? Number(logo_file_id) : null, max_upload_mb: Number(form.max_upload_mb), min_cell_size: Number(form.min_cell_size) }); setMsg({ k: 'ok', t: 'Configuración guardada.' }); } catch (e) { setMsg({ k: 'error', t: errorText(e) }); } }}><Icon name="check" /> Guardar</Button>
+      <Button onClick={async () => { setMsg(null); try { const { logo_file_id, ...rest } = form; await admin.put('settings', { ...rest, official_links: JSON.stringify(form.official_links ?? []), social_links: JSON.stringify(form.social_links ?? []), logo_file_id: logo_file_id ? Number(logo_file_id) : null, max_upload_mb: Number(form.max_upload_mb), min_cell_size: Number(form.min_cell_size) }); setMsg({ k: 'ok', t: 'Configuración guardada.' }); } catch (e) { setMsg({ k: 'error', t: errorText(e) }); } }}><Icon name="check" /> Guardar</Button>
     </div>
   );
 }

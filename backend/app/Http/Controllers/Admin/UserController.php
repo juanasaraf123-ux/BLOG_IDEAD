@@ -19,7 +19,7 @@ class UserController extends Controller
     public function index(Request $request)
     {
         abort_unless($request->user()->hasPermission('users.view') || $request->user()->hasPermission('users.manage'), 403);
-        $q = User::with('roles:id,code,name', 'dependencies:id,code')->orderBy('name');
+        $q = User::with('roles:id,code,name', 'dependencies:id,code,name')->orderBy('name');
         if ($t = $request->query('q')) {
             $q->where(fn ($w) => $w->where('name', 'like', "%$t%")->orWhere('email', 'like', "%$t%"));
         }
@@ -118,7 +118,7 @@ class UserController extends Controller
     {
         abort_unless($request->user()->hasPermission('users.view') || $request->user()->hasPermission('roles.manage') || $request->user()->hasPermission('users.manage'), 403);
 
-        return Role::with('permissions:id,code')->withCount('users')->orderBy('name')->get();
+        return Role::with('permissions:id,code,description')->withCount('users')->orderBy('name')->get();
     }
 
     public function permissions(Request $request)
@@ -147,7 +147,7 @@ class UserController extends Controller
         $role->permissions()->sync($data['permission_ids'] ?? []);
         Audit::log('role.permissions_changed', $role, ['before' => $before, 'after' => $data['permission_ids'] ?? []]);
 
-        return $role->load('permissions:id,code');
+        return $role->load('permissions:id,code,description');
     }
 
     public function deleteRole(Request $request, int $id)

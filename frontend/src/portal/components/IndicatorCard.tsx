@@ -99,7 +99,7 @@ export function IndicatorCard({ meta, filters }: { meta: IndicatorMeta; filters:
     <article id={meta.code} aria-labelledby={`${meta.code}-t`} className="print-break scroll-mt-40 rounded-2xl border border-line bg-white p-5 shadow-sm md:p-6">
       <header className="flex flex-wrap items-start gap-3">
         <div className="min-w-0 flex-1">
-          <p className="text-xs font-bold tracking-wide text-muted">{meta.code} · {meta.suggested_visualization}</p>
+          <p className="text-xs font-bold tracking-wide text-muted">{meta.code}</p>
           <h3 id={`${meta.code}-t`} className="text-lg leading-snug font-extrabold text-ink md:text-xl">{meta.name}</h3>
           <p className="mt-1 text-[0.95rem] text-muted">{meta.description}</p>
         </div>

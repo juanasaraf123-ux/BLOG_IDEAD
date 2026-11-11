@@ -60,6 +60,7 @@ Route::prefix('admin/v1')->name('admin.')->group(function () {
         Route::post('auth/password', [Admin\AuthController::class, 'changePassword'])->name('password.change');
 
         Route::get('dashboard', [Admin\MiscController::class, 'dashboard']);
+        Route::get('options/{type}', [Admin\MiscController::class, 'options'])->where('type', '[a-z-]+');
         Route::post('uploads/image', [Admin\MiscController::class, 'uploadImage'])->middleware('throttle:uploads');
         Route::get('audit', [Admin\MiscController::class, 'audit']);
         Route::get('history/{type}/{id}', [Admin\MiscController::class, 'history'])->whereNumber('id');

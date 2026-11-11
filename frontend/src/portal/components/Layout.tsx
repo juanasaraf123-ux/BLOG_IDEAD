@@ -149,11 +149,16 @@ export function Footer() {
         </div>
         <div>
           <p className="mb-3 font-bold">Contacto</p>
-          <ul className="space-y-2 text-sm text-white/85">
-            <li className="flex gap-2"><Icon name="pin" className="mt-0.5 shrink-0" />{s?.contact_address}</li>
-            <li className="flex gap-2"><Icon name="phone" className="mt-0.5 shrink-0" />{s?.contact_phone}</li>
-            <li className="flex gap-2"><Icon name="mail" className="mt-0.5 shrink-0" />{s?.contact_email}</li>
-          </ul>
+          {(() => {
+            // Solo se muestran los datos ya suministrados (nunca el texto «Pendiente…»).
+            const real = (v?: string | null) => (v && !/^pendiente/i.test(v.trim()) ? v : null);
+            const items = [['pin', real(s?.contact_address)], ['phone', real(s?.contact_phone)], ['mail', real(s?.contact_email)]].filter(([, v]) => v) as [string, string][];
+            return items.length ? (
+              <ul className="space-y-2 text-sm text-white/85">
+                {items.map(([icon, v]) => <li key={icon} className="flex gap-2"><Icon name={icon} className="mt-0.5 shrink-0" />{icon === 'mail' ? <a href={`mailto:${v}`} className="hover:underline">{v}</a> : v}</li>)}
+              </ul>
+            ) : <p className="text-sm text-white/70">Datos de contacto en actualización.</p>;
+          })()}
         </div>
         <div>
           <p className="mb-3 font-bold">El portal</p>

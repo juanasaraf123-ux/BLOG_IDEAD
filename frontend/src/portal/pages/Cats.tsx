@@ -93,14 +93,23 @@ export function CatDetail() {
             </div>
             <aside className="space-y-4 rounded-2xl border border-line bg-surface/60 p-5">
               <h2 className="text-lg font-extrabold text-ut-red">Información de contacto</h2>
-              <dl className="space-y-3 text-sm">
-                <div><dt className="flex items-center gap-2 font-bold"><Icon name="pin" className="shrink-0 text-ut-red" />Ubicación</dt><dd className="pl-6">{c.address ?? 'Pendiente'} — {c.municipality.name}, {c.municipality.department.name}</dd></div>
-                <div><dt className="flex items-center gap-2 font-bold"><Icon name="phone" className="shrink-0 text-ut-red" />Teléfono</dt><dd className="pl-6">{c.phone ?? 'Pendiente'}</dd></div>
-                <div><dt className="flex items-center gap-2 font-bold"><Icon name="mail" className="shrink-0 text-ut-red" />Correo</dt><dd className="pl-6">{c.email ? <a href={`mailto:${c.email}`} className="text-ut-red underline">{c.email}</a> : 'Pendiente'}</dd></div>
-                <div><dt className="flex items-center gap-2 font-bold"><Icon name="clock" className="shrink-0 text-ut-red" />Horarios</dt><dd className="pl-6 whitespace-pre-line">{c.schedule ?? 'Pendiente'}</dd></div>
-                <div><dt className="flex items-center gap-2 font-bold"><Icon name="user" className="shrink-0 text-ut-red" />Responsable institucional</dt><dd className="pl-6">{c.manager_name ?? 'Publicación no autorizada o pendiente'}</dd></div>
-                {c.opened_on && <div><dt className="flex items-center gap-2 font-bold"><Icon name="calendar" className="shrink-0 text-ut-red" />Inicio de actividades</dt><dd className="pl-6">{fmtDate(c.opened_on, { month: 'long', year: 'numeric' })}</dd></div>}
-              </dl>
+              {(() => {
+                const real = (v?: string | null) => (v && !/^pendiente/i.test(v.trim()) ? v : null);
+                const row = (icon: string, label: string, value: React.ReactNode) => (
+                  <div key={label}><dt className="flex items-center gap-2 font-bold"><Icon name={icon} className="shrink-0 text-ut-red" />{label}</dt><dd className="pl-6 whitespace-pre-line">{value}</dd></div>
+                );
+                return (
+                  <dl className="space-y-3 text-sm">
+                    {row('pin', 'Ubicación', `${real(c.address) ? `${c.address} — ` : ''}${c.municipality.name}, ${c.municipality.department.name}`)}
+                    {real(c.phone) && row('phone', 'Teléfono', c.phone)}
+                    {real(c.email) && row('mail', 'Correo', <a href={`mailto:${c.email}`} className="text-ut-red underline">{c.email}</a>)}
+                    {real(c.schedule) && row('clock', 'Horarios', c.schedule)}
+                    {real(c.manager_name) && row('user', 'Responsable', c.manager_name)}
+                    {c.opened_on && row('calendar', 'Inicio de actividades', fmtDate(c.opened_on, { month: 'long', year: 'numeric' }))}
+                    {!real(c.phone) && !real(c.email) && <p className="text-xs text-muted">Los datos de contacto de este CAT están en actualización.</p>}
+                  </dl>
+                );
+              })()}
               {c.coverage?.length > 0 && <div><p className="text-sm font-bold">Municipios atendidos</p><p className="text-sm">{c.coverage.map((m: Any) => m.name).join(', ')}</p></div>}
             </aside>
           </div>

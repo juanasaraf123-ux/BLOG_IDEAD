@@ -138,4 +138,30 @@ class MiscController extends Controller
 
         return $out;
     }
+
+    /**
+     * Listas para los campos de selección de los formularios (CAT, programas, proyectos, indicadores…).
+     * Solo datos no sensibles (identificador y nombre), para cualquier funcionario con sesión:
+     * así un rol puede asociar una noticia a un CAT aunque no pueda editar las fichas de los CAT.
+     */
+    public function options(Request $request, string $type)
+    {
+        $map = [
+            'cats' => [\App\Models\Cat::class, ['id', 'name', 'slug'], 'name'],
+            'programs' => [\App\Models\Program::class, ['id', 'name', 'slug', 'snies_code'], 'name'],
+            'projects' => [\App\Models\Project::class, ['id', 'name', 'code'], 'name'],
+            'indicators' => [\App\Models\Indicator::class, ['id', 'code', 'name'], 'code'],
+            'dependencies' => [\App\Models\Dependency::class, ['id', 'code', 'name'], 'name'],
+            'periods' => [\App\Models\AcademicPeriod::class, ['id', 'code', 'year', 'term', 'type'], 'code'],
+            'news-categories' => [\App\Models\NewsCategory::class, ['id', 'name'], 'name'],
+            'education-levels' => [\App\Models\EducationLevel::class, ['id', 'name', 'code'], 'sort'],
+            'knowledge-areas' => [\App\Models\KnowledgeArea::class, ['id', 'name'], 'name'],
+            'departments' => [\App\Models\Department::class, ['id', 'code', 'name'], 'name'],
+            'document-categories' => [\App\Models\DocumentCategory::class, ['id', 'code', 'name'], 'name'],
+        ];
+        abort_unless(isset($map[$type]), 404);
+        [$model, $cols, $order] = $map[$type];
+
+        return ['data' => $model::query()->orderBy($order)->get($cols)];
+    }
 }

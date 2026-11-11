@@ -112,6 +112,7 @@ function Editor({ cfg, id, onClose, onSaved }: { cfg: ResourceConfig; id: number
   const isAuthor = item?.author_id && item.author_id === me?.user.id;
   const imgs = item && cfg.imageUrls ? cfg.imageUrls(item) : {};
 
+  const wfActions = WF_ACTIONS.filter((a) => a.from.includes(status) && (a.publish ? can(...(cfg.publishPermission ?? [])) : can(...cfg.editPermission)));
   return (
     <div className="fixed inset-0 z-40 flex justify-end bg-black/30" role="dialog" aria-modal="true" aria-label={id ? `Editar ${cfg.title}` : `Nuevo registro de ${cfg.title}`} onKeyDown={(e) => e.key === 'Escape' && onClose()}>
       <div className="flex h-full w-full max-w-3xl flex-col bg-white shadow-2xl">
@@ -130,7 +131,9 @@ function Editor({ cfg, id, onClose, onSaved }: { cfg: ResourceConfig; id: number
           {msg && <Notice kind={msg.kind}>{msg.text}</Notice>}
           {tab === 'history' && id && cfg.entity ? <History entity={cfg.entity} id={id} /> : (
             <>
-              {!editable && id && <Notice kind="info">Solo lectura: no tiene permiso para modificar este registro en su estado actual.</Notice>}
+              {!editable && id && <Notice kind="info">{cfg.workflowField && status === 'publicado' && can(...cfg.editPermission)
+                ? 'Este contenido ya está publicado en el portal, por eso no se puede cambiar aquí. Si necesita corregirlo, pida a la Dirección que lo retire del portal o que haga el cambio.'
+                : 'Puede consultar esta información, pero su rol no permite modificarla.'}</Notice>}
               <fieldset disabled={!editable || busy} className="grid gap-4 md:grid-cols-2">
                 {cfg.fields.map((f) => (
                   <div key={f.name} className={f.full || ['html', 'textarea', 'repeater', 'multirelation', 'image'].includes(f.type) ? 'md:col-span-2' : ''}>
@@ -149,10 +152,10 @@ function Editor({ cfg, id, onClose, onSaved }: { cfg: ResourceConfig; id: number
         </div>
         {tab === 'form' && (
           <footer className="space-y-3 border-t border-line px-5 py-3">
-            {id && cfg.workflowField && (
+            {id && cfg.workflowField && wfActions.length > 0 && (
               <div className="flex flex-wrap items-center gap-2">
-                <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Comentario (obligatorio para devolver)" className="min-w-[12rem] flex-1 rounded-lg border border-line px-3 py-2 text-sm" />
-                {WF_ACTIONS.filter((a) => a.from.includes(status) && (a.publish ? can(...(cfg.publishPermission ?? [])) : can(...cfg.editPermission))).map((a) => (
+                {wfActions.some((a) => a.action === 'devolver') && <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Observaciones para el autor (obligatorio si lo devuelve)" className="min-w-[12rem] flex-1 rounded-lg border border-line px-3 py-2 text-sm" />}
+                {wfActions.map((a) => (
                   <Button key={a.action} variant={a.variant} disabled={busy || (a.action === 'publicar' && !!isAuthor && cfg.workflowField === 'status')} onClick={() => workflow(a.action)}
                     title={a.action === 'publicar' && isAuthor ? 'El autor no puede aprobar su propio contenido' : undefined}>{a.label}</Button>
                 ))}

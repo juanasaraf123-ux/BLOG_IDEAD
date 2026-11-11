@@ -1,6 +1,7 @@
 import { useEffect, useId, useState, type ReactNode } from 'react';
 import { admin, errorText } from '../../shared/api';
 import { Icon } from '../../shared/icons';
+import { RichText } from './RichText';
 
 /** Definición declarativa de campos de formulario del panel. */
 export type FieldDef = {
@@ -16,18 +17,23 @@ export type FieldDef = {
   /** Para repeater: subcampos. */
   fields?: FieldDef[];
   full?: boolean;
+  /** Para relation a «documents»: permite subir el archivo desde el mismo formulario. */
+  upload?: { categoryCode: string; confidentiality: string; relatedType?: string };
   step?: string;
 };
 
 export const inputCls = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink focus:border-ut-red focus:ring-2 focus:ring-ut-red/20 focus:outline-none disabled:bg-surface';
 
+const OPTION_LISTS = new Set(['cats', 'programs', 'projects', 'indicators', 'dependencies', 'periods', 'news-categories', 'education-levels', 'knowledge-areas', 'departments', 'document-categories']);
 const optionCache = new Map<string, Promise<Record<string, unknown>[]>>();
 export function useOptions(endpoint?: string) {
   const [opts, setOpts] = useState<Record<string, unknown>[]>([]);
   useEffect(() => {
     if (!endpoint) return;
     if (!optionCache.has(endpoint)) {
-      optionCache.set(endpoint, admin.get<{ data?: Record<string, unknown>[] } | Record<string, unknown>[]>(endpoint, { per_page: 200 })
+      // Listas públicas del panel (no sensibles): cualquier rol puede usarlas en sus formularios.
+      const src = OPTION_LISTS.has(endpoint) ? `options/${endpoint}` : endpoint;
+      optionCache.set(endpoint, admin.get<{ data?: Record<string, unknown>[] } | Record<string, unknown>[]>(src, { per_page: 200 })
         .then((r) => (Array.isArray(r) ? r : r.data ?? [])).catch(() => { optionCache.delete(endpoint); return []; }));
     }
     optionCache.get(endpoint)!.then(setOpts);
@@ -85,12 +91,15 @@ function Repeater({ def, value, onChange }: { def: FieldDef; value: unknown; onC
 export function FieldInput({ def, value, onChange, error, compact, imageUrl }: { def: FieldDef; value: unknown; onChange: (v: unknown) => void; error?: string; compact?: boolean; imageUrl?: string | null }) {
   const opts = useOptions(def.type === 'relation' || def.type === 'multirelation' ? def.endpoint : undefined);
   const id = `f-${def.name}-${useId()}`;
+  const [extra, setExtra] = useState<Record<string, unknown>[]>([]);
   const lbl = (o: Record<string, unknown>) => (def.optionLabel ? def.optionLabel(o) : String(o.name ?? o.title ?? o.label ?? o.code ?? o.id));
   let input: ReactNode;
   switch (def.type) {
-    case 'textarea':
     case 'html':
-      input = <textarea id={id} value={(value as string) ?? ''} onChange={(e) => onChange(e.target.value)} rows={def.type === 'html' ? 10 : 3} className={`${inputCls} ${def.type === 'html' ? 'font-mono text-xs' : ''}`} />;
+      input = <RichText id={id} value={(value as string) ?? ''} onChange={(v) => onChange(v)} />;
+      break;
+    case 'textarea':
+      input = <textarea id={id} value={(value as string) ?? ''} onChange={(e) => onChange(e.target.value)} rows={3} className={inputCls} />;
       break;
     case 'number':
       input = <input id={id} type="number" step={def.step ?? 'any'} value={value === null || value === undefined ? '' : String(value)} onChange={(e) => onChange(e.target.value === '' ? null : Number(e.target.value))} className={inputCls} />;
@@ -111,10 +120,13 @@ export function FieldInput({ def, value, onChange, error, compact, imageUrl }: {
       break;
     case 'relation':
       input = (
-        <select id={id} value={value === null || value === undefined ? '' : String(value)} onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)} className={inputCls}>
-          <option value="">— Ninguno —</option>
-          {opts.map((o) => <option key={String(o.id)} value={String(o.id)}>{lbl(o)}</option>)}
-        </select>
+        <>
+          <select id={id} value={value === null || value === undefined ? '' : String(value)} onChange={(e) => onChange(e.target.value ? Number(e.target.value) : null)} className={inputCls}>
+            <option value="">— Ninguno —</option>
+            {[...extra, ...opts.filter((o) => !extra.some((x) => x.id === o.id))].map((o) => <option key={String(o.id)} value={String(o.id)}>{lbl(o)}</option>)}
+          </select>
+          {def.upload && <InlineUpload cfg={def.upload} onUploaded={(doc) => { setExtra((x) => [doc, ...x]); onChange(doc.id); }} />}
+        </>
       );
       break;
     case 'multirelation': {
@@ -152,7 +164,7 @@ export function FieldInput({ def, value, onChange, error, compact, imageUrl }: {
     <div>
       <label htmlFor={id} className={`block font-semibold text-ink ${compact ? 'text-xs' : 'text-sm'}`}>{def.label}{def.required && <span className="text-ut-red"> *</span>}</label>
       {input}
-      {def.type === 'html' && <p className="mt-1 text-xs text-muted">Admite HTML básico (párrafos, títulos, listas, enlaces, imágenes). Los scripts y estilos se eliminan automáticamente al guardar.</p>}
+      {def.type === 'html' && <p className="mt-1 text-xs text-muted">Escriba como en Word. Use los botones de arriba para subtítulos, negrita, listas y enlaces.</p>}
       {def.help && <p className="mt-1 text-xs text-muted">{def.help}</p>}
       {error && <p className="mt-1 text-sm text-ut-red" role="alert">{error}</p>}
     </div>
@@ -170,4 +182,41 @@ export function Button({ children, variant = 'primary', ...props }: { variant?: 
     danger: 'border border-ut-red bg-white text-ut-red hover:bg-ut-red-50', light: 'bg-white text-ut-red shadow hover:bg-ut-red-50', ghost: 'hover:bg-surface',
   }[variant];
   return <button type="button" {...props} className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold disabled:opacity-50 ${v} ${props.className ?? ''}`}>{children}</button>;
+}
+
+/** Selector de archivo en español (reemplaza el botón del navegador «Choose File»). */
+export function FilePicker({ file, onPick, label = 'Elegir archivo', accept }: { file: File | null; onPick: (f: File | null) => void; label?: string; accept?: string }) {
+  return (
+    <label className="mt-1 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-ut-red/40 bg-white px-3 py-2.5 text-sm hover:border-ut-red hover:bg-ut-red-50/40">
+      <span className="inline-flex items-center gap-1.5 rounded-md bg-ut-red px-3 py-1.5 font-semibold text-white"><Icon name="upload" /> {label}</span>
+      <span className={`truncate ${file ? 'font-semibold text-ink' : 'text-muted'}`}>{file ? file.name : 'Ningún archivo seleccionado'}</span>
+      <input type="file" accept={accept} className="sr-only" onChange={(e) => onPick(e.target.files?.[0] ?? null)} />
+    </label>
+  );
+}
+
+/** Sube un archivo como documento (p. ej. la factura de un gasto) sin salir del formulario. */
+function InlineUpload({ cfg, onUploaded }: { cfg: { categoryCode: string; confidentiality: string; relatedType?: string }; onUploaded: (doc: Record<string, unknown>) => void }) {
+  const cats = useOptions('document-categories');
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState<string | null>(null);
+  const pick = async (f: File | undefined) => {
+    if (!f) return;
+    const cat = cats.find((c) => c.code === cfg.categoryCode);
+    if (!cat) { setErr('No se encontró el tipo de documento. Súbalo desde Documentos.'); return; }
+    setBusy(true); setErr(null);
+    const fd = new FormData();
+    fd.append('file', f); fd.append('title', f.name.replace(/\.[^.]+$/, '')); fd.append('category_id', String(cat.id)); fd.append('confidentiality', cfg.confidentiality);
+    if (cfg.relatedType) fd.append('related_type', cfg.relatedType);
+    try { const doc = await admin.post<Record<string, unknown>>('documents', fd); clearOptionCache(); onUploaded(doc); } catch (e) { setErr(errorText(e)); } finally { setBusy(false); }
+  };
+  return (
+    <div className="mt-1.5">
+      <label className="inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-dashed border-ut-red/50 px-3 py-1.5 text-sm font-semibold text-ut-red hover:bg-ut-red-50">
+        <Icon name="upload" /> {busy ? 'Subiendo…' : 'Subir el archivo desde aquí'}
+        <input type="file" className="sr-only" disabled={busy} onChange={(e) => pick(e.target.files?.[0])} />
+      </label>
+      {err && <p className="mt-1 text-sm text-ut-red">{err}</p>}
+    </div>
+  );
 }
