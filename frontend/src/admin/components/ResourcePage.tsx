@@ -188,7 +188,7 @@ export function ResourcePage({ cfg, embedded = false }: { cfg: ResourceConfig; e
         </div>
       ) : (
         <PageHeader title={cfg.title} description={cfg.description} icon={cfg.icon}
-          actions={can(...(cfg.createPermission ?? cfg.editPermission)) ? <Button variant="light" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button> : undefined} />
+          actions={can(...(cfg.createPermission ?? cfg.editPermission)) ? <Button variant="primary" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button> : undefined} />
       )}
       <div className="mb-3 flex flex-wrap items-end gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm">
         <label className="text-xs font-bold text-muted uppercase">Buscar
@@ -212,7 +212,7 @@ export function ResourcePage({ cfg, embedded = false }: { cfg: ResourceConfig; e
       {error && <ErrorBox message={error} onRetry={reload} />}
       <div className="overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="border-b-2 border-ut-red/70 bg-ut-red-50 text-xs text-ut-red-dark uppercase"><tr>{cfg.columns.map((c) => <th key={c.key} scope="col" className="px-3 py-2.5">{c.label}</th>)}{cfg.workflowField && <th className="px-3 py-2.5">Publicación</th>}<th className="px-3 py-2.5"><span className="sr-only">Acciones</span></th></tr></thead>
+          <thead className="border-b-2 border-ut-red/60 bg-white text-xs text-muted uppercase"><tr>{cfg.columns.map((c) => <th key={c.key} scope="col" className="px-3 py-2.5">{c.label}</th>)}{cfg.workflowField && <th className="px-3 py-2.5">Publicación</th>}<th className="px-3 py-2.5"><span className="sr-only">Acciones</span></th></tr></thead>
           <tbody className="divide-y divide-line">
             {loading && <tr><td colSpan={9}><Spinner /></td></tr>}
             {!loading && data?.data.length === 0 && <tr><td colSpan={9} className="px-3 py-6 text-center text-muted">Sin registros.</td></tr>}

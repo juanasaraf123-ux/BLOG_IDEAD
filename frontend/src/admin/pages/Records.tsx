@@ -26,13 +26,6 @@ type Analysis = {
 
 const templateUrl = (entity: string) => admin.url(`records/${entity}/template`);
 
-/** Color de cada base (franja superior e ícono). */
-const BASE_COLOR: Record<string, [string, string]> = {
-  estudiantes: ['bg-ut-red', 'from-ut-red to-ut-red-dark'],
-  docentes: ['bg-ut-red-dark', 'from-ut-red-dark to-ut-red-900'],
-  graduados: ['bg-ut-red', 'from-ut-red to-ut-red-dark'],
-  personal: ['bg-ut-red-dark', 'from-ut-red-dark to-ut-red-900'],
-};
 
 function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <section className={`rounded-2xl border border-line bg-white p-5 shadow-sm ${className}`}>{children}</section>;
@@ -70,9 +63,9 @@ export function RecordsHome() {
         <div className="grid gap-5 md:grid-cols-2">
           {data.data.map((b) => (
             <Card key={b.entity} className="relative flex flex-col overflow-hidden">
-              <span className={`absolute inset-x-0 top-0 h-1.5 ${BASE_COLOR[b.entity]?.[0] ?? 'bg-teal'}`} aria-hidden />
+              <span className="absolute inset-x-0 top-0 h-1 bg-ut-red" aria-hidden />
               <div className="flex items-start gap-3">
-                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow ${BASE_COLOR[b.entity]?.[1] ?? 'from-teal to-green'}`}><Icon name={b.icon} /></span>
+                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-ut-red-50 text-2xl text-ut-red"><Icon name={b.icon} /></span>
                 <div className="min-w-0">
                   <h2 className="text-lg font-bold text-ink">{b.title}</h2>
                   <p className="text-sm text-muted">Envía: {b.source}</p>

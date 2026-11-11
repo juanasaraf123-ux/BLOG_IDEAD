@@ -73,7 +73,7 @@ export function Dashboard() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {quick.map((q) => (
               <Link key={q.to} to={q.to} className="group flex items-center gap-4 rounded-2xl border border-line bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-gradient-to-br text-2xl text-white shadow ${q.color}`}><Icon name={q.icon} /></span>
+                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-ut-red-50 text-2xl text-ut-red transition group-hover:bg-ut-red group-hover:text-white"><Icon name={q.icon} /></span>
                 <span className="min-w-0">
                   <span className="block font-bold text-ink group-hover:text-ut-red">{q.label}</span>
                   <span className="block text-sm text-muted">{q.text}</span>
@@ -120,7 +120,7 @@ export function Documents() {
   return (
     <div>
       <PageHeader title="Documentos" icon="file" eyebrow="Documentos y caja menor" description="Archivos en almacenamiento privado, con versiones y descargas registradas. Solo ve los niveles de confidencialidad autorizados para su rol."
-        actions={can('documents.upload') ? <Button variant="light" onClick={() => setOpen('new')}><Icon name="upload" /> Cargar documento</Button> : undefined} />
+        actions={can('documents.upload') ? <Button variant="primary" onClick={() => setOpen('new')}><Icon name="upload" /> Cargar documento</Button> : undefined} />
       <div className="mb-3 flex flex-wrap gap-3">
         <label className="text-xs font-bold text-muted uppercase">Buscar<input value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })} className={inputCls} /></label>
         <label className="text-xs font-bold text-muted uppercase">Confidencialidad<select value={filters.confidentiality} onChange={(e) => setFilters({ ...filters, confidentiality: e.target.value })} className={inputCls}><option value="">Todas</option>{['publico', 'interno', 'restringido', 'financiero'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select></label>
@@ -230,7 +230,7 @@ export function Users() {
   return (
     <div>
       <PageHeader title="Usuarios" icon="user" eyebrow="Administración" description="Cuentas de los funcionarios, su rol y la oficina a la que pertenecen."
-        actions={can('users.manage') ? <Button variant="light" onClick={() => { setMsg(null); setOpen({ name: '', email: '', password: '', is_active: true, role_ids: [], dependency_ids: [] }); }}><Icon name="plus" /> Nuevo usuario</Button> : undefined} />
+        actions={can('users.manage') ? <Button variant="primary" onClick={() => { setMsg(null); setOpen({ name: '', email: '', password: '', is_active: true, role_ids: [], dependency_ids: [] }); }}><Icon name="plus" /> Nuevo usuario</Button> : undefined} />
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o correo" className={`${inputCls} mb-3 max-w-sm`} />
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
@@ -285,7 +285,7 @@ export function Roles() {
   return (
     <div>
       <PageHeader title="Roles y permisos" icon="shield" eyebrow="Administración" description="Qué puede ver y hacer cada rol. Ningún rol tiene acceso ilimitado."
-        actions={can('roles.manage') ? <Button variant="light" onClick={() => setEdit({ code: '', name: '', description: '', permission_ids: [] })}><Icon name="plus" /> Nuevo rol</Button> : undefined} />
+        actions={can('roles.manage') ? <Button variant="primary" onClick={() => setEdit({ code: '', name: '', description: '', permission_ids: [] })}><Icon name="plus" /> Nuevo rol</Button> : undefined} />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <div className="mt-3 grid gap-4 md:grid-cols-2">
         {data?.map((r) => (
