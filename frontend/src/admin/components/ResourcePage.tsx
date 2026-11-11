@@ -180,7 +180,7 @@ export function ResourcePage({ cfg }: { cfg: ResourceConfig }) {
     <div>
       <div className="mb-4 flex flex-wrap items-center gap-3">
         <div>
-          <h1 className="text-2xl font-extrabold text-green-dark">{cfg.title}</h1>
+          <h1 className="text-2xl font-extrabold text-ut-red">{cfg.title}</h1>
           {cfg.description && <p className="text-sm text-muted">{cfg.description}</p>}
         </div>
         {can(...(cfg.createPermission ?? cfg.editPermission)) && <Button className="ml-auto" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button>}

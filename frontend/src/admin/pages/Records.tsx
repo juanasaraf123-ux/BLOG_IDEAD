@@ -41,7 +41,7 @@ export function RecordsHome() {
   return (
     <div className="mx-auto max-w-6xl space-y-6">
       <header>
-        <h1 className="text-2xl font-extrabold text-green-dark">Bases de datos</h1>
+        <h1 className="text-2xl font-extrabold text-ut-red">Bases de datos</h1>
         <p className="mt-1 max-w-3xl text-muted">Aquí se cargan las bases que envían las oficinas. Los datos personales quedan cifrados y solo los ven personas autorizadas; en el portal se publican únicamente totales.</p>
       </header>
 
@@ -88,7 +88,7 @@ export function RecordsHome() {
                 )}
               </div>
               <div className="flex flex-wrap gap-2">
-                {data.can.import && <Link to={`/bases/${b.entity}`} className="inline-flex items-center gap-1.5 rounded-lg bg-green-dark px-3.5 py-2 text-sm font-semibold text-white hover:bg-green"><Icon name="upload" /> Cargar archivo</Link>}
+                {data.can.import && <Link to={`/bases/${b.entity}`} className="inline-flex items-center gap-1.5 rounded-lg bg-ut-red px-3.5 py-2 text-sm font-semibold text-white hover:bg-ut-red-dark"><Icon name="upload" /> Cargar archivo</Link>}
                 <Link to={`/bases/${b.entity}?tab=consultar`} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3.5 py-2 text-sm font-semibold hover:border-green"><Icon name="chart" /> Ver datos</Link>
                 <a href={templateUrl(b.entity)} className="ml-auto inline-flex items-center gap-1 px-2 py-2 text-sm font-semibold text-green-dark hover:underline"><Icon name="download" /> Plantilla</a>
               </div>
@@ -120,14 +120,14 @@ export function RecordDetail() {
       <header className="flex items-start gap-3">
         <IconBubble name={def.icon} />
         <div>
-          <h1 className="text-2xl font-extrabold text-green-dark">{def.title}</h1>
+          <h1 className="text-2xl font-extrabold text-ut-red">{def.title}</h1>
           <p className="text-muted">Envía: {def.source}. {def.description}</p>
         </div>
       </header>
       <nav role="tablist" aria-label="Secciones" className="flex gap-1 rounded-xl bg-white p-1 shadow-sm ring-1 ring-line sm:inline-flex">
         {TABS.filter(([k]) => k !== 'cargar' || canImport).map(([k, label, icon]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setParams({ tab: k })}
-            className={`flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold transition ${tab === k ? 'bg-green-dark text-white' : 'text-ink hover:bg-surface'}`}>
+            className={`flex flex-1 items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-4 py-2 text-sm font-semibold transition ${tab === k ? 'bg-ut-red text-white' : 'text-ink hover:bg-surface'}`}>
             <Icon name={icon} /> {label}
           </button>
         ))}
@@ -147,7 +147,7 @@ function Steps({ step }: { step: number }) {
     <ol className="flex items-center gap-2 text-sm" aria-label="Pasos">
       {names.map((n, i) => (
         <li key={n} className="flex items-center gap-2" aria-current={i === step ? 'step' : undefined}>
-          <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i < step ? 'bg-green text-white' : i === step ? 'bg-green-dark text-white ring-4 ring-teal/30' : 'bg-surface text-muted ring-1 ring-line'}`}>
+          <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i < step ? 'bg-green text-white' : i === step ? 'bg-ut-red text-white ring-4 ring-ut-red/20' : 'bg-surface text-muted ring-1 ring-line'}`}>
             {i < step ? <Icon name="check" /> : i + 1}
           </span>
           <span className={`hidden sm:inline ${i === step ? 'font-semibold text-ink' : 'text-muted'}`}>{n}</span>
@@ -218,9 +218,9 @@ function Upload({ def, onDone, goTo }: { def: Row; onDone: () => void; goTo: (t:
       <div className="grid gap-5 lg:grid-cols-[1fr_1.4fr]">
         {/* Paso 1 */}
         <Card>
-          <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-green-dark text-xs text-white">1</span> Descargue la plantilla</h2>
+          <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-ut-red text-xs text-white">1</span> Descargue la plantilla</h2>
           <p className="mt-2 text-sm text-muted">Es un Excel con las columnas que necesita el portal, instrucciones y la lista de programas y CAT válidos. Adjúntela al correo para la oficina.</p>
-          <a href={templateUrl(def.entity)} className="mt-4 inline-flex items-center gap-1.5 rounded-lg bg-ut-red px-3.5 py-2 text-sm font-semibold text-white hover:bg-ut-red-dark"><Icon name="download" /> Descargar plantilla (.xlsx)</a>
+          <a href={templateUrl(def.entity)} className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-ut-red bg-white px-3.5 py-2 text-sm font-semibold text-ut-red hover:bg-ut-red-50"><Icon name="download" /> Descargar plantilla (.xlsx)</a>
           <button onClick={() => setShowCols(!showCols)} aria-expanded={showCols} className="mt-4 flex items-center gap-1 text-sm font-semibold text-green-dark hover:underline">
             <Icon name="chevronDown" className={`transition ${showCols ? 'rotate-180' : ''}`} /> Ver las {def.columns.length} columnas
           </button>
@@ -238,7 +238,7 @@ function Upload({ def, onDone, goTo }: { def: Row; onDone: () => void; goTo: (t:
 
         {/* Paso 2 */}
         <Card>
-          <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-green-dark text-xs text-white">2</span> Suba el archivo que envió la oficina</h2>
+          <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-ut-red text-xs text-white">2</span> Suba el archivo que envió la oficina</h2>
           {def.by_period && (
             <label className="mt-3 block text-sm font-semibold">¿De qué semestre es la información?
               <select className={inputCls} value={period} onChange={(e) => { setPeriod(e.target.value); setAnalysis(null); }}>
@@ -295,7 +295,7 @@ function Review({ a, busy, onConfirm, onReset }: { a: Analysis; busy: boolean; o
   const allGood = a.rows_error === 0;
   return (
     <Card>
-      <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-green-dark text-xs text-white">3</span> Revisión del archivo</h2>
+      <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-ut-red text-xs text-white">3</span> Revisión del archivo</h2>
       <div className="mt-4 grid gap-3 sm:grid-cols-3">
         <Stat label="Filas leídas" value={a.rows_total} tone="gray" />
         <Stat label="Listas para cargar" value={a.rows_valid} tone="green" />
@@ -431,7 +431,7 @@ function Explore({ def }: { def: Row }) {
           {rows.data && <span className="text-sm text-muted">{fmtNumber(rows.data.meta.total)} en total</span>}
           {can('records.view_personal') && (
             <label className="ml-auto flex cursor-pointer items-center gap-2 text-sm">
-              <input type="checkbox" checked={personal} onChange={(e) => { setPersonal(e.target.checked); setPage(1); }} className="h-4 w-4 accent-green-dark" />
+              <input type="checkbox" checked={personal} onChange={(e) => { setPersonal(e.target.checked); setPage(1); }} className="h-4 w-4 accent-ut-red" />
               <Icon name="eye" /> Mostrar nombres y documentos
             </label>
           )}

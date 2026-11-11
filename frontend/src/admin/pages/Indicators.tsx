@@ -28,7 +28,7 @@ export function IndicatorList() {
   const { data, error, loading } = useAsync(() => admin.get<Row[]>('indicators', { module_id: module, q, mine: mine ? 1 : undefined }), [module, q, mine]);
   return (
     <div>
-      <h1 className="text-2xl font-extrabold text-green-dark">Catálogo de indicadores</h1>
+      <h1 className="text-2xl font-extrabold text-ut-red">Catálogo de indicadores</h1>
       <p className="mb-4 text-sm text-muted">76 indicadores del documento «Indicadores sugeridos». Desde aquí se edita su ficha técnica y se registran sus datos.</p>
       <div className="mb-3 flex flex-wrap items-end gap-3">
         <label className="text-xs font-bold text-muted uppercase">Módulo
@@ -85,7 +85,7 @@ export function IndicatorDetail() {
     <div className="space-y-6">
       <div>
         <Link to="/indicadores" className="text-sm text-green-dark hover:underline">← Catálogo</Link>
-        <h1 className="text-2xl font-extrabold text-green-dark">{data.code} · {data.name}</h1>
+        <h1 className="text-2xl font-extrabold text-ut-red">{data.code} · {data.name}</h1>
         <p className="text-sm text-muted">{data.module.number}. {data.module.name} · Fuente (Excel): {data.source_text}</p>
       </div>
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
@@ -158,7 +158,7 @@ export function SubmissionDetail() {
     <div className="space-y-5">
       <div>
         <Link to={`/indicadores/${ind.id}`} className="text-sm text-green-dark hover:underline">← {ind.code} {ind.name}</Link>
-        <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold text-green-dark">Lote #{s.id} <StatusBadge s={s.status} />{s.is_demo && <Badge tone="amber">Demo</Badge>}</h1>
+        <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold text-ut-red">Lote #{s.id} <StatusBadge s={s.status} />{s.is_demo && <Badge tone="amber">Demo</Badge>}</h1>
         <p className="text-sm text-muted">Registró: {s.creator?.name} · Envió: {s.submitter?.name ?? '—'} ({fmtDateTime(s.submitted_at)}) · Aprobó: {s.approver?.name ?? '—'} ({fmtDateTime(s.approved_at)}) · Publicó: {s.publisher?.name ?? '—'} ({fmtDateTime(s.published_at)})</p>
         {s.supersedes_id && <p className="text-sm text-amber-800">Corrige y reemplazará al lote #{s.supersedes_id} al publicarse.</p>}
       </div>
@@ -241,7 +241,7 @@ export function SubmissionList() {
   const { data, error, loading } = useAsync(() => admin.get<Row>('submissions', { status, page }), [status, page]);
   return (
     <div>
-      <h1 className="text-2xl font-extrabold text-green-dark">Cargas de datos</h1>
+      <h1 className="text-2xl font-extrabold text-ut-red">Cargas de datos</h1>
       <p className="mb-4 text-sm text-muted">Lotes de datos de indicadores y su estado en el flujo: borrador → enviado → aprobado → publicado.</p>
       <label className="mb-3 inline-block text-xs font-bold text-muted uppercase">Estado
         <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className={inputCls}><option value="">Todos</option>{['borrador', 'enviado', 'devuelto', 'aprobado', 'publicado', 'reemplazado', 'retirado'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select>

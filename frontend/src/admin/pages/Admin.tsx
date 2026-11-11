@@ -27,7 +27,7 @@ export function Dashboard() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-extrabold text-green-dark">Hola, {me?.user.name}</h1>
+        <h1 className="text-2xl font-extrabold text-ut-red">Hola, {me?.user.name}</h1>
         <p className="text-muted">Roles: {me?.user.roles.map((r) => r.name).join(', ') || 'sin rol asignado'}</p>
       </div>
       {!me?.user.mfa_enabled && <Notice kind="info">Recomendación de seguridad: active la verificación en dos pasos en <Link to="/cuenta" className="underline">Mi cuenta</Link>.</Notice>}
@@ -67,7 +67,7 @@ export function Documents() {
   return (
     <div>
       <div className="mb-4 flex items-center gap-3">
-        <div><h1 className="text-2xl font-extrabold text-green-dark">Gestión documental</h1><p className="text-sm text-muted">Archivos en almacenamiento privado, con versiones y descargas auditadas. Solo ve los niveles de confidencialidad autorizados para su rol.</p></div>
+        <div><h1 className="text-2xl font-extrabold text-ut-red">Gestión documental</h1><p className="text-sm text-muted">Archivos en almacenamiento privado, con versiones y descargas auditadas. Solo ve los niveles de confidencialidad autorizados para su rol.</p></div>
         {can('documents.upload') && <Button className="ml-auto" onClick={() => setOpen('new')}><Icon name="upload" /> Cargar documento</Button>}
       </div>
       <div className="mb-3 flex flex-wrap gap-3">
@@ -178,7 +178,7 @@ export function Users() {
   const toggle = (k: 'role_ids' | 'dependency_ids', idv: number) => setOpen((o) => ({ ...o!, [k]: o![k].includes(idv) ? o![k].filter((x: number) => x !== idv) : [...o![k], idv] }));
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3"><h1 className="text-2xl font-extrabold text-green-dark">Usuarios</h1>
+      <div className="mb-4 flex items-center gap-3"><h1 className="text-2xl font-extrabold text-ut-red">Usuarios</h1>
         {can('users.manage') && <Button className="ml-auto" onClick={() => { setMsg(null); setOpen({ name: '', email: '', password: '', is_active: true, role_ids: [], dependency_ids: [] }); }}><Icon name="plus" /> Nuevo usuario</Button>}</div>
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o correo" className={`${inputCls} mb-3 max-w-sm`} />
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
@@ -233,7 +233,7 @@ export function Roles() {
   };
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3"><div><h1 className="text-2xl font-extrabold text-green-dark">Roles y permisos</h1><p className="text-sm text-muted">Control de acceso basado en roles. Los permisos son independientes y configurables; ningún rol tiene acceso ilimitado.</p></div>
+      <div className="mb-4 flex items-center gap-3"><div><h1 className="text-2xl font-extrabold text-ut-red">Roles y permisos</h1><p className="text-sm text-muted">Control de acceso basado en roles. Los permisos son independientes y configurables; ningún rol tiene acceso ilimitado.</p></div>
         {can('roles.manage') && <Button className="ml-auto" onClick={() => setEdit({ code: '', name: '', description: '', permission_ids: [] })}><Icon name="plus" /> Nuevo rol</Button>}</div>
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <div className="mt-3 grid gap-4 md:grid-cols-2">
@@ -276,7 +276,7 @@ export function Audit() {
   const { data, loading, error } = useAsync(() => admin.get<Row>('audit', { ...f, page }), [JSON.stringify(f), page]);
   return (
     <div>
-      <h1 className="text-2xl font-extrabold text-green-dark">Registro de auditoría</h1>
+      <h1 className="text-2xl font-extrabold text-ut-red">Registro de auditoría</h1>
       <p className="mb-4 text-sm text-muted">Inicios de sesión, intentos fallidos, cambios de permisos, publicaciones, descargas de documentos privados y exportaciones. Registro de solo inserción.</p>
       <div className="mb-3 flex flex-wrap gap-3">
         <label className="text-xs font-bold text-muted uppercase">Acción<input value={f.action} onChange={(e) => setF({ ...f, action: e.target.value })} placeholder="auth.login" className={inputCls} /></label>
@@ -304,7 +304,7 @@ export function Settings() {
   const t = (k: string, l: string, type: 'text' | 'textarea' | 'number' | 'checkbox' | 'image' = 'text', help?: string) => <FieldInput def={{ name: k, label: l, type, help }} value={form[k]} onChange={(v) => setForm({ ...form, [k]: v })} />;
   return (
     <div className="max-w-3xl space-y-4">
-      <h1 className="text-2xl font-extrabold text-green-dark">Configuración del sistema</h1>
+      <h1 className="text-2xl font-extrabold text-ut-red">Configuración del sistema</h1>
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <section className="grid gap-4 rounded-xl border border-line bg-white p-5 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">Identidad y contacto</h2>
@@ -343,7 +343,7 @@ export function Reports() {
   );
   return (
     <div className="max-w-4xl space-y-6">
-      <h1 className="text-2xl font-extrabold text-green-dark">Informes y exportaciones</h1>
+      <h1 className="text-2xl font-extrabold text-ut-red">Informes y exportaciones</h1>
       {can('reports.internal.export') && (
         <section className="rounded-xl border border-line bg-white p-5">
           <h2 className="font-bold">Informe interno de indicadores</h2>
@@ -355,7 +355,7 @@ export function Reports() {
             {sel('program', 'Programa', programs.map((c) => ({ v: String(c.id), l: String(c.name) })))}
             <label className="text-xs font-bold text-muted uppercase">Formato<select value={f.format} onChange={(e) => setF({ ...f, format: e.target.value })} className={inputCls}><option value="xlsx">Excel</option><option value="csv">CSV</option></select></label>
           </div>
-          <a href={admin.url('reports/indicators', f)} className="mt-4 inline-flex items-center gap-1 rounded-lg bg-green-dark px-4 py-2 text-sm font-semibold text-white hover:bg-green"><Icon name="download" /> Generar informe</a>
+          <a href={admin.url('reports/indicators', f)} className="mt-4 inline-flex items-center gap-1 rounded-lg bg-ut-red px-4 py-2 text-sm font-semibold text-white hover:bg-ut-red-dark"><Icon name="download" /> Generar informe</a>
           <p className="mt-3 text-xs text-muted">Para un informe en PDF, abra el módulo correspondiente en el portal público y use «Imprimir / PDF».</p>
         </section>
       )}
@@ -364,7 +364,7 @@ export function Reports() {
           <h2 className="font-bold">Informe de caja menor</h2>
           <div className="mt-2 flex flex-wrap items-end gap-3">
             <label className="text-xs font-bold text-muted uppercase">Presupuesto<select value={pc} onChange={(e) => setPc(e.target.value)} className={inputCls}><option value="">Todos</option>{budgets.map((b) => <option key={String(b.id)} value={String(b.id)}>{String(b.year)} — {String(b.name)}</option>)}</select></label>
-            <a href={admin.url('reports/petty-cash', { budget_id: pc, format: 'xlsx' })} className="inline-flex items-center gap-1 rounded-lg bg-green-dark px-4 py-2 text-sm font-semibold text-white hover:bg-green"><Icon name="download" /> Excel</a>
+            <a href={admin.url('reports/petty-cash', { budget_id: pc, format: 'xlsx' })} className="inline-flex items-center gap-1 rounded-lg bg-ut-red px-4 py-2 text-sm font-semibold text-white hover:bg-ut-red-dark"><Icon name="download" /> Excel</a>
           </div>
         </section>
       )}

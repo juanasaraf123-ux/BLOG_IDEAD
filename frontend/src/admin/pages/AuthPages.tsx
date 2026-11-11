@@ -8,13 +8,21 @@ import { Button, inputCls, Notice } from '../components/Form';
 
 function Frame({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="grid min-h-screen place-items-center bg-[linear-gradient(135deg,#17534b_0%,#289d8d_55%,#51bbb1_100%)] p-4">
-      <main className="w-full max-w-md rounded-2xl bg-white p-8 shadow-2xl">
-        <img src="/img/logo-ut-temporal.png" alt="Universidad del Tolima" className="mb-4 h-12" />
-        <h1 className="text-xl font-extrabold text-green-dark">{title}</h1>
-        <p className="mb-6 text-sm text-muted">Panel de administración del portal IDEAD — acceso exclusivo para funcionarios autorizados.</p>
-        {children}
-      </main>
+    <div className="flex min-h-screen flex-col bg-surface">
+      <div className="h-1.5 bg-ut-red" aria-hidden />
+      <div className="grid flex-1 place-items-center p-4">
+        <main className="w-full max-w-md rounded-2xl border border-line bg-white p-8 shadow-xl">
+          <div className="mb-6 flex items-center gap-3">
+            <img src="/img/logo-ut-temporal.png" alt="Universidad del Tolima" className="h-12 w-auto" />
+            <span className="border-l border-gray-300 pl-3 text-[0.7rem] leading-tight font-medium text-ink uppercase">Instituto de<br />Educación<br />a Distancia</span>
+          </div>
+          <p className="text-xs font-bold tracking-wider text-muted uppercase">Panel de gestión</p>
+          <h1 className="text-2xl font-extrabold text-ut-red">{title}</h1>
+          <p className="mb-6 text-sm text-muted">Acceso exclusivo para funcionarios autorizados del IDEAD.</p>
+          {children}
+        </main>
+      </div>
+      <footer className="bg-green-dark px-4 py-3 text-center text-xs text-white/80">Universidad del Tolima · Instituto de Educación a Distancia</footer>
     </div>
   );
 }
@@ -123,7 +131,7 @@ export function Account() {
   if (!me) return null;
   return (
     <div className="max-w-3xl space-y-8">
-      <h1 className="text-2xl font-extrabold text-green-dark">Mi cuenta</h1>
+      <h1 className="text-2xl font-extrabold text-ut-red">Mi cuenta</h1>
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       {me.must_setup_mfa && <Notice kind="info">La política institucional exige configurar el segundo factor antes de usar el panel.</Notice>}
       <section className="rounded-xl border border-line bg-white p-5">

@@ -166,8 +166,8 @@ export function Notice({ kind, children }: { kind: 'ok' | 'error' | 'info'; chil
 
 export function Button({ children, variant = 'primary', ...props }: { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const v = {
-    primary: 'bg-green-dark text-white hover:bg-green', secondary: 'border border-line bg-white hover:border-green',
-    danger: 'bg-ut-red text-white hover:bg-ut-red-dark', ghost: 'hover:bg-surface',
+    primary: 'bg-ut-red text-white hover:bg-ut-red-dark', secondary: 'border border-line bg-white hover:border-ut-red hover:text-ut-red',
+    danger: 'border border-ut-red bg-white text-ut-red hover:bg-ut-red-50', ghost: 'hover:bg-surface',
   }[variant];
   return <button type="button" {...props} className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold disabled:opacity-50 ${v} ${props.className ?? ''}`}>{children}</button>;
 }
