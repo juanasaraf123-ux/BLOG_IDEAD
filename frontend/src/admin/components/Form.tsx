@@ -19,7 +19,7 @@ export type FieldDef = {
   step?: string;
 };
 
-export const inputCls = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink focus:border-green focus:ring-2 focus:ring-teal/40 focus:outline-none disabled:bg-surface';
+export const inputCls = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink focus:border-ut-red focus:ring-2 focus:ring-ut-red/20 focus:outline-none disabled:bg-surface';
 
 const optionCache = new Map<string, Promise<Record<string, unknown>[]>>();
 export function useOptions(endpoint?: string) {
@@ -46,7 +46,7 @@ function ImageField({ value, onChange, url }: { value: unknown; onChange: (v: un
   return (
     <div className="mt-1 flex flex-wrap items-center gap-3">
       {preview ? <img src={preview} alt="" className="h-20 w-32 rounded border border-line object-cover" /> : <div className="grid h-20 w-32 place-items-center rounded border border-dashed border-line text-xs text-muted">Sin imagen</div>}
-      <label className="cursor-pointer rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-green">
+      <label className="cursor-pointer rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red">
         {busy ? 'Subiendo…' : 'Cargar imagen (JPG, PNG, WebP)'}
         <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={async (e) => {
           const f = e.target.files?.[0];
@@ -77,7 +77,7 @@ function Repeater({ def, value, onChange }: { def: FieldDef; value: unknown; onC
         </div>
       ))}
       <button type="button" onClick={() => onChange([...rows, Object.fromEntries(def.fields!.map((f) => [f.name, f.type === 'checkbox' ? true : null]))])}
-        className="inline-flex items-center gap-1 rounded-lg border border-dashed border-line px-3 py-1.5 text-sm font-semibold hover:border-green"><Icon name="plus" /> Agregar</button>
+        className="inline-flex items-center gap-1 rounded-lg border border-dashed border-line px-3 py-1.5 text-sm font-semibold hover:border-ut-red"><Icon name="plus" /> Agregar</button>
     </div>
   );
 }
@@ -135,7 +135,7 @@ export function FieldInput({ def, value, onChange, error, compact, imageUrl }: {
     case 'checkbox':
       return (
         <label className={`flex items-center gap-2 text-sm font-semibold ${compact ? 'mb-2' : 'mt-6'}`}>
-          <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 accent-green" /> {def.label}
+          <input type="checkbox" checked={!!value} onChange={(e) => onChange(e.target.checked)} className="h-4 w-4 accent-ut-red" /> {def.label}
           {def.help && <span className="font-normal text-muted">— {def.help}</span>}
         </label>
       );
@@ -164,10 +164,10 @@ export function Notice({ kind, children }: { kind: 'ok' | 'error' | 'info'; chil
   return <div role={kind === 'error' ? 'alert' : 'status'} className={`rounded-lg border px-4 py-2.5 text-sm ${cls}`}>{children}</div>;
 }
 
-export function Button({ children, variant = 'primary', ...props }: { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+export function Button({ children, variant = 'primary', ...props }: { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'light' } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const v = {
     primary: 'bg-ut-red text-white hover:bg-ut-red-dark', secondary: 'border border-line bg-white hover:border-ut-red hover:text-ut-red',
-    danger: 'border border-ut-red bg-white text-ut-red hover:bg-ut-red-50', ghost: 'hover:bg-surface',
+    danger: 'border border-ut-red bg-white text-ut-red hover:bg-ut-red-50', light: 'bg-white text-ut-red shadow hover:bg-ut-red-50', ghost: 'hover:bg-surface',
   }[variant];
   return <button type="button" {...props} className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold disabled:opacity-50 ${v} ${props.className ?? ''}`}>{children}</button>;
 }

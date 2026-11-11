@@ -6,6 +6,7 @@ import { Badge, ErrorBox, Spinner, STATUS_TONE, useAsync } from '../../shared/ui
 import type { Paginated } from '../../shared/types';
 import { useAuth } from '../auth';
 import { Button, clearOptionCache, FieldInput, Notice, type FieldDef } from './Form';
+import { PageHeader } from './PageHeader';
 
 type Row = Record<string, any>; // eslint-disable-line @typescript-eslint/no-explicit-any
 
@@ -27,6 +28,8 @@ export interface ResourceConfig {
   toForm?: (r: Row) => Row;
   imageUrls?: (r: Row) => Record<string, string | null | undefined>;
   defaults?: Row;
+  /** Ícono del encabezado. */
+  icon?: string;
 }
 
 const WF_ACTIONS: { action: string; label: string; from: string[]; publish: boolean; variant: 'primary' | 'secondary' | 'danger' }[] = [
@@ -120,7 +123,7 @@ function Editor({ cfg, id, onClose, onSaved }: { cfg: ResourceConfig; id: number
         </header>
         {id && cfg.entity && (
           <div className="flex gap-1 border-b border-line px-5" role="tablist">
-            {(['form', 'history'] as const).map((t) => <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`border-b-2 px-3 py-2 text-sm font-semibold ${tab === t ? 'border-green text-green-dark' : 'border-transparent text-muted'}`}>{t === 'form' ? 'Datos' : 'Historial de cambios'}</button>)}
+            {(['form', 'history'] as const).map((t) => <button key={t} role="tab" aria-selected={tab === t} onClick={() => setTab(t)} className={`border-b-2 px-3 py-2 text-sm font-semibold ${tab === t ? 'border-ut-red text-ut-red' : 'border-transparent text-muted'}`}>{t === 'form' ? 'Datos' : 'Historial de cambios'}</button>)}
           </div>
         )}
         <div className="flex-1 space-y-4 overflow-y-auto px-5 py-4">
@@ -168,7 +171,7 @@ function Editor({ cfg, id, onClose, onSaved }: { cfg: ResourceConfig; id: number
 }
 
 /** Página CRUD genérica: listado con búsqueda, filtros, estado y paginación + editor lateral con flujo editorial e historial. */
-export function ResourcePage({ cfg }: { cfg: ResourceConfig }) {
+export function ResourcePage({ cfg, embedded = false }: { cfg: ResourceConfig; embedded?: boolean }) {
   const { can } = useAuth();
   const [q, setQ] = useState('');
   const [page, setPage] = useState(1);
@@ -178,14 +181,16 @@ export function ResourcePage({ cfg }: { cfg: ResourceConfig }) {
   useEffect(() => { setPage(1); setFilters({}); setQ(''); setEditing(null); }, [cfg.endpoint]);
   return (
     <div>
-      <div className="mb-4 flex flex-wrap items-center gap-3">
-        <div>
-          <h1 className="text-2xl font-extrabold text-ut-red">{cfg.title}</h1>
-          {cfg.description && <p className="text-sm text-muted">{cfg.description}</p>}
+      {embedded ? (
+        <div className="mb-4 flex flex-wrap items-center gap-3">
+          {cfg.description && <p className="max-w-3xl text-sm text-muted">{cfg.description}</p>}
+          {can(...(cfg.createPermission ?? cfg.editPermission)) && <Button className="ml-auto" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button>}
         </div>
-        {can(...(cfg.createPermission ?? cfg.editPermission)) && <Button className="ml-auto" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button>}
-      </div>
-      <div className="mb-3 flex flex-wrap items-end gap-3">
+      ) : (
+        <PageHeader title={cfg.title} description={cfg.description} icon={cfg.icon}
+          actions={can(...(cfg.createPermission ?? cfg.editPermission)) ? <Button variant="light" onClick={() => setEditing('new')}><Icon name="plus" /> Nuevo</Button> : undefined} />
+      )}
+      <div className="mb-3 flex flex-wrap items-end gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm">
         <label className="text-xs font-bold text-muted uppercase">Buscar
           <input value={q} onChange={(e) => { setQ(e.target.value); setPage(1); }} className="mt-1 block rounded-lg border border-line px-3 py-2 text-sm font-normal text-ink normal-case" />
         </label>
@@ -205,9 +210,9 @@ export function ResourcePage({ cfg }: { cfg: ResourceConfig }) {
         ))}
       </div>
       {error && <ErrorBox message={error} onRetry={reload} />}
-      <div className="overflow-x-auto rounded-xl border border-line bg-white">
+      <div className="overflow-x-auto rounded-2xl border border-line bg-white shadow-sm">
         <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr>{cfg.columns.map((c) => <th key={c.key} scope="col" className="px-3 py-2.5">{c.label}</th>)}{cfg.workflowField && <th className="px-3 py-2.5">Publicación</th>}<th className="px-3 py-2.5"><span className="sr-only">Acciones</span></th></tr></thead>
+          <thead className="border-b-2 border-ut-red/70 bg-ut-red-50 text-xs text-ut-red-dark uppercase"><tr>{cfg.columns.map((c) => <th key={c.key} scope="col" className="px-3 py-2.5">{c.label}</th>)}{cfg.workflowField && <th className="px-3 py-2.5">Publicación</th>}<th className="px-3 py-2.5"><span className="sr-only">Acciones</span></th></tr></thead>
           <tbody className="divide-y divide-line">
             {loading && <tr><td colSpan={9}><Spinner /></td></tr>}
             {!loading && data?.data.length === 0 && <tr><td colSpan={9} className="px-3 py-6 text-center text-muted">Sin registros.</td></tr>}

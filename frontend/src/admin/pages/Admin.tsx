@@ -4,6 +4,7 @@ import { admin, errorText } from '../../shared/api';
 import { fmtBytes, fmtDateTime, label } from '../../shared/format';
 import { Icon } from '../../shared/icons';
 import { Badge, ErrorBox, Spinner, useAsync } from '../../shared/ui';
+import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../auth';
 import { Button, FieldInput, inputCls, Notice, useOptions } from '../components/Form';
 import { PASSWORD_HELP } from './AuthPages';
@@ -24,13 +25,13 @@ const PENDING_LABELS: Record<string, [string, string, string]> = {
 /** Accesos rápidos del inicio (solo los que el rol puede usar). */
 const QUICK: { to: string; label: string; text: string; icon: string; color: string; perms: string[] }[] = [
   { to: '/bases', label: 'Bases de datos', text: 'Cargar y consultar estudiantes, docentes, graduados y personal', icon: 'table', color: 'from-ut-red to-ut-red-dark', perms: ['records.view', 'records.import'] },
-  { to: '/indicadores', label: 'Indicadores', text: 'Los 76 indicadores del portal y su estado', icon: 'chart', color: 'from-green to-green-dark', perms: ['indicators.view_internal', 'indicators.submit'] },
-  { to: '/r/noticias', label: 'Noticias', text: 'Publicar noticias y novedades', icon: 'book', color: 'from-teal to-green', perms: ['content.create', 'content.publish'] },
-  { to: '/r/actividades', label: 'Actividades', text: 'Agenda de eventos del IDEAD', icon: 'calendar', color: 'from-[#e0a43a] to-[#b7791f]', perms: ['content.create', 'content.publish'] },
-  { to: '/documentos', label: 'Documentos', text: 'Actas, resoluciones, contratos y convenios', icon: 'file', color: 'from-[#5b6f8a] to-[#3d4d63]', perms: ['documents.view.internal', 'documents.upload'] },
-  { to: '/r/caja-menor-gastos', label: 'Caja menor', text: 'Gastos, facturas y soportes', icon: 'money', color: 'from-[#e0a43a] to-[#b7791f]', perms: ['petty_cash.view'] },
-  { to: '/r/cat', label: 'CAT', text: 'Fichas de los Centros de Atención Tutorial', icon: 'building', color: 'from-green to-green-dark', perms: ['cats.edit', 'entities.publish'] },
-  { to: '/usuarios', label: 'Usuarios', text: 'Cuentas, roles y permisos', icon: 'user', color: 'from-[#5b6f8a] to-[#3d4d63]', perms: ['users.view', 'users.manage'] },
+  { to: '/indicadores', label: 'Indicadores', text: 'Los 76 indicadores del portal y su estado', icon: 'chart', color: 'from-ut-red-dark to-ut-red-900', perms: ['indicators.view_internal', 'indicators.submit'] },
+  { to: '/r/noticias', label: 'Noticias', text: 'Publicar noticias y novedades', icon: 'book', color: 'from-ut-red to-ut-red-dark', perms: ['content.create', 'content.publish'] },
+  { to: '/r/actividades', label: 'Actividades', text: 'Agenda de eventos del IDEAD', icon: 'calendar', color: 'from-ut-red-dark to-ut-red-900', perms: ['content.create', 'content.publish'] },
+  { to: '/documentos', label: 'Documentos', text: 'Actas, resoluciones, contratos y convenios', icon: 'file', color: 'from-ut-red to-ut-red-dark', perms: ['documents.view.internal', 'documents.upload'] },
+  { to: '/h/caja-menor', label: 'Caja menor', text: 'Gastos, facturas y soportes', icon: 'money', color: 'from-ut-red-dark to-ut-red-900', perms: ['petty_cash.view'] },
+  { to: '/h/cat', label: 'CAT', text: 'Fichas de los Centros de Atención Tutorial', icon: 'building', color: 'from-ut-red to-ut-red-dark', perms: ['cats.edit', 'entities.publish'] },
+  { to: '/usuarios', label: 'Usuarios', text: 'Cuentas, roles y permisos', icon: 'user', color: 'from-ut-red-dark to-ut-red-900', perms: ['users.view', 'users.manage'] },
 ];
 
 export function Dashboard() {
@@ -43,9 +44,9 @@ export function Dashboard() {
   const pct = data?.indicators ? Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100) : 0;
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-green-dark via-green-dark to-green p-6 text-white shadow-lg md:p-8">
-        <span className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-teal/30" aria-hidden />
-        <span className="pointer-events-none absolute -right-24 bottom-[-6rem] h-64 w-64 rounded-full bg-ut-red/40" aria-hidden />
+      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-ut-red via-ut-red to-ut-red-dark p-6 text-white shadow-lg md:p-8">
+        <span className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-white/10" aria-hidden />
+        <span className="pointer-events-none absolute -right-24 bottom-[-6rem] h-64 w-64 rounded-full bg-ut-red-900/40" aria-hidden />
         <span className="pointer-events-none absolute top-6 right-40 hidden h-16 w-16 rounded-full border-4 border-white/15 md:block" aria-hidden />
         <div className="relative">
           <p className="text-sm text-white/80 first-letter:uppercase">{today}</p>
@@ -91,10 +92,10 @@ export function Dashboard() {
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
               <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className={`relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md ${v > 0 ? 'border-ut-red/30' : 'border-line'}`}>
-                <span className={`absolute inset-x-0 top-0 h-1 ${v > 0 ? 'bg-ut-red' : 'bg-teal'}`} aria-hidden />
+                <span className={`absolute inset-x-0 top-0 h-1 ${v > 0 ? 'bg-ut-red' : 'bg-ut-red/25'}`} aria-hidden />
                 <div className="flex items-start justify-between">
-                  <p className={`text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-green-dark'}`}>{v}</p>
-                  <span className={`grid h-9 w-9 place-items-center rounded-full text-lg ${v > 0 ? 'bg-ut-red-50 text-ut-red' : 'bg-teal/15 text-green-dark'}`}><Icon name={PENDING_LABELS[k]?.[2] ?? 'info'} /></span>
+                  <p className={`text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-ink'}`}>{v}</p>
+                  <span className={`grid h-9 w-9 place-items-center rounded-full text-lg ${v > 0 ? 'bg-ut-red text-white' : 'bg-ut-red-50 text-ut-red'}`}><Icon name={PENDING_LABELS[k]?.[2] ?? 'info'} /></span>
                 </div>
                 <p className="mt-1 text-sm">{PENDING_LABELS[k]?.[0] ?? k}</p>
                 {v === 0 && <p className="text-xs text-muted">Al día</p>}
@@ -118,10 +119,8 @@ export function Documents() {
   const { data, error, loading, reload } = useAsync(() => admin.get<Row>('documents', { ...filters, page }), [JSON.stringify(filters), page]);
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3">
-        <div><h1 className="text-2xl font-extrabold text-ut-red">Gestión documental</h1><p className="text-sm text-muted">Archivos en almacenamiento privado, con versiones y descargas auditadas. Solo ve los niveles de confidencialidad autorizados para su rol.</p></div>
-        {can('documents.upload') && <Button className="ml-auto" onClick={() => setOpen('new')}><Icon name="upload" /> Cargar documento</Button>}
-      </div>
+      <PageHeader title="Documentos" icon="file" eyebrow="Documentos y caja menor" description="Archivos en almacenamiento privado, con versiones y descargas registradas. Solo ve los niveles de confidencialidad autorizados para su rol."
+        actions={can('documents.upload') ? <Button variant="light" onClick={() => setOpen('new')}><Icon name="upload" /> Cargar documento</Button> : undefined} />
       <div className="mb-3 flex flex-wrap gap-3">
         <label className="text-xs font-bold text-muted uppercase">Buscar<input value={filters.q} onChange={(e) => setFilters({ ...filters, q: e.target.value })} className={inputCls} /></label>
         <label className="text-xs font-bold text-muted uppercase">Confidencialidad<select value={filters.confidentiality} onChange={(e) => setFilters({ ...filters, confidentiality: e.target.value })} className={inputCls}><option value="">Todas</option>{['publico', 'interno', 'restringido', 'financiero'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select></label>
@@ -137,7 +136,7 @@ export function Documents() {
             {data?.data.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-muted">Sin documentos visibles.</td></tr>}
             {data?.data.map((d: Row) => (
               <tr key={d.id}><td className="px-3 py-2 font-semibold">{d.title}</td><td className="px-3 py-2">{d.category?.name}</td><td className="px-3 py-2"><Badge tone={CONF_TONE[d.confidentiality]}>{label(d.confidentiality)}</Badge></td><td className="px-3 py-2">{d.dependency?.code ?? '—'}</td><td className="px-3 py-2">v{d.current_version}</td><td className="px-3 py-2">{d.creator?.name}</td><td className="px-3 py-2">{fmtDateTime(d.updated_at)}</td>
-                <td className="px-3 py-2 text-right whitespace-nowrap"><a href={admin.url(`documents/${d.id}/download`)} className="mr-3 text-green-dark hover:underline">Descargar</a><button onClick={() => setOpen(d.id)} className="font-semibold text-green-dark hover:underline">Abrir</button></td></tr>
+                <td className="px-3 py-2 text-right whitespace-nowrap"><a href={admin.url(`documents/${d.id}/download`)} className="mr-3 text-ut-red hover:underline">Descargar</a><button onClick={() => setOpen(d.id)} className="font-semibold text-ut-red hover:underline">Abrir</button></td></tr>
             ))}
           </tbody>
         </table>
@@ -194,7 +193,7 @@ function DocumentEditor({ id, onClose, onSaved }: { id: number | null; onClose: 
         {id && doc && (
           <section className="mt-6">
             <h3 className="mb-2 font-bold">Versiones</h3>
-            <ul className="space-y-1 text-sm">{doc.versions.map((v: Row) => <li key={v.id} className="flex flex-wrap gap-2"><strong>v{v.version_no}</strong> {v.file?.original_name} · {fmtBytes(v.file?.size_bytes)} · {v.uploader?.name} · {fmtDateTime(v.created_at)} · {v.change_note}<a href={admin.url(`documents/${id}/download/${v.version_no}`)} className="text-green-dark hover:underline">Descargar</a></li>)}</ul>
+            <ul className="space-y-1 text-sm">{doc.versions.map((v: Row) => <li key={v.id} className="flex flex-wrap gap-2"><strong>v{v.version_no}</strong> {v.file?.original_name} · {fmtBytes(v.file?.size_bytes)} · {v.uploader?.name} · {fmtDateTime(v.created_at)} · {v.change_note}<a href={admin.url(`documents/${id}/download/${v.version_no}`)} className="text-ut-red hover:underline">Descargar</a></li>)}</ul>
             {can('documents.upload') && (
               <div className="mt-3 grid gap-2 rounded-lg border border-dashed border-line p-3 md:grid-cols-[1fr_1fr_auto]">
                 <input type="file" onChange={(e) => setFile(e.target.files?.[0] ?? null)} className="text-sm" aria-label="Archivo de la nueva versión" />
@@ -230,8 +229,8 @@ export function Users() {
   const toggle = (k: 'role_ids' | 'dependency_ids', idv: number) => setOpen((o) => ({ ...o!, [k]: o![k].includes(idv) ? o![k].filter((x: number) => x !== idv) : [...o![k], idv] }));
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3"><h1 className="text-2xl font-extrabold text-ut-red">Usuarios</h1>
-        {can('users.manage') && <Button className="ml-auto" onClick={() => { setMsg(null); setOpen({ name: '', email: '', password: '', is_active: true, role_ids: [], dependency_ids: [] }); }}><Icon name="plus" /> Nuevo usuario</Button>}</div>
+      <PageHeader title="Usuarios" icon="user" eyebrow="Administración" description="Cuentas de los funcionarios, su rol y la oficina a la que pertenecen."
+        actions={can('users.manage') ? <Button variant="light" onClick={() => { setMsg(null); setOpen({ name: '', email: '', password: '', is_active: true, role_ids: [], dependency_ids: [] }); }}><Icon name="plus" /> Nuevo usuario</Button> : undefined} />
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o correo" className={`${inputCls} mb-3 max-w-sm`} />
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
       <div className="overflow-x-auto rounded-xl border border-line bg-white">
@@ -239,7 +238,7 @@ export function Users() {
           <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Nombre</th><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Roles</th><th className="px-3 py-2">Dependencias</th><th className="px-3 py-2">2FA</th><th className="px-3 py-2">Último acceso</th><th className="px-3 py-2">Estado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((u: Row) => (
             <tr key={u.id}><td className="px-3 py-2 font-semibold">{u.name}</td><td className="px-3 py-2">{u.email}</td><td className="px-3 py-2">{u.roles.map((r: Row) => r.name).join(', ')}</td><td className="px-3 py-2">{u.dependencies.map((d: Row) => d.code).join(', ')}</td><td className="px-3 py-2">{u.mfa_enabled ? <Badge tone="green">Activo</Badge> : <Badge>No</Badge>}</td><td className="px-3 py-2">{fmtDateTime(u.last_login_at) || '—'}</td><td className="px-3 py-2">{u.is_active ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Inactivo</Badge>}</td>
-              <td className="px-3 py-2 text-right">{can('users.manage') && <button className="font-semibold text-green-dark hover:underline" onClick={() => { setMsg(null); setOpen({ ...u, password: '', role_ids: u.roles.map((r: Row) => r.id), dependency_ids: u.dependencies.map((d: Row) => d.id) }); }}>Editar</button>}</td></tr>
+              <td className="px-3 py-2 text-right">{can('users.manage') && <button className="font-semibold text-ut-red hover:underline" onClick={() => { setMsg(null); setOpen({ ...u, password: '', role_ids: u.roles.map((r: Row) => r.id), dependency_ids: u.dependencies.map((d: Row) => d.id) }); }}>Editar</button>}</td></tr>
           ))}</tbody>
         </table>
       </div>
@@ -285,14 +284,14 @@ export function Roles() {
   };
   return (
     <div>
-      <div className="mb-4 flex items-center gap-3"><div><h1 className="text-2xl font-extrabold text-ut-red">Roles y permisos</h1><p className="text-sm text-muted">Control de acceso basado en roles. Los permisos son independientes y configurables; ningún rol tiene acceso ilimitado.</p></div>
-        {can('roles.manage') && <Button className="ml-auto" onClick={() => setEdit({ code: '', name: '', description: '', permission_ids: [] })}><Icon name="plus" /> Nuevo rol</Button>}</div>
+      <PageHeader title="Roles y permisos" icon="shield" eyebrow="Administración" description="Qué puede ver y hacer cada rol. Ningún rol tiene acceso ilimitado."
+        actions={can('roles.manage') ? <Button variant="light" onClick={() => setEdit({ code: '', name: '', description: '', permission_ids: [] })}><Icon name="plus" /> Nuevo rol</Button> : undefined} />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <div className="mt-3 grid gap-4 md:grid-cols-2">
         {data?.map((r) => (
           <div key={r.id} className="rounded-xl border border-line bg-white p-4">
             <div className="flex items-start gap-2"><div><p className="font-bold">{r.name}</p><p className="text-xs text-muted">{r.code} · {r.users_count} usuario(s)</p></div>
-              {can('roles.manage') && !mine.has(r.id) && <button className="ml-auto text-sm font-semibold text-green-dark hover:underline" onClick={() => setEdit({ ...r, permission_ids: r.permissions.map((p: Row) => p.id) })}>Editar</button>}</div>
+              {can('roles.manage') && !mine.has(r.id) && <button className="ml-auto text-sm font-semibold text-ut-red hover:underline" onClick={() => setEdit({ ...r, permission_ids: r.permissions.map((p: Row) => p.id) })}>Editar</button>}</div>
             <p className="mt-1 text-sm text-muted">{r.description}</p>
             <p className="mt-2 flex flex-wrap gap-1">{r.permissions.map((p: Row) => <Badge key={p.id}>{p.code}</Badge>)}</p>
           </div>
@@ -328,8 +327,7 @@ export function Audit() {
   const { data, loading, error } = useAsync(() => admin.get<Row>('audit', { ...f, page }), [JSON.stringify(f), page]);
   return (
     <div>
-      <h1 className="text-2xl font-extrabold text-ut-red">Registro de auditoría</h1>
-      <p className="mb-4 text-sm text-muted">Inicios de sesión, intentos fallidos, cambios de permisos, publicaciones, descargas de documentos privados y exportaciones. Registro de solo inserción.</p>
+      <PageHeader title="Auditoría" icon="history" eyebrow="Administración" description="Quién hizo qué y cuándo: ingresos, intentos fallidos, cambios de permisos, publicaciones, descargas y consultas de datos personales. No se puede modificar." />
       <div className="mb-3 flex flex-wrap gap-3">
         <label className="text-xs font-bold text-muted uppercase">Acción<input value={f.action} onChange={(e) => setF({ ...f, action: e.target.value })} placeholder="auth.login" className={inputCls} /></label>
         <label className="text-xs font-bold text-muted uppercase">Desde<input type="date" value={f.from} onChange={(e) => setF({ ...f, from: e.target.value })} className={inputCls} /></label>
@@ -356,7 +354,7 @@ export function Settings() {
   const t = (k: string, l: string, type: 'text' | 'textarea' | 'number' | 'checkbox' | 'image' = 'text', help?: string) => <FieldInput def={{ name: k, label: l, type, help }} value={form[k]} onChange={(v) => setForm({ ...form, [k]: v })} />;
   return (
     <div className="max-w-3xl space-y-4">
-      <h1 className="text-2xl font-extrabold text-ut-red">Configuración del sistema</h1>
+      <PageHeader title="Configuración" icon="settings" eyebrow="Administración" description="Logotipo, datos de contacto y parámetros generales del portal." />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <section className="grid gap-4 rounded-xl border border-line bg-white p-5 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">Identidad y contacto</h2>
@@ -395,7 +393,7 @@ export function Reports() {
   );
   return (
     <div className="max-w-4xl space-y-6">
-      <h1 className="text-2xl font-extrabold text-ut-red">Informes y exportaciones</h1>
+      <PageHeader title="Informes" icon="download" eyebrow="Información e indicadores" description="Descargue en Excel los indicadores y la caja menor para informes de gestión." />
       {can('reports.internal.export') && (
         <section className="rounded-xl border border-line bg-white p-5">
           <h2 className="font-bold">Informe interno de indicadores</h2>

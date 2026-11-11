@@ -11,6 +11,7 @@ import { Account, Forgot, Login, Reset } from './pages/AuthPages';
 import { IndicatorDetail, IndicatorList, SubmissionDetail, SubmissionList } from './pages/Indicators';
 import { Audit, Dashboard, Documents, Reports, Roles, Settings, Users } from './pages/Admin';
 import { RecordDetail, RecordsHome } from './pages/Records';
+import { HubPage } from './pages/Hubs';
 
 /**
  * Menú lateral agrupado por tareas. Cada entrada se muestra solo si el rol tiene alguno de los permisos indicados ([] = cualquiera);
@@ -30,43 +31,25 @@ const MENU: { group: string; icon: string; items: Item[] }[] = [
     { to: '/r/actividades', label: 'Actividades', icon: 'calendar', perms: ['content.create', 'content.publish'] },
     { to: '/r/multimedia', label: 'Multimedia', icon: 'image', perms: ['media.manage', 'content.publish'] },
     { to: '/r/paginas', label: 'Páginas', icon: 'file', perms: ['content.create', 'content.publish'] },
-    { to: '/r/carrusel', label: 'Carrusel del inicio', icon: 'image', perms: ['content.site'] },
-    { to: '/r/destacados', label: 'Cifras destacadas', icon: 'chart', perms: ['content.site'] },
-    { to: '/r/equipo', label: 'Equipo IDEAD', icon: 'people', perms: ['content.site'] },
-    { to: '/r/categorias-noticias', label: 'Categorías de noticias', icon: 'filter', perms: ['content.site'] },
+    { to: '/h/inicio-portal', label: 'Página de inicio', icon: 'home', perms: ['content.site'] },
   ] },
   { group: 'Fichas institucionales', icon: 'building', items: [
-    { to: '/r/cat', label: 'CAT', icon: 'building', perms: ['cats.edit', 'entities.publish'] },
+    { to: '/h/cat', label: 'CAT', icon: 'building', perms: ['cats.edit', 'entities.publish', 'programs.edit'] },
     { to: '/r/programas', label: 'Programas', icon: 'graduation', perms: ['programs.edit', 'entities.publish'] },
-    { to: '/r/oferta', label: 'Oferta por CAT', icon: 'table', perms: ['programs.edit'] },
-    { to: '/r/proyectos', label: 'Proyectos', icon: 'project', perms: ['projects.edit', 'entities.publish'] },
-    { to: '/r/avances', label: 'Avances de proyectos', icon: 'chart', perms: ['projects.edit'] },
+    { to: '/h/proyectos', label: 'Proyectos', icon: 'project', perms: ['projects.edit', 'entities.publish'] },
     { to: '/r/convenios', label: 'Convenios', icon: 'hands', perms: ['agreements.view', 'agreements.manage'] },
-    { to: '/r/publicaciones', label: 'Publicaciones', icon: 'book', perms: ['lists.edit', 'entities.publish'] },
-    { to: '/r/listados', label: 'Otros listados', icon: 'book', perms: ['lists.edit', 'entities.publish'] },
+    { to: '/h/publicaciones', label: 'Publicaciones y listados', icon: 'book', perms: ['lists.edit', 'entities.publish'] },
   ] },
   { group: 'Documentos y caja menor', icon: 'file', items: [
     { to: '/documentos', label: 'Documentos', icon: 'file', perms: ['documents.view.internal', 'documents.view.restricted', 'documents.view.financial', 'documents.upload'] },
-    { to: '/r/caja-menor', label: 'Caja menor: presupuestos', icon: 'money', perms: ['petty_cash.view'] },
-    { to: '/r/caja-menor-gastos', label: 'Caja menor: gastos', icon: 'money', perms: ['petty_cash.view'] },
+    { to: '/h/caja-menor', label: 'Caja menor', icon: 'money', perms: ['petty_cash.view'] },
   ] },
   { group: 'Administración', icon: 'shield', items: [
     { to: '/usuarios', label: 'Usuarios', icon: 'user', perms: ['users.view', 'users.manage'] },
     { to: '/roles', label: 'Roles y permisos', icon: 'shield', perms: ['roles.manage', 'users.view'] },
     { to: '/auditoria', label: 'Auditoría', icon: 'history', perms: ['audit.view'] },
     { to: '/configuracion', label: 'Configuración', icon: 'settings', perms: ['settings.manage'] },
-  ] },
-  { group: 'Listas de referencia', icon: 'filter', items: [
-    { to: '/r/periodos', label: 'Períodos', icon: 'calendar', perms: ['catalogs.manage'] },
-    { to: '/r/dependencias', label: 'Dependencias', icon: 'building', perms: ['catalogs.manage'] },
-    { to: '/r/fuentes', label: 'Fuentes de información', icon: 'info', perms: ['catalogs.manage'] },
-    { to: '/r/clasificadores', label: 'Clasificadores', icon: 'filter', perms: ['catalogs.manage'] },
-    { to: '/r/categorias-clasificador', label: 'Categorías de clasificador', icon: 'filter', perms: ['catalogs.manage'] },
-    { to: '/r/departamentos', label: 'Departamentos', icon: 'pin', perms: ['catalogs.manage'] },
-    { to: '/r/municipios', label: 'Municipios', icon: 'pin', perms: ['catalogs.manage'] },
-    { to: '/r/niveles', label: 'Niveles de formación', icon: 'graduation', perms: ['catalogs.manage'] },
-    { to: '/r/areas', label: 'Áreas de conocimiento', icon: 'book', perms: ['catalogs.manage'] },
-    { to: '/r/categorias-documentales', label: 'Categorías documentales', icon: 'file', perms: ['catalogs.manage'] },
+    { to: '/h/referencias', label: 'Listas de referencia', icon: 'filter', perms: ['catalogs.manage'] },
   ] },
 ];
 
@@ -125,14 +108,14 @@ function Shell({ children }: { children: ReactNode }) {
           <span className="ml-1 hidden rounded-full bg-ut-red-50 px-3 py-1 text-xs font-bold text-ut-red md:inline">Panel de gestión</span>
           <a href="/" target="_blank" rel="noopener" className="ml-auto hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-[#4a4f55] hover:border-ut-red hover:text-ut-red sm:flex"><Icon name="external" /> Ver portal</a>
           <NavLink to="/cuenta" className="ml-auto flex items-center gap-2 rounded-full px-2 py-1 text-sm hover:bg-surface sm:ml-0">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-green-dark text-xs font-bold text-white">{(me?.user.name ?? '?').replace(/[^\p{L}\s]/gu, '').split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
+            <span className="grid h-8 w-8 place-items-center rounded-full bg-ut-red text-xs font-bold text-white">{(me?.user.name ?? '?').replace(/[^\p{L}\s]/gu, '').split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
             <span className="hidden max-w-40 truncate md:inline">{me?.user.name}</span>
           </NavLink>
           <button onClick={logout} className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold text-ut-red hover:bg-ut-red-50"><Icon name="logout" /> <span className="hidden sm:inline">Salir</span></button>
         </div>
       </header>
       <div className="lg:grid lg:grid-cols-[16.5rem_1fr]">
-        <aside className={`fixed inset-y-0 left-0 z-20 w-72 overflow-y-auto bg-gradient-to-b from-green-dark to-[#123f39] px-3 pt-20 pb-6 transition-transform lg:sticky lg:top-[69px] lg:z-0 lg:h-[calc(100vh-69px)] lg:w-auto lg:translate-x-0 lg:pt-4 ${open ? 'translate-x-0 shadow-xl' : '-translate-x-full'}`}>
+        <aside className={`fixed inset-y-0 left-0 z-20 w-72 overflow-y-auto bg-gradient-to-b from-ut-red via-ut-red-dark to-ut-red-900 px-3 pt-20 pb-6 transition-transform lg:sticky lg:top-[69px] lg:z-0 lg:h-[calc(100vh-69px)] lg:w-auto lg:translate-x-0 lg:pt-4 ${open ? 'translate-x-0 shadow-xl' : '-translate-x-full'}`}>
           {nav}
           <p className="mt-8 px-3 text-[0.7rem] leading-snug text-white/50">Universidad del Tolima<br />Instituto de Educación a Distancia</p>
         </aside>
@@ -173,6 +156,7 @@ function Protected() {
         <Route path="/configuracion" element={<Settings />} />
         <Route path="/cuenta" element={<Account />} />
         <Route path="/r/:name" element={<ResourceRoute />} />
+        <Route path="/h/:hub" element={<HubPage />} />
         <Route path="*" element={<p>Página no encontrada.</p>} />
       </Routes>
     </Shell>

@@ -3,6 +3,7 @@ import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import QRCode from 'qrcode';
 import { admin, errorText } from '../../shared/api';
 import { Icon } from '../../shared/icons';
+import { PageHeader } from '../components/PageHeader';
 import { useAuth, type Me } from '../auth';
 import { Button, inputCls, Notice } from '../components/Form';
 
@@ -22,7 +23,7 @@ function Frame({ title, children }: { title: string; children: React.ReactNode }
           {children}
         </main>
       </div>
-      <footer className="bg-green-dark px-4 py-3 text-center text-xs text-white/80">Universidad del Tolima · Instituto de Educación a Distancia</footer>
+      <footer className="bg-ut-red-dark px-4 py-3 text-center text-xs text-white/80">Universidad del Tolima · Instituto de Educación a Distancia</footer>
     </div>
   );
 }
@@ -63,7 +64,7 @@ export function Login() {
           </label>
         )}
         <Button type="submit" disabled={busy} className="w-full justify-center py-2.5">{busy ? 'Verificando…' : step === 'login' ? 'Ingresar' : 'Verificar'}</Button>
-        {step === 'login' && <Link to="/recuperar" className="block text-center text-sm text-green-dark hover:underline">¿Olvidó su contraseña?</Link>}
+        {step === 'login' && <Link to="/recuperar" className="block text-center text-sm text-ut-red hover:underline">¿Olvidó su contraseña?</Link>}
         <a href="/" className="block text-center text-sm text-muted hover:underline">← Volver al portal público</a>
       </form>
     </Frame>
@@ -83,7 +84,7 @@ export function Forgot() {
         {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
         <label className="block text-sm font-semibold">Correo institucional<input type="email" required value={email} onChange={(e) => setEmail(e.target.value)} className={inputCls} /></label>
         <Button type="submit" className="w-full justify-center">Enviar instrucciones</Button>
-        <Link to="/login" className="block text-center text-sm text-green-dark hover:underline">Volver</Link>
+        <Link to="/login" className="block text-center text-sm text-ut-red hover:underline">Volver</Link>
       </form>
     </Frame>
   );
@@ -111,7 +112,7 @@ export function Reset() {
         <label className="block text-sm font-semibold">Confirmar contraseña<input type="password" required autoComplete="new-password" value={confirm} onChange={(e) => setConfirm(e.target.value)} className={inputCls} /></label>
         <p className="text-xs text-muted">{PASSWORD_HELP}</p>
         <Button type="submit" className="w-full justify-center">Guardar contraseña</Button>
-        <Link to="/login" className="block text-center text-sm text-green-dark hover:underline">Ir al inicio de sesión</Link>
+        <Link to="/login" className="block text-center text-sm text-ut-red hover:underline">Ir al inicio de sesión</Link>
       </form>
     </Frame>
   );
@@ -131,7 +132,7 @@ export function Account() {
   if (!me) return null;
   return (
     <div className="max-w-3xl space-y-8">
-      <h1 className="text-2xl font-extrabold text-ut-red">Mi cuenta</h1>
+      <PageHeader title="Mi cuenta" icon="user" description="Sus datos, la verificación en dos pasos y el cambio de contraseña." />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       {me.must_setup_mfa && <Notice kind="info">La política institucional exige configurar el segundo factor antes de usar el panel.</Notice>}
       <section className="rounded-xl border border-line bg-white p-5">

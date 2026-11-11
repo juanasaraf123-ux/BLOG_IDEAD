@@ -6,6 +6,7 @@ import { Icon } from '../../shared/icons';
 import { Badge, ErrorBox, Spinner, useAsync } from '../../shared/ui';
 import { useAuth } from '../auth';
 import { Button, inputCls, Notice, useOptions } from '../components/Form';
+import { PageHeader } from '../components/PageHeader';
 
 /**
  * Bases de datos institucionales: cada oficina diligencia una plantilla de Excel, aquí se sube,
@@ -28,19 +29,15 @@ const templateUrl = (entity: string) => admin.url(`records/${entity}/template`);
 /** Color de cada base (franja superior e ícono). */
 const BASE_COLOR: Record<string, [string, string]> = {
   estudiantes: ['bg-ut-red', 'from-ut-red to-ut-red-dark'],
-  docentes: ['bg-green', 'from-green to-green-dark'],
-  graduados: ['bg-[#d4952e]', 'from-[#e0a43a] to-[#b7791f]'],
-  personal: ['bg-[#4d6079]', 'from-[#5b6f8a] to-[#3d4d63]'],
+  docentes: ['bg-ut-red-dark', 'from-ut-red-dark to-ut-red-900'],
+  graduados: ['bg-ut-red', 'from-ut-red to-ut-red-dark'],
+  personal: ['bg-ut-red-dark', 'from-ut-red-dark to-ut-red-900'],
 };
 
 function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
   return <section className={`rounded-2xl border border-line bg-white p-5 shadow-sm ${className}`}>{children}</section>;
 }
 
-function IconBubble({ name, tone = 'teal' }: { name: string; tone?: 'teal' | 'red' | 'green' | 'amber' }) {
-  const t = { teal: 'bg-teal/15 text-green-dark', red: 'bg-ut-red-50 text-ut-red', green: 'bg-emerald-50 text-emerald-700', amber: 'bg-amber-50 text-amber-800' }[tone];
-  return <span className={`grid h-11 w-11 shrink-0 place-items-center rounded-full text-2xl ${t}`}><Icon name={name} /></span>;
-}
 
 // ------------------------------------------------------------------ Inicio: las cuatro bases
 
@@ -48,14 +45,11 @@ export function RecordsHome() {
   const { data, loading, error, reload } = useAsync(() => admin.get<{ data: Base[]; can: { import: boolean } }>('records'), []);
   return (
     <div className="mx-auto max-w-6xl space-y-6">
-      <header>
-        <p className="text-xs font-bold tracking-wider text-muted uppercase">Información e indicadores</p>
-        <h1 className="text-3xl font-extrabold text-ut-red">Bases de datos</h1>
-        <p className="mt-1 max-w-3xl text-muted">Aquí se cargan las bases que envían las oficinas. Los datos personales quedan cifrados y solo los ven personas autorizadas; en el portal se publican únicamente totales.</p>
-      </header>
+      <PageHeader title="Bases de datos" icon="table" eyebrow="Información e indicadores"
+        description="Aquí se cargan las bases que envían las oficinas. Los datos personales quedan cifrados y solo los ven personas autorizadas; en el portal se publican únicamente totales." />
 
-      <Card className="bg-gradient-to-r from-green-dark to-green text-white">
-        <h2 className="mb-3 font-bold">¿Cómo funciona?</h2>
+      <Card className="border-ut-red/20">
+        <h2 className="mb-3 text-lg font-extrabold text-ut-red">¿Cómo funciona?</h2>
         <ol className="grid gap-4 sm:grid-cols-3">
           {[
             ['download', 'Descargue la plantilla', 'Envíela a la oficina con el correo de solicitud.'],
@@ -63,8 +57,8 @@ export function RecordsHome() {
             ['check', 'Confirme la carga', 'Los totales quedan listos para consultar.'],
           ].map(([icon, t, d], i) => (
             <li key={t} className="flex gap-3">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-white/20 text-xl"><Icon name={icon} /></span>
-              <div><p className="font-semibold">{i + 1}. {t}</p><p className="text-sm text-white/85">{d}</p></div>
+              <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-ut-red text-xl text-white shadow"><Icon name={icon} /></span>
+              <div><p className="font-semibold">{i + 1}. {t}</p><p className="text-sm text-muted">{d}</p></div>
             </li>
           ))}
         </ol>
@@ -87,7 +81,7 @@ export function RecordsHome() {
               <div className="my-5 flex-1">
                 {b.total > 0 ? (
                   <>
-                    <p className="text-4xl font-extrabold text-green-dark">{fmtNumber(b.total)}</p>
+                    <p className="text-4xl font-extrabold text-ut-red">{fmtNumber(b.total)}</p>
                     <p className="text-sm text-muted">registros{b.periods.length ? ` · ${b.periods.length} ${b.periods.length === 1 ? 'semestre' : 'semestres'}` : ''}</p>
                     {b.last_import && <p className="mt-2 text-xs text-muted">Última carga: {fmtDateTime(b.last_import.date)} por {b.last_import.user}{b.last_import.period ? ` (${b.last_import.period})` : ''}</p>}
                   </>
@@ -99,8 +93,8 @@ export function RecordsHome() {
               </div>
               <div className="flex flex-wrap gap-2">
                 {data.can.import && <Link to={`/bases/${b.entity}`} className="inline-flex items-center gap-1.5 rounded-lg bg-ut-red px-3.5 py-2 text-sm font-semibold text-white hover:bg-ut-red-dark"><Icon name="upload" /> Cargar archivo</Link>}
-                <Link to={`/bases/${b.entity}?tab=consultar`} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3.5 py-2 text-sm font-semibold hover:border-green"><Icon name="chart" /> Ver datos</Link>
-                <a href={templateUrl(b.entity)} className="ml-auto inline-flex items-center gap-1 px-2 py-2 text-sm font-semibold text-green-dark hover:underline"><Icon name="download" /> Plantilla</a>
+                <Link to={`/bases/${b.entity}?tab=consultar`} className="inline-flex items-center gap-1.5 rounded-lg border border-line px-3.5 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="chart" /> Ver datos</Link>
+                <a href={templateUrl(b.entity)} className="ml-auto inline-flex items-center gap-1 px-2 py-2 text-sm font-semibold text-ut-red hover:underline"><Icon name="download" /> Plantilla</a>
               </div>
             </Card>
           ))}
@@ -126,14 +120,7 @@ export function RecordDetail() {
   if (!def) return <Spinner />;
   return (
     <div className="mx-auto max-w-6xl space-y-5">
-      <Link to="/bases" className="inline-flex items-center gap-1 text-sm font-semibold text-green-dark hover:underline"><Icon name="chevronLeft" /> Bases de datos</Link>
-      <header className="flex items-start gap-3">
-        <IconBubble name={def.icon} />
-        <div>
-          <h1 className="text-2xl font-extrabold text-ut-red">{def.title}</h1>
-          <p className="text-muted">Envía: {def.source}. {def.description}</p>
-        </div>
-      </header>
+      <PageHeader back={{ to: '/bases', label: 'Bases de datos' }} title={def.title} icon={def.icon} description={`Envía: ${def.source}. ${def.description}`} />
       <nav role="tablist" aria-label="Secciones" className="flex gap-1 rounded-xl bg-white p-1 shadow-sm ring-1 ring-line sm:inline-flex">
         {TABS.filter(([k]) => k !== 'cargar' || canImport).map(([k, label, icon]) => (
           <button key={k} role="tab" aria-selected={tab === k} onClick={() => setParams({ tab: k })}
@@ -157,7 +144,7 @@ function Steps({ step }: { step: number }) {
     <ol className="flex items-center gap-2 text-sm" aria-label="Pasos">
       {names.map((n, i) => (
         <li key={n} className="flex items-center gap-2" aria-current={i === step ? 'step' : undefined}>
-          <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i < step ? 'bg-green text-white' : i === step ? 'bg-ut-red text-white ring-4 ring-ut-red/20' : 'bg-surface text-muted ring-1 ring-line'}`}>
+          <span className={`grid h-7 w-7 place-items-center rounded-full text-xs font-bold ${i < step ? 'bg-ut-red-dark text-white' : i === step ? 'bg-ut-red text-white ring-4 ring-ut-red/20' : 'bg-surface text-muted ring-1 ring-line'}`}>
             {i < step ? <Icon name="check" /> : i + 1}
           </span>
           <span className={`hidden sm:inline ${i === step ? 'font-semibold text-ink' : 'text-muted'}`}>{n}</span>
@@ -212,7 +199,7 @@ function Upload({ def, onDone, goTo }: { def: Row; onDone: () => void; goTo: (t:
     return (
       <Card className="py-10 text-center">
         <span className="mx-auto grid h-16 w-16 place-items-center rounded-full bg-emerald-50 text-4xl text-emerald-700"><Icon name="check" /></span>
-        <h2 className="mt-4 text-xl font-extrabold text-green-dark">¡Listo! Se cargaron {fmtNumber(done.rows_valid)} registros{done.period ? ` del semestre ${done.period}` : ''}.</h2>
+        <h2 className="mt-4 text-xl font-extrabold text-ut-red">¡Listo! Se cargaron {fmtNumber(done.rows_valid)} registros{done.period ? ` del semestre ${done.period}` : ''}.</h2>
         <p className="mt-1 text-muted">Los datos personales quedaron cifrados. Ya puede consultar los totales.</p>
         <div className="mt-6 flex justify-center gap-2">
           <Button onClick={() => goTo('consultar')}><Icon name="chart" /> Ver datos</Button>
@@ -231,7 +218,7 @@ function Upload({ def, onDone, goTo }: { def: Row; onDone: () => void; goTo: (t:
           <h2 className="flex items-center gap-2 font-bold"><span className="grid h-6 w-6 place-items-center rounded-full bg-ut-red text-xs text-white">1</span> Descargue la plantilla</h2>
           <p className="mt-2 text-sm text-muted">Es un Excel con las columnas que necesita el portal, instrucciones y la lista de programas y CAT válidos. Adjúntela al correo para la oficina.</p>
           <a href={templateUrl(def.entity)} className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-ut-red bg-white px-3.5 py-2 text-sm font-semibold text-ut-red hover:bg-ut-red-50"><Icon name="download" /> Descargar plantilla (.xlsx)</a>
-          <button onClick={() => setShowCols(!showCols)} aria-expanded={showCols} className="mt-4 flex items-center gap-1 text-sm font-semibold text-green-dark hover:underline">
+          <button onClick={() => setShowCols(!showCols)} aria-expanded={showCols} className="mt-4 flex items-center gap-1 text-sm font-semibold text-ut-red hover:underline">
             <Icon name="chevronDown" className={`transition ${showCols ? 'rotate-180' : ''}`} /> Ver las {def.columns.length} columnas
           </button>
           {showCols && (
@@ -262,8 +249,8 @@ function Upload({ def, onDone, goTo }: { def: Row; onDone: () => void; goTo: (t:
             onDrop={(e) => { e.preventDefault(); setDrag(false); pick(e.dataTransfer.files[0]); }}
             onClick={() => input.current?.click()} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.current?.click(); } }}
             role="button" tabIndex={0} aria-label="Elegir archivo de Excel o CSV"
-            className={`mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-8 text-center transition ${drag ? 'border-green bg-teal/10' : file ? 'border-green/60 bg-emerald-50/50' : 'border-line hover:border-green hover:bg-surface'}`}>
-            <span className="text-4xl text-green"><Icon name={file ? 'file' : 'upload'} /></span>
+            className={`mt-4 flex cursor-pointer flex-col items-center justify-center rounded-2xl border-2 border-dashed px-4 py-8 text-center transition ${drag ? 'border-ut-red bg-ut-red-50' : file ? 'border-ut-red/60 bg-ut-red-50/50' : 'border-ut-red/30 hover:border-ut-red hover:bg-ut-red-50/40'}`}>
+            <span className="text-4xl text-ut-red"><Icon name={file ? 'file' : 'upload'} /></span>
             {file ? (
               <>
                 <p className="mt-2 font-semibold text-ink">{file.name}</p>
@@ -426,7 +413,7 @@ function Explore({ def }: { def: Row }) {
         <>
           <div className="grid gap-3 sm:grid-cols-3">
             {summary.data.kpis.map((k: Row) => (
-              <Card key={k.label} className="!p-4"><p className="text-3xl font-extrabold text-green-dark">{fmtNumber(k.value)}</p><p className="text-sm text-muted">{k.label}</p></Card>
+              <Card key={k.label} className="!p-4"><p className="text-3xl font-extrabold text-ut-red">{fmtNumber(k.value)}</p><p className="text-sm text-muted">{k.label}</p></Card>
             ))}
           </div>
           <div className="grid gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -493,7 +480,7 @@ function GroupTable({ title, rows, total }: { title: string; rows: { label: stri
           </tbody>
         </table>
       )}
-      {rows.length > 6 && <button onClick={() => setAll(!all)} className="mt-2 text-sm font-semibold text-green-dark hover:underline">{all ? 'Ver menos' : `Ver todos (${rows.length})`}</button>}
+      {rows.length > 6 && <button onClick={() => setAll(!all)} className="mt-2 text-sm font-semibold text-ut-red hover:underline">{all ? 'Ver menos' : `Ver todos (${rows.length})`}</button>}
     </Card>
   );
 }

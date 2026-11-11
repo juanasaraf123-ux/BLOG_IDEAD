@@ -4,6 +4,7 @@ import { admin, errorText } from '../../shared/api';
 import { fmtDateTime, fmtValue, label } from '../../shared/format';
 import { Icon } from '../../shared/icons';
 import { Badge, ErrorBox, Spinner, useAsync } from '../../shared/ui';
+import { PageHeader } from '../components/PageHeader';
 import { useAuth } from '../auth';
 import { Button, FieldInput, inputCls, Notice, useOptions } from '../components/Form';
 import { StatusBadge } from '../components/ResourcePage';
@@ -28,8 +29,7 @@ export function IndicatorList() {
   const { data, error, loading } = useAsync(() => admin.get<Row[]>('indicators', { module_id: module, q, mine: mine ? 1 : undefined }), [module, q, mine]);
   return (
     <div>
-      <h1 className="text-2xl font-extrabold text-ut-red">Catálogo de indicadores</h1>
-      <p className="mb-4 text-sm text-muted">76 indicadores del documento «Indicadores sugeridos». Desde aquí se edita su ficha técnica y se registran sus datos.</p>
+      <PageHeader title="Indicadores" icon="chart" eyebrow="Información e indicadores" description="Los 76 indicadores del documento «Indicadores sugeridos»: su ficha técnica, la oficina que los reporta y si ya tienen datos publicados." />
       <div className="mb-3 flex flex-wrap items-end gap-3">
         <label className="text-xs font-bold text-muted uppercase">Módulo
           <select value={module} onChange={(e) => setModule(e.target.value)} className={inputCls}><option value="">Todos</option>{mods.data?.map((m) => <option key={m.id} value={m.id}>{m.number}. {m.name}</option>)}</select>
@@ -45,13 +45,13 @@ export function IndicatorList() {
           <tbody className="divide-y divide-line">
             {data?.map((i) => (
               <tr key={i.id} className="hover:bg-surface/60">
-                <td className="px-3 py-2 font-bold text-green-dark">{i.code}</td>
+                <td className="px-3 py-2 font-bold text-ut-red">{i.code}</td>
                 <td className="px-3 py-2">{i.name}{i.pending_count > 0 && <Badge tone="amber">{i.pending_count} por revisar</Badge>}</td>
                 <td className="px-3 py-2">{i.responsible_dependency?.code ?? '—'}</td>
                 <td className="px-3 py-2"><Badge tone={i.methodology_status === 'validada' ? 'green' : 'amber'}>{label(i.methodology_status)}</Badge></td>
                 <td className="px-3 py-2">{label(i.publication_level)}{!i.publication_authorized && <Badge tone="red">Sin autorizar</Badge>}</td>
                 <td className="px-3 py-2">{i.last_submission ? <StatusBadge s={i.last_submission.status} /> : <span className="text-muted">Sin datos</span>}</td>
-                <td className="px-3 py-2 text-right"><Link to={`/indicadores/${i.id}`} className="font-semibold text-green-dark hover:underline">Abrir</Link></td>
+                <td className="px-3 py-2 text-right"><Link to={`/indicadores/${i.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link></td>
               </tr>
             ))}
           </tbody>
@@ -83,22 +83,18 @@ export function IndicatorDetail() {
   const p = data.internal_preview;
   return (
     <div className="space-y-6">
-      <div>
-        <Link to="/indicadores" className="text-sm text-green-dark hover:underline">← Catálogo</Link>
-        <h1 className="text-2xl font-extrabold text-ut-red">{data.code} · {data.name}</h1>
-        <p className="text-sm text-muted">{data.module.number}. {data.module.name} · Fuente (Excel): {data.source_text}</p>
-      </div>
+      <PageHeader back={{ to: '/indicadores', label: 'Indicadores' }} eyebrow={data.code} title={data.name} icon="chart" description={`${data.module.number}. ${data.module.name} · Fuente: ${data.source_text}`} />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <section className="rounded-xl border border-line bg-white p-5">
         <div className="mb-3 flex items-center gap-2"><h2 className="font-bold">Datos registrados</h2>
           {can('indicators.submit') && <Button className="ml-auto" onClick={() => newSub()}><Icon name="plus" /> Nueva carga de datos</Button>}
-          {can('indicators.submit') && <a href={admin.url(`indicators/${id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-green"><Icon name="download" /> Plantilla Excel</a>}
+          {can('indicators.submit') && <a href={admin.url(`indicators/${id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="download" /> Plantilla Excel</a>}
         </div>
         <p className="mb-3 text-sm text-muted">Vista interna (incluye datos aprobados no publicados): {p.row_count} valores; último total {p.kpi ? `${fmtValue(p.kpi.value, data.value_type)} (${p.kpi.period})` : '—'}.</p>
         <table className="w-full text-sm"><thead className="text-xs text-muted uppercase"><tr><th className="py-1 text-left">Lote</th><th className="text-left">Estado</th><th className="text-left">Valores</th><th className="text-left">Registró</th><th className="text-left">Publicado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{subs.data?.data.map((s) => (
             <tr key={s.id}><td className="py-1.5">#{s.id} {s.title}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td><StatusBadge s={s.status} /></td><td>{s.values_count}</td><td>{s.creator?.name}</td><td>{fmtDateTime(s.published_at)}</td>
-              <td className="text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-green-dark hover:underline">Abrir</Link>{s.status === 'publicado' && can('indicators.submit') && <button onClick={() => newSub(s.id)} className="ml-3 text-sm text-ut-red hover:underline">Corregir</button>}</td></tr>
+              <td className="text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link>{s.status === 'publicado' && can('indicators.submit') && <button onClick={() => newSub(s.id)} className="ml-3 text-sm text-ut-red hover:underline">Corregir</button>}</td></tr>
           ))}</tbody>
         </table>
       </section>
@@ -157,7 +153,7 @@ export function SubmissionDetail() {
   return (
     <div className="space-y-5">
       <div>
-        <Link to={`/indicadores/${ind.id}`} className="text-sm text-green-dark hover:underline">← {ind.code} {ind.name}</Link>
+        <Link to={`/indicadores/${ind.id}`} className="text-sm text-ut-red hover:underline">← {ind.code} {ind.name}</Link>
         <h1 className="flex flex-wrap items-center gap-2 text-2xl font-extrabold text-ut-red">Lote #{s.id} <StatusBadge s={s.status} />{s.is_demo && <Badge tone="amber">Demo</Badge>}</h1>
         <p className="text-sm text-muted">Registró: {s.creator?.name} · Envió: {s.submitter?.name ?? '—'} ({fmtDateTime(s.submitted_at)}) · Aprobó: {s.approver?.name ?? '—'} ({fmtDateTime(s.approved_at)}) · Publicó: {s.publisher?.name ?? '—'} ({fmtDateTime(s.published_at)})</p>
         {s.supersedes_id && <p className="text-sm text-amber-800">Corrige y reemplazará al lote #{s.supersedes_id} al publicarse.</p>}
@@ -170,9 +166,9 @@ export function SubmissionDetail() {
           <span className="text-xs text-muted">Desagregaciones admitidas: {dims.map((d) => d.label).join(', ') || 'ninguna (solo total por período)'} · Unidad: {ind.unit}</span>
           {editable && (
             <div className="ml-auto flex flex-wrap gap-2">
-              <a href={admin.url(`indicators/${ind.id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-green"><Icon name="download" /> Plantilla</a>
+              <a href={admin.url(`indicators/${ind.id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="download" /> Plantilla</a>
               {can('indicators.import') && (
-                <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-green"><Icon name="upload" /> Importar Excel/CSV
+                <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="upload" /> Importar Excel/CSV
                   <input type="file" accept=".xlsx,.csv" className="sr-only" onChange={(e) => { const f = e.target.files?.[0]; if (f) run(() => admin.upload(`submissions/${id}/import`, f), 'Archivo importado y validado. Los valores anteriores del lote fueron reemplazados.'); e.target.value = ''; }} />
                 </label>
               )}
@@ -241,8 +237,7 @@ export function SubmissionList() {
   const { data, error, loading } = useAsync(() => admin.get<Row>('submissions', { status, page }), [status, page]);
   return (
     <div>
-      <h1 className="text-2xl font-extrabold text-ut-red">Cargas de datos</h1>
-      <p className="mb-4 text-sm text-muted">Lotes de datos de indicadores y su estado en el flujo: borrador → enviado → aprobado → publicado.</p>
+      <PageHeader title="Cargas de indicadores" icon="upload" eyebrow="Información e indicadores" description="Datos de los indicadores que no salen de las bases (presupuesto, convenios…) y su camino: borrador → enviado → aprobado → publicado." />
       <label className="mb-3 inline-block text-xs font-bold text-muted uppercase">Estado
         <select value={status} onChange={(e) => { setStatus(e.target.value); setPage(1); }} className={inputCls}><option value="">Todos</option>{['borrador', 'enviado', 'devuelto', 'aprobado', 'publicado', 'reemplazado', 'retirado'].map((v) => <option key={v} value={v}>{label(v)}</option>)}</select>
       </label>
@@ -252,7 +247,7 @@ export function SubmissionList() {
         <table className="w-full text-left text-sm">
           <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Lote</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2">Valores</th><th className="px-3 py-2">Registró</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((s: Row) => (
-            <tr key={s.id}><td className="px-3 py-2">#{s.id}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td className="px-3 py-2">{s.indicator?.code} {s.indicator?.name}</td><td className="px-3 py-2"><StatusBadge s={s.status} /></td><td className="px-3 py-2">{s.values_count}</td><td className="px-3 py-2">{s.creator?.name}</td><td className="px-3 py-2">{fmtDateTime(s.updated_at)}</td><td className="px-3 py-2 text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-green-dark hover:underline">Abrir</Link></td></tr>
+            <tr key={s.id}><td className="px-3 py-2">#{s.id}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td className="px-3 py-2">{s.indicator?.code} {s.indicator?.name}</td><td className="px-3 py-2"><StatusBadge s={s.status} /></td><td className="px-3 py-2">{s.values_count}</td><td className="px-3 py-2">{s.creator?.name}</td><td className="px-3 py-2">{fmtDateTime(s.updated_at)}</td><td className="px-3 py-2 text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link></td></tr>
           ))}</tbody>
         </table>
       </div>
