@@ -91,7 +91,6 @@ class RecordDefinitions
                     ['key' => 'cat', 'label' => 'CAT', 'required' => false, 'type' => 'cat', 'help' => 'CAT donde cursó el programa.', 'example' => 'Chaparral'],
                     ['key' => 'fecha_grado', 'label' => 'Fecha de grado', 'required' => true, 'type' => 'date', 'help' => 'dd/mm/aaaa.', 'example' => '12/12/2025'],
                     ['key' => 'periodo_ingreso', 'label' => 'Semestre de ingreso', 'required' => false, 'type' => 'period', 'help' => 'Por ejemplo 2020-1.', 'example' => '2020-1'],
-                    ['key' => 'opcion_grado', 'label' => 'Opción de grado', 'required' => false, 'type' => 'text', 'max' => 60, 'help' => 'Trabajo de grado, pasantía, seminario…', 'example' => 'Trabajo de grado'],
                     ['key' => 'sexo', 'label' => 'Sexo', 'required' => false, 'type' => 'sex', 'help' => 'Femenino, Masculino, Otro o No informa.', 'example' => 'Femenino'],
                     ['key' => 'promedio_final', 'label' => 'Promedio final', 'required' => false, 'type' => 'decimal', 'min' => 0, 'max' => 5, 'help' => 'De 0 a 5.', 'example' => '4,1'],
                     ['key' => 'situacion_laboral', 'label' => 'Situación laboral', 'required' => false, 'type' => 'enum', 'options' => ['empleado' => 'Empleado', 'emprendedor' => 'Emprendedor / independiente', 'desempleado' => 'Desempleado', 'sin_dato' => 'Sin dato'], 'help' => 'Empleado, Emprendedor, Desempleado o Sin dato.', 'example' => 'Empleado'],

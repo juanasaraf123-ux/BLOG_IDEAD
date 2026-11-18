@@ -97,8 +97,9 @@ class BaseCatalogSeeder extends Seeder
             'documents.view.internal', 'documents.view.restricted', 'documents.upload', 'documents.edit', 'documents.classify', 'documents.archive',
             'agreements.view', 'agreements.manage', 'scope.all_dependencies',
         ]],
-        'caja_menor' => ['Caja menor', 'Registro de presupuestos, facturas y soportes de caja menor.', [
-            'petty_cash.view', 'petty_cash.manage', 'documents.view.financial', 'documents.upload', 'reports.financial.view',
+        'caja_menor' => ['Caja menor', 'Caja menor, presupuestos, contratos, convenios y proyectos de inversión: registro, documentos y soportes.', [
+            'petty_cash.view', 'petty_cash.manage', 'documents.view.internal', 'documents.view.restricted', 'documents.view.financial',
+            'documents.upload', 'documents.edit', 'reports.financial.view', 'agreements.view', 'agreements.manage', 'projects.edit',
         ]],
         'comunicaciones' => ['Comunicaciones', 'Creación y edición de noticias, actividades, fotografías y novedades (publicación previa autorización).', [
             'content.create', 'content.site', 'media.manage',
@@ -140,6 +141,7 @@ class BaseCatalogSeeder extends Seeder
     /** Fuentes del Excel. official_name_status = pendiente cuando la abreviatura no está definida en el glosario. */
     public const SOURCES = [
         'PAGINA_WEB' => ['Página web institucional', 'sistema', 'validado'],
+        'SIAT' => ['SIAT – sistema de consulta de información académica', 'sistema', 'validado'],
         'BD_MATRICULADOS' => ['Base de datos de matriculados', 'base_datos', 'validado'],
         'BD_REPRESENTANTES' => ['Base de datos de representantes estudiantiles', 'base_datos', 'validado'],
         'BD_DEPARTAMENTOS' => ['Bases de datos de los departamentos académicos', 'base_datos', 'validado'],

@@ -16,7 +16,7 @@ Acceso: `https://<dominio>/admin` (enlace «Funcionarios» del portal). El menú
 |---|---|
 | **Director del IDEAD** | Consultar todo lo interno, revisar y aprobar lotes de datos, publicar indicadores, contenidos y fichas, editar la ficha técnica de los indicadores (metodología y autorización), ver documentos internos, restringidos y financieros, informes y auditoría |
 | **Administración documental** | Cargar, clasificar, versionar y archivar documentos; gestionar convenios |
-| **Caja menor** | Registrar presupuestos, gastos y facturas; cargar soportes financieros; informe de caja menor |
+| **Caja menor** | Registrar presupuestos, gastos y facturas; subir contratos, convenios y proyectos de inversión con sus documentos; informe de caja menor |
 | **Comunicaciones** | Crear y editar noticias, actividades, multimedia y páginas; carrusel, cifras destacadas y equipo. Publica **previa aprobación** de un revisor |
 | **Coordinador / responsable** | Registrar e importar datos de los indicadores **de sus dependencias**, enviarlos a revisión; editar CAT, programas, oferta, proyectos y listados |
 | **Administrador técnico** | Usuarios, roles, permisos, catálogos, configuración y auditoría. **No** ve documentos financieros ni restringidos ni datos de indicadores |
@@ -75,7 +75,7 @@ Noticias, Actividades, Multimedia y Páginas siguen el flujo **Borrador → Envi
 
 ## 8. Caja menor
 
-Primero cargue la factura o soporte en *Documentos* con confidencialidad *Financiero*; luego registre el gasto en *Caja menor: gastos* y asócielo. El presupuesto muestra el valor gastado. *Informes → Informe de caja menor* exporta a Excel.
+Registre el gasto en *Caja menor → Gastos* y suba la factura desde el mismo formulario («Subir el archivo desde aquí»). El presupuesto muestra el valor gastado. *Informes → Informe de caja menor* exporta a Excel.
 
 ## 9. Informes
 

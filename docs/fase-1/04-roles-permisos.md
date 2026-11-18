@@ -18,7 +18,7 @@
 | Informes | `reports.public.export`, `reports.internal.view`, `reports.internal.export`, `reports.financial.view` |
 | Documentos | `documents.view.public`, `documents.view.internal`, `documents.view.restricted`, `documents.view.financial`, `documents.upload`, `documents.edit`, `documents.classify`, `documents.archive`, `documents.versions.manage` |
 | Contratos y convenios | `agreements.view`, `agreements.manage` |
-| Caja menor | `petty_cash.view`, `petty_cash.manage` (presupuestos, facturas, soportes) |
+| Caja menor | `petty_cash.*` (presupuestos, facturas, soportes) y, por decisión de Centros Regionales, contratos, convenios y proyectos (`documents.view.restricted`, `agreements.manage`, `projects.edit`) |
 | Noticias | `news.create`, `news.edit`, `news.review`, `news.publish`, `news.unpublish`, `media.manage` |
 | CAT | `cats.edit`, `cats.publish` |
 | Proyectos | `projects.edit`, `projects.publish` |

@@ -374,7 +374,7 @@ class RecordImporter
             ],
             'graduados' => $person + [
                 'graduate_key' => $key, 'program_id' => $v['programa'], 'cat_id' => $v['cat'], 'graduation_date' => $v['fecha_grado'],
-                'period_id' => $this->periodForDate($v['fecha_grado']), 'cohort_period_id' => $v['periodo_ingreso'], 'degree_option' => $v['opcion_grado'],
+                'period_id' => $this->periodForDate($v['fecha_grado']), 'cohort_period_id' => $v['periodo_ingreso'], 
                 'sex' => $v['sexo'], 'final_average' => $v['promedio_final'], 'employment_status' => $v['situacion_laboral'],
             ],
             'personal' => $person + [

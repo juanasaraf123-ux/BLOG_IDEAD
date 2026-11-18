@@ -56,7 +56,7 @@ class SecurityTest extends IdeadTestCase
         $this->postJson('/api/admin/v1/auth/mfa', ['code' => $g->getCurrentOtp($secret)])->assertOk()->assertJsonPath('user.email', $u->email);
     }
 
-    public function test_technical_admin_cannot_see_financial_or_restricted_documents(): void
+    public function test_technical_admin_cannot_see_documents_but_petty_cash_sees_financial_and_contracts(): void
     {
         $this->makeDocument('financiero');
         $this->makeDocument('restringido');
@@ -67,7 +67,8 @@ class SecurityTest extends IdeadTestCase
         $caja = $this->userWithRole('caja_menor');
         $levels = collect($this->actingAs($caja)->getJson('/api/admin/v1/documents')->assertOk()->json('data'))->pluck('confidentiality')->all();
         $this->assertContains('financiero', $levels);
-        $this->assertNotContains('restringido', $levels);
+        // Decisión de Centros Regionales (nov. 2026): caja menor también gestiona contratos y convenios (restringidos).
+        $this->assertContains('restringido', $levels);
     }
 
     public function test_user_cannot_change_own_roles(): void
