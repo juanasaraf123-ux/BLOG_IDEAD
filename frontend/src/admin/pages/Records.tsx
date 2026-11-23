@@ -28,7 +28,7 @@ const templateUrl = (entity: string) => admin.url(`records/${entity}/template`);
 
 
 function Card({ children, className = '' }: { children: ReactNode; className?: string }) {
-  return <section className={`rounded-2xl border border-line bg-white p-5 shadow-sm ${className}`}>{children}</section>;
+  return <section className={`admin-card p-5 ${className}`}>{children}</section>;
 }
 
 
@@ -37,7 +37,7 @@ function Card({ children, className = '' }: { children: ReactNode; className?: s
 export function RecordsHome() {
   const { data, loading, error, reload } = useAsync(() => admin.get<{ data: Base[]; can: { import: boolean } }>('records'), []);
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
+    <div className="mx-auto max-w-[1600px] space-y-6">
       <PageHeader title="Bases de datos" icon="table" eyebrow="Información e indicadores"
         description="Aquí se cargan las bases que envían las oficinas. Los datos personales quedan cifrados y solo los ven personas autorizadas; en el portal se publican únicamente totales." />
 
@@ -112,7 +112,7 @@ export function RecordDetail() {
   if (error) return <ErrorBox message={error} onRetry={reload} />;
   if (!def) return <Spinner />;
   return (
-    <div className="mx-auto max-w-6xl space-y-5">
+    <div className="mx-auto max-w-[1600px] space-y-5">
       <PageHeader back={{ to: '/bases', label: 'Bases de datos' }} title={def.title} icon={def.icon} description={`Envía: ${def.source}. ${def.description}`} />
       <nav role="tablist" aria-label="Secciones" className="flex gap-1 rounded-xl bg-white p-1 shadow-sm ring-1 ring-line sm:inline-flex">
         {TABS.filter(([k]) => k !== 'cargar' || canImport).map(([k, label, icon]) => (
@@ -303,7 +303,7 @@ function Review({ a, busy, onConfirm, onReset }: { a: Analysis; busy: boolean; o
           <h3 className="font-semibold text-ut-red-dark">Qué corregir en el archivo</h3>
           <p className="text-sm text-muted">Corrija en el Excel y vuelva a subirlo, o cargue solo las filas correctas y pida a la oficina las demás.</p>
           <div className="mt-2 max-h-80 overflow-auto rounded-xl ring-1 ring-line">
-            <table className="w-full text-left text-sm">
+            <table className="admin-table w-full text-left text-sm">
               <thead className="sticky top-0 bg-ut-red-50 text-ut-red-dark"><tr><th className="px-3 py-2">Fila</th><th className="px-3 py-2">Columna</th><th className="px-3 py-2">Qué pasa</th></tr></thead>
               <tbody>
                 {a.errors.map((e, i) => (
@@ -320,7 +320,7 @@ function Review({ a, busy, onConfirm, onReset }: { a: Analysis; busy: boolean; o
           <h3 className="font-semibold">Así se ven los primeros registros</h3>
           <p className="text-sm text-muted">Sin nombres ni documentos completos, para verificar que programas y CAT se reconocieron bien.</p>
           <div className="mt-2 overflow-x-auto rounded-xl ring-1 ring-line">
-            <table className="w-full text-left text-sm">
+            <table className="admin-table w-full text-left text-sm">
               <thead className="bg-surface text-muted"><tr><th className="px-3 py-2">Fila</th><th className="px-3 py-2">Documento</th><th className="px-3 py-2">Programa</th><th className="px-3 py-2">CAT</th><th className="px-3 py-2">Sexo</th></tr></thead>
               <tbody>{a.sample.map((r) => <tr key={r.fila} className="border-t border-line"><td className="px-3 py-2">{r.fila}</td><td className="px-3 py-2">{r.documento}</td><td className="px-3 py-2">{r.programa}</td><td className="px-3 py-2">{r.cat}</td><td className="px-3 py-2">{r.sexo}</td></tr>)}</tbody>
             </table>
@@ -432,7 +432,7 @@ function Explore({ def }: { def: Row }) {
         {rows.data && (
           <>
             <div className="overflow-x-auto rounded-xl ring-1 ring-line">
-              <table className="w-full text-left text-sm">
+              <table className="admin-table w-full text-left text-sm">
                 <thead className="bg-surface text-muted"><tr>{cols.map(([k, l]) => <th key={k} className="px-3 py-2 whitespace-nowrap">{l}</th>)}</tr></thead>
                 <tbody>
                   {rows.data.data.map((r: Row) => <tr key={r.id} className="border-t border-line">{cols.map(([k]) => <td key={k} className="px-3 py-2">{r[k] ?? '—'}</td>)}</tr>)}
@@ -461,7 +461,7 @@ function GroupTable({ title, rows, total }: { title: string; rows: { label: stri
     <Card className="!p-4">
       <h3 className="mb-2 font-bold">{title}</h3>
       {rows.length === 0 ? <p className="text-sm text-muted">Sin información.</p> : (
-        <table className="w-full text-sm">
+        <table className="admin-table w-full text-sm">
           <tbody>
             {shown.map((r) => (
               <tr key={r.label} className="border-t border-line first:border-0">
@@ -496,7 +496,7 @@ function History({ entity, canImport, onChange }: { entity: string; canImport: b
       {msg && <div className="mb-3"><Notice kind="ok">{msg}</Notice></div>}
       {data!.data.length === 0 ? <p className="py-6 text-center text-muted">Todavía no se ha cargado ningún archivo.</p> : (
         <div className="overflow-x-auto">
-          <table className="w-full text-left text-sm">
+          <table className="admin-table w-full text-left text-sm">
             <thead className="text-muted"><tr><th className="py-2 pr-3">Fecha</th><th className="py-2 pr-3">Semestre</th><th className="py-2 pr-3">Archivo</th><th className="py-2 pr-3">Cargó</th><th className="py-2 pr-3 text-right">Registros</th><th className="py-2 pr-3 text-right">Filas con error</th><th className="py-2 pr-3">Estado</th><th /></tr></thead>
             <tbody>
               {data!.data.map((r) => (

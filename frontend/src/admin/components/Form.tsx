@@ -22,7 +22,7 @@ export type FieldDef = {
   step?: string;
 };
 
-export const inputCls = 'mt-1 w-full rounded-lg border border-line bg-white px-3 py-2 text-sm text-ink focus:border-ut-red focus:ring-2 focus:ring-ut-red/20 focus:outline-none disabled:bg-surface';
+export const inputCls = 'mt-1 w-full rounded-xl border border-[#e3dbd3] bg-white px-3.5 py-2.5 text-sm text-ink shadow-[inset_0_1px_2px_rgb(0_0_0/0.03)] transition placeholder:text-gray-400 hover:border-[#cfc4ba] focus:border-ut-red focus:ring-4 focus:ring-ut-red/12 focus:outline-none disabled:bg-warm disabled:text-muted';
 
 const OPTION_LISTS = new Set(['cats', 'programs', 'projects', 'indicators', 'dependencies', 'periods', 'news-categories', 'education-levels', 'knowledge-areas', 'departments', 'document-categories']);
 const optionCache = new Map<string, Promise<Record<string, unknown>[]>>();
@@ -51,8 +51,8 @@ function ImageField({ value, onChange, url }: { value: unknown; onChange: (v: un
   useEffect(() => setPreview(url ?? null), [url]);
   return (
     <div className="mt-1 flex flex-wrap items-center gap-3">
-      {preview ? <img src={preview} alt="" className="h-20 w-32 rounded border border-line object-cover" /> : <div className="grid h-20 w-32 place-items-center rounded border border-dashed border-line text-xs text-muted">Sin imagen</div>}
-      <label className="cursor-pointer rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red">
+      {preview ? <img src={preview} alt="" className="h-20 w-32 rounded-xl border border-line object-cover shadow-sm" /> : <div className="grid h-20 w-32 place-items-center rounded-xl border border-dashed border-line text-xs text-muted">Sin imagen</div>}
+      <label className="cursor-pointer rounded-xl border border-[#e3dbd3] bg-white px-3 py-2 text-sm font-semibold shadow-sm hover:border-ut-red hover:text-ut-red">
         {busy ? 'Subiendo…' : 'Cargar imagen (JPG, PNG, WebP)'}
         <input type="file" accept="image/jpeg,image/png,image/webp" className="sr-only" onChange={async (e) => {
           const f = e.target.files?.[0];
@@ -73,7 +73,7 @@ function Repeater({ def, value, onChange }: { def: FieldDef; value: unknown; onC
   return (
     <div className="mt-1 space-y-2">
       {rows.map((r, i) => (
-        <div key={i} className="flex flex-wrap items-end gap-2 rounded-lg border border-line bg-surface/50 p-2">
+        <div key={i} className="flex flex-wrap items-end gap-2 rounded-xl border border-line bg-ivory/60 p-2.5">
           {def.fields!.map((f) => (
             <div key={f.name} className="min-w-[8rem] flex-1">
               <FieldInput def={{ ...f, label: f.label }} value={r[f.name]} onChange={(v) => set(i, f.name, v)} compact />
@@ -132,7 +132,7 @@ export function FieldInput({ def, value, onChange, error, compact, imageUrl }: {
     case 'multirelation': {
       const sel = new Set(((value as number[]) ?? []).map(Number));
       input = (
-        <div className="mt-1 max-h-44 overflow-y-auto rounded-lg border border-line p-2">
+        <div className="mt-1 max-h-44 overflow-y-auto rounded-xl border border-[#e3dbd3] bg-white p-2.5">
           {opts.length === 0 && <p className="text-sm text-muted">Sin opciones.</p>}
           {opts.map((o) => (
             <label key={String(o.id)} className="flex items-center gap-2 py-0.5 text-sm">
@@ -172,23 +172,37 @@ export function FieldInput({ def, value, onChange, error, compact, imageUrl }: {
 }
 
 export function Notice({ kind, children }: { kind: 'ok' | 'error' | 'info'; children: ReactNode }) {
-  const cls = kind === 'ok' ? 'border-emerald-300 bg-emerald-50 text-emerald-900' : kind === 'error' ? 'border-ut-red/40 bg-ut-red-50 text-ut-red-dark' : 'border-sky-200 bg-sky-50 text-sky-900';
-  return <div role={kind === 'error' ? 'alert' : 'status'} className={`rounded-lg border px-4 py-2.5 text-sm ${cls}`}>{children}</div>;
+  const cfg = {
+    ok: ['border-idead-teal/35 bg-idead-teal-50 text-idead-teal-dark', 'check', 'bg-idead-teal'],
+    error: ['border-ut-red/30 bg-ut-red-50 text-ut-red-dark', 'alert', 'bg-ut-red'],
+    info: ['border-idead-blue/25 bg-idead-blue-50 text-[#1d4f88]', 'info', 'bg-idead-blue'],
+  }[kind];
+  return (
+    <div role={kind === 'error' ? 'alert' : 'status'} className={`fade-in flex items-start gap-3 rounded-2xl border px-4 py-3 text-sm ${cfg[0]}`}>
+      <span className={`grid h-6 w-6 shrink-0 place-items-center rounded-full text-sm text-white ${cfg[2]}`}><Icon name={cfg[1]} /></span>
+      <div className="min-w-0 flex-1 pt-0.5">{children}</div>
+    </div>
+  );
 }
 
-export function Button({ children, variant = 'primary', ...props }: { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'light' } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
+/** Botones con jerarquía: principal en rojo institucional, secundaria neutra, peligro, clara (sobre fondos rojos) y fantasma. */
+export function Button({ children, variant = 'primary', ...props }: { variant?: 'primary' | 'secondary' | 'danger' | 'ghost' | 'light' | 'teal' } & React.ButtonHTMLAttributes<HTMLButtonElement>) {
   const v = {
-    primary: 'bg-ut-red text-white hover:bg-ut-red-dark', secondary: 'border border-line bg-white hover:border-ut-red hover:text-ut-red',
-    danger: 'border border-ut-red bg-white text-ut-red hover:bg-ut-red-50', light: 'bg-white text-ut-red shadow hover:bg-ut-red-50', ghost: 'hover:bg-surface',
+    primary: 'bg-gradient-to-b from-[#d6232d] to-ut-red text-white shadow-[0_6px_16px_-6px_rgb(201_21_32/0.7)] hover:from-ut-red hover:to-ut-red-dark',
+    secondary: 'border border-[#e3dbd3] bg-white text-ink shadow-sm hover:border-ut-red/50 hover:text-ut-red',
+    danger: 'border border-ut-red/40 bg-white text-ut-red hover:bg-ut-red-50',
+    light: 'bg-white text-ut-red shadow hover:bg-ut-red-50',
+    teal: 'bg-idead-teal text-white shadow-[0_6px_16px_-6px_rgb(32_169_156/0.7)] hover:bg-idead-teal-dark',
+    ghost: 'text-ink hover:bg-warm',
   }[variant];
-  return <button type="button" {...props} className={`inline-flex items-center gap-1.5 rounded-lg px-3.5 py-2 text-sm font-semibold disabled:opacity-50 ${v} ${props.className ?? ''}`}>{children}</button>;
+  return <button type="button" {...props} className={`inline-flex items-center justify-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold transition active:scale-[0.98] focus-visible:ring-4 focus-visible:ring-ut-red/20 disabled:pointer-events-none disabled:opacity-50 ${v} ${props.className ?? ''}`}>{children}</button>;
 }
 
 /** Selector de archivo en español (reemplaza el botón del navegador «Choose File»). */
 export function FilePicker({ file, onPick, label = 'Elegir archivo', accept }: { file: File | null; onPick: (f: File | null) => void; label?: string; accept?: string }) {
   return (
-    <label className="mt-1 flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-ut-red/40 bg-white px-3 py-2.5 text-sm hover:border-ut-red hover:bg-ut-red-50/40">
-      <span className="inline-flex items-center gap-1.5 rounded-md bg-ut-red px-3 py-1.5 font-semibold text-white"><Icon name="upload" /> {label}</span>
+    <label className="mt-1 flex cursor-pointer items-center gap-3 rounded-xl border border-dashed border-ut-red/40 bg-white px-3 py-2.5 text-sm hover:border-ut-red hover:bg-ut-red-50/40">
+      <span className="inline-flex items-center gap-1.5 rounded-lg bg-ut-red px-3 py-1.5 font-semibold text-white"><Icon name="upload" /> {label}</span>
       <span className={`truncate ${file ? 'font-semibold text-ink' : 'text-muted'}`}>{file ? file.name : 'Ningún archivo seleccionado'}</span>
       <input type="file" accept={accept} className="sr-only" onChange={(e) => onPick(e.target.files?.[0] ?? null)} />
     </label>

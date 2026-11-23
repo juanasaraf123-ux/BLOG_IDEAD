@@ -39,9 +39,9 @@ export function IndicatorList() {
       </div>
       {loading && <Spinner />}
       {error && <ErrorBox message={error} />}
-      <div className="overflow-x-auto rounded-xl border border-line bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Código</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Responsable</th><th className="px-3 py-2">Metodología</th><th className="px-3 py-2">Publicación</th><th className="px-3 py-2">Última carga</th><th /></tr></thead>
+      <div className="overflow-x-auto admin-card">
+        <table className="admin-table w-full text-left text-sm">
+          <thead className="text-[0.7rem] uppercase"><tr><th className="px-3 py-2">Código</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Responsable</th><th className="px-3 py-2">Metodología</th><th className="px-3 py-2">Publicación</th><th className="px-3 py-2">Última carga</th><th /></tr></thead>
           <tbody className="divide-y divide-line">
             {data?.map((i) => (
               <tr key={i.id} className="hover:bg-surface/60">
@@ -85,20 +85,20 @@ export function IndicatorDetail() {
     <div className="space-y-6">
       <PageHeader back={{ to: '/indicadores', label: 'Indicadores' }} eyebrow={data.code} title={data.name} icon="chart" description={`${data.module.number}. ${data.module.name} · Fuente: ${data.source_text}`} />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
-      <section className="rounded-xl border border-line bg-white p-5">
+      <section className="admin-card p-5">
         <div className="mb-3 flex items-center gap-2"><h2 className="font-bold">Datos registrados</h2>
           {can('indicators.submit') && <Button className="ml-auto" onClick={() => newSub()}><Icon name="plus" /> Nueva carga de datos</Button>}
           {can('indicators.submit') && <a href={admin.url(`indicators/${id}/template`)} className="inline-flex items-center gap-1 rounded-lg border border-line px-3 py-2 text-sm font-semibold hover:border-ut-red"><Icon name="download" /> Plantilla Excel</a>}
         </div>
         <p className="mb-3 text-sm text-muted">Vista interna (incluye datos aprobados no publicados): {p.row_count} valores; último total {p.kpi ? `${fmtValue(p.kpi.value, data.value_type)} (${p.kpi.period})` : '—'}.</p>
-        <table className="w-full text-sm"><thead className="text-xs text-muted uppercase"><tr><th className="py-1 text-left">Carga</th><th className="text-left">Estado</th><th className="text-left">Datos</th><th className="text-left">Registró</th><th className="text-left">Publicado</th><th /></tr></thead>
+        <table className="admin-table w-full text-sm"><thead className="text-xs text-muted uppercase"><tr><th className="py-1 text-left">Carga</th><th className="text-left">Estado</th><th className="text-left">Datos</th><th className="text-left">Registró</th><th className="text-left">Publicado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{subs.data?.data.map((s) => (
             <tr key={s.id}><td className="py-1.5">#{s.id} {s.title}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td><StatusBadge s={s.status} /></td><td>{s.values_count}</td><td>{s.creator?.name}</td><td>{fmtDateTime(s.published_at)}</td>
               <td className="text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link>{s.status === 'publicado' && can('indicators.submit') && <button onClick={() => newSub(s.id)} className="ml-3 text-sm text-ut-red hover:underline">Corregir</button>}</td></tr>
           ))}</tbody>
         </table>
       </section>
-      <section className="rounded-xl border border-line bg-white p-5">
+      <section className="admin-card p-5">
         <h2 className="mb-3 font-bold">Ficha técnica {!editable && <span className="text-sm font-normal text-muted">(solo lectura)</span>}</h2>
         <fieldset disabled={!editable} className="grid gap-4 md:grid-cols-2">
           {f('name', 'Nombre', 'text')}
@@ -160,7 +160,7 @@ export function SubmissionDetail() {
       </div>
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
 
-      <section className="rounded-xl border border-line bg-white p-5">
+      <section className="admin-card p-5">
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <h2 className="font-bold">Valores ({rows.length})</h2>
           <span className="text-xs text-muted">Desagregaciones admitidas: {dims.map((d) => d.label).join(', ') || 'ninguna (solo total por período)'} · Unidad: {ind.unit}</span>
@@ -176,8 +176,8 @@ export function SubmissionDetail() {
           )}
         </div>
         <div className="overflow-x-auto">
-          <table className="w-full text-sm">
-            <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-2 py-2 text-left">Período</th>{dims.map((d) => <th key={d.key} className="px-2 py-2 text-left">{d.label}</th>)}<th className="px-2 py-2 text-right">Valor</th><th className="px-2 py-2 text-left">Nota</th><th /></tr></thead>
+          <table className="admin-table w-full text-sm">
+            <thead className="text-[0.7rem] uppercase"><tr><th className="px-2 py-2 text-left">Período</th>{dims.map((d) => <th key={d.key} className="px-2 py-2 text-left">{d.label}</th>)}<th className="px-2 py-2 text-right">Valor</th><th className="px-2 py-2 text-left">Nota</th><th /></tr></thead>
             <tbody className="divide-y divide-line">
               {rows.map((r, i) => (
                 <tr key={i}>
@@ -199,7 +199,7 @@ export function SubmissionDetail() {
         )}
       </section>
 
-      <section className="space-y-3 rounded-xl border border-line bg-white p-5">
+      <section className="space-y-3 admin-card p-5">
         <h2 className="font-bold">Flujo de revisión y publicación</h2>
         <input value={comment} onChange={(e) => setComment(e.target.value)} placeholder="Comentario (obligatorio para devolver)" className={inputCls} />
         <div className="flex flex-wrap gap-2">
@@ -243,9 +243,9 @@ export function SubmissionList() {
       </label>
       {loading && <Spinner />}
       {error && <ErrorBox message={error} />}
-      <div className="overflow-x-auto rounded-xl border border-line bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Carga</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2">Datos</th><th className="px-3 py-2">Registró</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
+      <div className="overflow-x-auto admin-card">
+        <table className="admin-table w-full text-left text-sm">
+          <thead className="text-[0.7rem] uppercase"><tr><th className="px-3 py-2">Carga</th><th className="px-3 py-2">Indicador</th><th className="px-3 py-2">Estado</th><th className="px-3 py-2">Datos</th><th className="px-3 py-2">Registró</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((s: Row) => (
             <tr key={s.id}><td className="px-3 py-2">#{s.id}{s.is_demo && <Badge tone="amber">Demo</Badge>}</td><td className="px-3 py-2">{s.indicator?.code} {s.indicator?.name}</td><td className="px-3 py-2"><StatusBadge s={s.status} /></td><td className="px-3 py-2">{s.values_count}</td><td className="px-3 py-2">{s.creator?.name}</td><td className="px-3 py-2">{fmtDateTime(s.updated_at)}</td><td className="px-3 py-2 text-right"><Link to={`/cargas/${s.id}`} className="font-semibold text-ut-red hover:underline">Abrir</Link></td></tr>
           ))}</tbody>

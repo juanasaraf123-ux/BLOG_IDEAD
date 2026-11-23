@@ -29,6 +29,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     ],
     imageUrls: (r) => ({ cover_file_id: r.cover?.url }),
     columns: [{ key: 'title', label: 'Título' }, { key: 'category', label: 'Categoría', render: (r) => r.category?.name ?? '—' }, { key: 'publish_at', label: 'Fecha de publicación', render: (r) => fmtDateTime(r.publish_at) || '—' }, { key: 'author', label: 'Autor', render: (r) => r.author?.name ?? '—' }],
+    card: { image: (r) => r.cover?.url, subtitle: (r) => r.category?.name ?? 'Noticia', meta: (r) => `${fmtDateTime(r.publish_at) || 'Sin fecha de publicación'}${r.author?.name ? ' · ' + r.author.name : ''}` },
   },
   actividades: {
     icon: 'calendar',
@@ -47,6 +48,8 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     ],
     imageUrls: (r) => ({ cover_file_id: r.cover?.url }),
     columns: [{ key: 'title', label: 'Título' }, { key: 'starts_at', label: 'Inicio', render: (r) => fmtDateTime(r.starts_at) }, { key: 'location', label: 'Lugar' }],
+    card: { image: (r) => r.cover?.url, subtitle: (r) => fmtDateTime(r.starts_at), meta: (r) => [r.location, r.cat?.name].filter(Boolean).join(' · ') || 'Sin lugar definido' },
+    calendar: { dateField: 'starts_at' },
   },
   multimedia: {
     icon: 'image',
@@ -66,6 +69,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     defaults: { type: 'foto' },
     imageUrls: (r) => ({ file_id: r.file?.url }),
     columns: [{ key: 'title', label: 'Título' }, { key: 'type', label: 'Tipo' }, { key: 'album', label: 'Álbum' }],
+    card: { image: (r) => (r.file?.url && /\.(jpe?g|png|webp|gif)$/i.test(r.file.url) ? r.file.url : null), subtitle: (r) => label(r.type ?? 'multimedia'), meta: (r) => [r.album, r.cat?.name].filter(Boolean).join(' · ') || 'Sin álbum' },
   },
   paginas: {
     icon: 'file',
@@ -94,6 +98,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     defaults: { is_active: true, sort: 0 },
     imageUrls: (r) => ({ image_file_id: r.image?.url }),
     columns: [{ key: 'title', label: 'Título' }, { key: 'sort', label: 'Orden' }, { key: 'is_active', label: '¿Se muestra?', render: (r) => (r.is_active ? 'Sí' : 'No') }],
+    card: { image: (r) => r.image?.url, subtitle: (r) => `Posición ${r.sort ?? '—'}`, meta: (r) => (r.is_active ? 'Se muestra en el inicio' : 'Oculta') },
   },
   destacados: {
     icon: 'chart',
@@ -172,6 +177,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     toForm: (r) => ({ coverage_ids: (r.coverage ?? []).map((m: Row) => m.id), sites: r.sites ?? [], facilities: r.facilities ?? [], events: r.events ?? [] }),
     imageUrls: (r) => ({ photo_file_id: r.photo?.url }),
     columns: [{ key: 'name', label: 'CAT' }, { key: 'municipality', label: 'Municipio', render: (r) => `${r.municipality?.name ?? ''}, ${r.municipality?.department?.name ?? ''}` }, { key: 'status', label: 'Estado', render: (r) => label(r.status) }],
+    card: { image: (r) => r.photo?.url, subtitle: (r) => r.municipality?.department?.name ?? 'CAT', meta: (r) => `${r.municipality?.name ?? ''} · ${label(r.status)}${r.coverage?.length ? ` · ${r.coverage.length} municipios atendidos` : ''}` },
   },
   programas: {
     icon: 'graduation',
@@ -192,6 +198,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     ],
     defaults: { modality: 'distancia', status: 'activo' },
     columns: [{ key: 'name', label: 'Programa' }, { key: 'level', label: 'Nivel', render: (r) => r.level?.name }, { key: 'snies_code', label: 'SNIES' }, { key: 'status', label: 'Estado', render: (r) => label(r.status) }],
+    card: { subtitle: (r) => r.level?.name ?? 'Programa', meta: (r) => [r.snies_code && `SNIES ${r.snies_code}`, r.modality, label(r.status)].filter(Boolean).join(' · ') },
   },
   oferta: {
     icon: 'table',
@@ -233,6 +240,7 @@ export const RESOURCES: Record<string, ResourceConfig> = {
     toForm: (r) => ({ cat_ids: (r.cats ?? []).map((c: Row) => c.id) }),
     imageUrls: (r) => ({ cover_file_id: r.cover?.url }),
     columns: [{ key: 'name', label: 'Proyecto' }, { key: 'status', label: 'Estado', render: (r) => label(r.status) }, { key: 'approved_amount', label: 'Aprobado', render: (r) => fmtCurrency(r.approved_amount) }, { key: 'progress_pct', label: 'Avance', render: (r) => (r.progress_pct != null ? `${r.progress_pct} %` : '—') }],
+    card: { image: (r) => r.cover?.url, subtitle: (r) => label(r.status), meta: (r) => `${r.progress_pct != null ? `Avance ${r.progress_pct} %` : 'Sin avance reportado'}${r.cats?.length ? ` · ${r.cats.length} CAT` : ''}` },
   },
   avances: {
     icon: 'chart',

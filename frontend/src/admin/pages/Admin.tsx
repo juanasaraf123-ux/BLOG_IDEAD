@@ -1,8 +1,9 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Link } from 'react-router-dom';
 import { admin, errorText } from '../../shared/api';
 import { fmtBytes, fmtDateTime, fmtNumber, label } from '../../shared/format';
-import { Donut, LineChart } from '../components/DashCharts';
+import { BarChart, Donut, LineChart, ModuleBars } from '../components/DashCharts';
+import { ColombiaMap } from '../../portal/components/ColombiaMap';
 import { Icon } from '../../shared/icons';
 import { Badge, ErrorBox, Spinner, useAsync } from '../../shared/ui';
 import { PageHeader } from '../components/PageHeader';
@@ -23,162 +24,249 @@ const PENDING_LABELS: Record<string, [string, string, string]> = {
   solicitudes_vencidas: ['Solicitudes vencidas', '/r/solicitudes', 'clock'],
 };
 
-/** Accesos rápidos del boceto (solo los que el rol puede usar). */
-const QUICK: { to: string; label: string; icon: string; perms: string[] }[] = [
-  { to: '/r/noticias', label: 'Gestionar Noticias', icon: 'book', perms: ['content.create', 'content.publish'] },
-  { to: '/r/actividades', label: 'Crear Actividad', icon: 'calendar', perms: ['content.create', 'content.publish'] },
-  { to: '/informes', label: 'Generar Reportes', icon: 'download', perms: ['reports.internal.export', 'petty_cash.view'] },
-  { to: '/h/cat', label: 'Ver Mapas y CAT', icon: 'pin', perms: ['cats.edit', 'entities.publish', 'programs.edit'] },
-  { to: '/bases', label: 'Bases de datos', icon: 'table', perms: ['records.view', 'records.import'] },
-  { to: '/h/caja-menor', label: 'Caja menor', icon: 'money', perms: ['petty_cash.view'] },
-  { to: '/documentos', label: 'Documentos', icon: 'file', perms: ['documents.view.internal', 'documents.upload'] },
-  { to: '/indicadores', label: 'Indicadores', icon: 'chart', perms: ['indicators.view_internal', 'indicators.submit'] },
+/** Accesos rápidos (solo los que el rol puede usar). */
+const QUICK: { to: string; label: string; text: string; icon: string; tone: string; perms: string[] }[] = [
+  { to: '/r/noticias', label: 'Gestionar Noticias', text: 'Publicar novedades', icon: 'book', tone: 'from-ut-red to-ut-red-dark', perms: ['content.create', 'content.publish'] },
+  { to: '/r/actividades', label: 'Crear Actividad', text: 'Agenda y calendario', icon: 'calendar', tone: 'from-idead-teal to-idead-teal-dark', perms: ['content.create', 'content.publish'] },
+  { to: '/informes', label: 'Generar Reportes', text: 'PDF y Excel', icon: 'download', tone: 'from-idead-blue to-[#1d4f88]', perms: ['reports.internal.export', 'petty_cash.view'] },
+  { to: '/h/cat', label: 'CAT y Mapas', text: 'Fichas territoriales', icon: 'pin', tone: 'from-ut-red to-ut-red-dark', perms: ['cats.edit', 'entities.publish', 'programs.edit'] },
+  { to: '/cargas', label: 'Cargar Indicadores', text: 'Datos por período', icon: 'upload', tone: 'from-idead-blue to-[#1d4f88]', perms: ['indicators.submit', 'indicators.review'] },
+  { to: '/bases', label: 'Bases de Datos', text: 'Estudiantes, docentes…', icon: 'table', tone: 'from-idead-teal to-idead-teal-dark', perms: ['records.view', 'records.import'] },
+  { to: '/documentos', label: 'Documentos', text: 'Actas y contratos', icon: 'file', tone: 'from-ut-red to-ut-red-dark', perms: ['documents.view.internal', 'documents.upload'] },
+  { to: '/h/caja-menor', label: 'Caja Menor', text: 'Gastos y facturas', icon: 'money', tone: 'from-idead-teal to-idead-teal-dark', perms: ['petty_cash.view'] },
+  { to: '/usuarios', label: 'Usuarios', text: 'Cuentas y roles', icon: 'user', tone: 'from-idead-blue to-[#1d4f88]', perms: ['users.view', 'users.manage'] },
 ];
 
-const KPI_CARDS: { key: string; label: string; icon: string; tone: string }[] = [
-  { key: 'cats', label: 'CAT Activos', icon: 'building', tone: 'bg-ut-red-50 text-ut-red' },
-  { key: 'students', label: 'Estudiantes', icon: 'students', tone: 'bg-[#e6f6f0] text-[#14805a]' },
-  { key: 'events', label: 'Actividades', icon: 'calendar', tone: 'bg-[#fdf3dc] text-[#9a6700]' },
-  { key: 'projects', label: 'Proyectos', icon: 'project', tone: 'bg-[#e8f0fc] text-[#1f5fae]' },
+/** Tarjetas de cifras generales: cada una con su color suave distintivo. */
+const KPI_CARDS: { key: string; label: string; icon: string; tone: string; glow: string; to?: string }[] = [
+  { key: 'cats', label: 'CAT activos', icon: 'building', tone: 'bg-ut-red-50 text-ut-red', glow: 'from-ut-red/10', to: '/h/cat' },
+  { key: 'students', label: 'Estudiantes', icon: 'students', tone: 'bg-idead-teal-50 text-idead-teal-dark', glow: 'from-idead-teal/12', to: '/indicadores' },
+  { key: 'teachers', label: 'Docentes', icon: 'teacher', tone: 'bg-idead-blue-50 text-idead-blue', glow: 'from-idead-blue/10', to: '/indicadores' },
+  { key: 'municipalities', label: 'Municipios', icon: 'pin', tone: 'bg-[#fdf1e4] text-[#a35a00]', glow: 'from-[#f0a040]/14', to: '/indicadores' },
+  { key: 'programs', label: 'Programas académicos', icon: 'graduation', tone: 'bg-ut-red-50 text-ut-red', glow: 'from-ut-red/10', to: '/r/programas' },
+  { key: 'events', label: 'Actividades', icon: 'calendar', tone: 'bg-idead-teal-50 text-idead-teal-dark', glow: 'from-idead-teal/12', to: '/r/actividades' },
+  { key: 'projects', label: 'Proyectos', icon: 'project', tone: 'bg-idead-blue-50 text-idead-blue', glow: 'from-idead-blue/10', to: '/h/proyectos' },
 ];
 
-const ACTIVITY_ICON: Record<string, string> = { News: 'book', Event: 'calendar', MediaItem: 'image', Page: 'file', Cat: 'building', Program: 'graduation', Project: 'project', HeroSlide: 'home', DataSubmission: 'upload', Document: 'file' };
+/** Estados de las cargas de indicadores, con color e icono (nunca solo color). */
+const SUBMISSION_STATES: { key: string; label: string; text: string; icon: string; tone: string }[] = [
+  { key: 'borrador', label: 'En borrador', text: 'Cargas sin enviar', icon: 'file', tone: 'border-[#ddd5cd] bg-warm text-[#55504b]' },
+  { key: 'enviado', label: 'Por revisar', text: 'Enviadas por las oficinas', icon: 'search', tone: 'border-amber-300/60 bg-amber-50 text-amber-900' },
+  { key: 'devuelto', label: 'Devueltas', text: 'Requieren corrección', icon: 'alert', tone: 'border-ut-red/30 bg-ut-red-50 text-ut-red-dark' },
+  { key: 'aprobado', label: 'Por publicar', text: 'Aprobadas, sin publicar', icon: 'upload', tone: 'border-idead-blue/25 bg-idead-blue-50 text-[#1d4f88]' },
+  { key: 'publicado', label: 'Publicadas', text: 'Visibles en el portal', icon: 'check', tone: 'border-idead-teal/30 bg-idead-teal-50 text-idead-teal-dark' },
+];
+
+const ACTIVITY_ICON: Record<string, [string, string]> = {
+  News: ['book', 'bg-ut-red-50 text-ut-red'], Event: ['calendar', 'bg-idead-teal-50 text-idead-teal-dark'], MediaItem: ['image', 'bg-idead-blue-50 text-idead-blue'],
+  Page: ['file', 'bg-warm text-ink'], Cat: ['building', 'bg-ut-red-50 text-ut-red'], Program: ['graduation', 'bg-idead-blue-50 text-idead-blue'],
+  Project: ['project', 'bg-idead-teal-50 text-idead-teal-dark'], HeroSlide: ['home', 'bg-warm text-ink'], DataSubmission: ['upload', 'bg-idead-blue-50 text-idead-blue'], Document: ['file', 'bg-warm text-ink'],
+};
 
 function timeAgo(iso: string) {
   const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
   if (m < 1) return 'hace un momento';
   if (m < 60) return `hace ${m} min`;
   if (m < 60 * 24) return `hace ${Math.round(m / 60)} h`;
+  if (m < 60 * 24 * 7) return `hace ${Math.round(m / 1440)} d`;
   return fmtDateTime(iso);
 }
 
-const card = 'rounded-2xl border border-line bg-white p-5 shadow-[0_4px_18px_rgba(0,0,0,0.05)]';
+function Card({ title, subtitle, children, className = '', action, icon }: { title: string; subtitle?: ReactNode; children: ReactNode; className?: string; action?: ReactNode; icon?: string }) {
+  return (
+    <section className={`admin-card p-5 ${className}`}>
+      <div className="mb-4 flex flex-wrap items-start gap-3">
+        {icon && <span className="grid h-9 w-9 shrink-0 place-items-center rounded-xl bg-ut-red-50 text-lg text-ut-red"><Icon name={icon} /></span>}
+        <div className="min-w-0 flex-1">
+          <h2 className="text-[1.05rem] font-extrabold text-ink">{title}</h2>
+          {subtitle && <p className="text-xs text-muted">{subtitle}</p>}
+        </div>
+        {action}
+      </div>
+      {children}
+    </section>
+  );
+}
 
 export function Dashboard() {
   const { me, can } = useAuth();
   const { data, loading } = useAsync(() => admin.get<Row>('dashboard'), []);
-  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 4);
+  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 6);
   const first = (me?.user.name ?? '').split(/\s+/)[0];
-  const pct = data?.indicators ? Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100) : 0;
+  const today = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
+  const charts = data?.charts;
+  const territory = (charts?.territory ?? {}) as Record<string, { name: string; value: number }>;
+  const subs = (charts?.submissions ?? {}) as Record<string, number>;
+  const demo = charts?.is_demo ? <Badge tone="amber">DEMO</Badge> : null;
   return (
-    <div className="mx-auto max-w-7xl space-y-6">
-      {/* Banner de bienvenida del boceto */}
-      <section className="relative flex min-h-40 overflow-hidden rounded-3xl bg-gradient-to-r from-[#f4c6c9] via-[#e0565c] to-ut-red text-white shadow-lg">
-        <img src="/img/home/grupo-idead.jpg" alt="" className="hidden w-64 shrink-0 object-cover [mask-image:linear-gradient(to_right,black_65%,transparent)] md:block" />
-        <div className="relative z-10 flex flex-1 flex-col justify-center px-6 py-6 md:pl-2">
-          <h1 className="text-3xl font-extrabold drop-shadow-sm md:text-4xl">¡Te damos la bienvenida, {first}!</h1>
-          <p className="mt-1 text-lg text-white/95">Gestiona y administra el contenido del portal IDEAD</p>
-          <p className="mt-2 text-sm text-white/85">{me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
+    <div className="mx-auto max-w-[1600px] space-y-6">
+      {/* Banner de bienvenida */}
+      <section className="relative isolate overflow-hidden rounded-[1.5rem] bg-gradient-to-r from-ut-red via-[#c21a26] to-ut-red-dark text-white md:from-[#f7d4d6] md:via-[#e04a52] shadow-[0_24px_48px_-22px_rgb(149_21_29/0.7)]">
+        <div className="absolute inset-y-0 left-0 -z-10 hidden w-[27%] md:block">
+          <img src="/img/home/grupo-idead.jpg" alt="Comunidad IDEAD en el campus de la Universidad del Tolima" className="h-full w-full object-cover object-[30%_center] [mask-image:linear-gradient(to_right,black_55%,transparent)]" />
         </div>
-        <div className="relative z-10 hidden flex-col items-end justify-center pr-8 text-right lg:flex" aria-hidden>
-          <span className="text-4xl leading-none font-extrabold">Conocimiento</span>
-          <span className="font-serif text-3xl italic">que Transforma</span>
+        <span className="absolute -top-24 right-[28%] -z-10 h-64 w-64 rounded-full bg-white/10" aria-hidden />
+        <span className="absolute right-10 -bottom-24 -z-10 h-56 w-56 rounded-full border-[22px] border-white/10" aria-hidden />
+        <span className="absolute top-8 left-[46%] -z-10 hidden h-10 w-10 rounded-full bg-idead-teal/50 md:block" aria-hidden />
+        <svg className="absolute inset-x-0 bottom-0 -z-10 h-14 w-full" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden>
+          <path d="M0 40 C 220 10, 420 60, 640 34 S 1020 6, 1200 30 V60 H0Z" fill="#20a99c" fillOpacity=".25" />
+          <path d="M0 50 C 260 30, 460 66, 700 46 S 1040 24, 1200 40 V60 H0Z" fill="#fff" fillOpacity=".12" />
+        </svg>
+        <div className="flex flex-wrap items-center gap-6 px-6 py-8 md:py-9 md:pl-[29%] lg:pr-10">
+          <div className="min-w-0 flex-1">
+            <p className="text-xs font-semibold tracking-wide text-white/85 first-letter:uppercase">{today}</p>
+            <h1 className="mt-1 text-3xl font-extrabold drop-shadow md:text-[2.15rem]">¡Te damos la bienvenida, {first}!</h1>
+            <p className="mt-1 text-lg text-white/95">Gestiona y administra el contenido del portal IDEAD</p>
+            <p className="admin-glass mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold"><Icon name="user" /> {me?.user.name} · {me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
+          </div>
+          <div className="hidden text-right drop-shadow lg:block" aria-hidden>
+            <p className="font-display text-[2.6rem] leading-none font-extrabold">Conocimiento</p>
+            <p className="font-serif text-[2.1rem] leading-tight italic">que Transforma</p>
+          </div>
         </div>
-        <span className="pointer-events-none absolute -top-20 right-56 h-56 w-56 rounded-full bg-white/10" aria-hidden />
       </section>
 
       {!me?.user.mfa_enabled && <Notice kind="info">Recomendación de seguridad: active la verificación en dos pasos en <Link to="/cuenta" className="font-semibold underline">Mi cuenta</Link>.</Notice>}
-      {loading && <Spinner />}
+      {loading && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">{KPI_CARDS.map((k) => <div key={k.key} className="skeleton h-36" />)}</div>}
 
       {data?.kpis && (
-        <section aria-label="Cifras generales" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <section aria-label="Indicadores generales" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
           {KPI_CARDS.map((k) => {
-            const v = data.kpis[k.key] as Row;
-            return (
-              <div key={k.key} className={`${card} flex items-center gap-4`}>
-                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-full text-2xl ${k.tone}`}><Icon name={k.icon} /></span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium text-muted">{k.label} {v.is_demo && <Badge tone="amber">DEMO</Badge>}</p>
-                  <p className="text-[1.75rem] leading-tight font-extrabold text-ink tabular-nums">{v.value === null ? '—' : fmtNumber(v.value, 0)}</p>
-                  {typeof v.change === 'number' ? (
-                    <p className={`text-xs font-semibold ${v.change >= 0 ? 'text-[#14805a]' : 'text-ut-red'}`}>{v.change >= 0 ? '▲' : '▼'} {Math.abs(v.change).toLocaleString('es-CO')} % <span className="font-normal text-muted">vs {v.versus}</span></p>
-                  ) : <p className="truncate text-xs text-muted">{v.note}</p>}
+            const v = (data.kpis[k.key] ?? { value: null, note: 'Sin datos' }) as Row;
+            const body = (
+              <>
+                <span className={`pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-gradient-to-br ${k.glow} to-transparent`} aria-hidden />
+                <div className="flex items-start justify-between gap-2">
+                  <span className={`grid h-12 w-12 place-items-center rounded-2xl text-2xl ${k.tone}`}><Icon name={k.icon} /></span>
+                  {typeof v.change === 'number' && (
+                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${v.change >= 0 ? 'bg-idead-teal-50 text-idead-teal-dark' : 'bg-ut-red-50 text-ut-red'}`} title={`Variación frente a ${v.versus}`}>{v.change >= 0 ? '▲' : '▼'} {Math.abs(v.change).toLocaleString('es-CO')} %</span>
+                  )}
                 </div>
-              </div>
+                <p className="font-display mt-3 text-[1.9rem] leading-none font-extrabold text-ink tabular-nums">{v.value === null || v.value === undefined ? '—' : fmtNumber(v.value, 0)}</p>
+                <p className="mt-1 text-sm font-semibold text-ink">{k.label} {v.is_demo && <Badge tone="amber">DEMO</Badge>}</p>
+                <p className="mt-0.5 truncate text-xs text-muted">{typeof v.change === 'number' ? `${v.note} · vs ${v.versus}` : v.note}</p>
+              </>
             );
+            return k.to ? <Link key={k.key} to={k.to} className="admin-card admin-card-hover relative overflow-hidden p-4">{body}</Link> : <div key={k.key} className="admin-card relative overflow-hidden p-4">{body}</div>;
           })}
         </section>
       )}
 
-      {data?.charts && (
-        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-          <section className={card}>
-            <div className="mb-2 flex flex-wrap items-baseline gap-x-3">
-              <h2 className="text-lg font-extrabold text-ink">Estudiantes matriculados</h2>
-              <p className="text-sm text-muted">Últimos {data.charts.enrollment.length} semestres · indicador M02-I03</p>
-              {data.charts.is_demo && <Badge tone="amber">DEMO</Badge>}
-            </div>
-            <LineChart data={data.charts.enrollment} label="Estudiantes matriculados por semestre" />
-          </section>
-          <section className={card}>
-            <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
-              <h2 className="text-lg font-extrabold text-ink">Distribución por CAT</h2>
-              <p className="text-sm text-muted">Estudiantes · período {data.charts.period ?? '—'}</p>
-            </div>
-            <Donut data={data.charts.by_cat} center="estudiantes" />
-          </section>
-        </div>
-      )}
+      {charts && (
+        <>
+          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+            <Card title="Estudiantes matriculados por semestre" subtitle={<>Últimos {charts.enrollment.length} semestres · indicador M02-I01 {demo}</>} icon="students">
+              <LineChart data={charts.enrollment} label="Estudiantes matriculados por semestre" />
+            </Card>
+            <Card title="Distribución de estudiantes por CAT" subtitle={<>Período {charts.period ?? '—'} · indicador M02-I03</>} icon="building">
+              <Donut data={charts.by_cat} center="estudiantes" />
+            </Card>
+          </div>
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
-        {data?.recent && (
-          <section className={card}>
-            <h2 className="mb-3 text-lg font-extrabold text-ink">Actividad Reciente</h2>
-            {data.recent.length === 0 ? <p className="text-sm text-muted">Sin cambios registrados.</p> : (
-              <ul className="divide-y divide-line">
-                {data.recent.map((r: Row) => (
-                  <li key={r.id} className="flex items-center gap-3 py-2.5">
-                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ut-red-50 text-lg text-ut-red"><Icon name={ACTIVITY_ICON[r.entity] ?? 'info'} /></span>
-                    <div className="min-w-0 flex-1">
-                      <p className="truncate text-sm text-ink"><span className="font-semibold">{r.user}</span> {r.action} {r.type.toLowerCase()}: <span className="font-medium">{r.title}</span></p>
-                      <p className="text-xs text-muted">{timeAgo(r.at)}</p>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            )}
-          </section>
-        )}
-        {quick.length > 0 && (
-          <section className={card}>
-            <h2 className="mb-3 text-lg font-extrabold text-ink">Accesos Rápidos</h2>
-            <div className="grid grid-cols-2 gap-3">
-              {quick.map((q) => (
-                <Link key={q.to} to={q.to} className="group flex flex-col items-center gap-2 rounded-2xl border border-line p-4 text-center transition hover:-translate-y-0.5 hover:border-ut-red/40 hover:shadow-md">
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-ut-red to-ut-red-dark text-2xl text-white shadow-md shadow-ut-red/25"><Icon name={q.icon} /></span>
-                  <span className="text-sm font-bold text-ink group-hover:text-ut-red">{q.label}</span>
+          <div className="grid gap-6 lg:grid-cols-2 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)]">
+            <Card title="Estudiantes nuevos" subtitle={<>Comparación entre períodos · indicador M02-I04 {demo}</>} icon="chart">
+              <BarChart data={charts.new_students} unit="estudiantes nuevos" />
+            </Card>
+            <Card title="Presencia territorial" subtitle={`Estudiantes por departamento del CAT · ${charts.period ?? ''}`} icon="pin">
+              <div className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+                <ColombiaMap title="Estudiantes del IDEAD por departamento" values={Object.fromEntries(Object.entries(territory).map(([c, t]) => [c, t.value]))} formatValue={(v) => `${fmtNumber(v, 0)} estudiantes`} className="[&_figcaption]:hidden" />
+                <ul className="space-y-1.5 text-sm">
+                  {Object.entries(territory).sort((x, y) => y[1].value - x[1].value).map(([c, t]) => (
+                    <li key={c} className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate">{t.name}</span><span className="font-semibold tabular-nums">{fmtNumber(t.value, 0)}</span></li>
+                  ))}
+                </ul>
+              </div>
+            </Card>
+            <Card title="Comportamiento de los indicadores" subtitle="Por módulo del portal" icon="chart" className="lg:col-span-2 2xl:col-span-1">
+              <ModuleBars modules={charts.modules} />
+            </Card>
+          </div>
+
+          <section aria-labelledby="estados-title">
+            <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
+              <h2 id="estados-title" className="text-[1.05rem] font-extrabold text-ink">Indicadores pendientes y publicados</h2>
+              <p className="text-xs text-muted">Estado de las cargas de datos de las oficinas</p>
+              <Link to="/cargas" className="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-ut-red hover:underline">Ver cargas <Icon name="arrowRight" /></Link>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              {SUBMISSION_STATES.map((st) => (
+                <Link key={st.key} to="/cargas" className={`admin-card-hover flex items-center gap-3 rounded-[1.125rem] border p-4 ${st.tone}`}>
+                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/80 text-xl shadow-sm"><Icon name={st.icon} /></span>
+                  <span className="min-w-0">
+                    <span className="font-display block text-2xl leading-none font-extrabold tabular-nums">{subs[st.key] ?? 0}</span>
+                    <span className="block text-sm font-bold">{st.label}</span>
+                    <span className="block truncate text-xs opacity-80">{st.text}</span>
+                  </span>
                 </Link>
               ))}
             </div>
           </section>
+        </>
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
+        {data?.recent && (
+          <Card title="Actividad reciente" subtitle="Últimos cambios en contenidos, fichas y cargas" icon="history"
+            action={can('audit.view') ? <Link to="/auditoria" className="inline-flex items-center gap-1 text-sm font-semibold text-ut-red hover:underline">Ver todo <Icon name="arrowRight" /></Link> : undefined}>
+            {data.recent.length === 0 ? <p className="text-sm text-muted">Sin cambios registrados.</p> : (
+              <ol className="relative space-y-1 before:absolute before:top-3 before:bottom-3 before:left-[1.2rem] before:w-px before:bg-line">
+                {data.recent.map((r: Row) => {
+                  const [ic, tone] = ACTIVITY_ICON[r.entity] ?? ['info', 'bg-warm text-ink'];
+                  return (
+                    <li key={r.id} className="relative flex items-center gap-3 rounded-xl p-1.5 hover:bg-ivory">
+                      <span className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg ring-4 ring-white ${tone}`}><Icon name={ic} /></span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm text-ink"><span className="font-semibold">{r.user}</span> {r.action} {r.type.toLowerCase()}: <span className="font-medium">{r.title}</span></p>
+                        <p className="text-xs text-muted">{r.type} · {timeAgo(r.at)}</p>
+                      </div>
+                    </li>
+                  );
+                })}
+              </ol>
+            )}
+          </Card>
+        )}
+        {quick.length > 0 && (
+          <Card title="Accesos rápidos" subtitle="Según los permisos de su rol" icon="home">
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3">
+              {quick.map((q) => (
+                <Link key={q.to} to={q.to} className="admin-card-hover group flex flex-col items-center gap-2 rounded-2xl border border-[#ece4dc] bg-gradient-to-b from-white to-ivory p-4 text-center">
+                  <span className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${q.tone} text-2xl text-white shadow-lg transition group-hover:scale-110`}><Icon name={q.icon} /></span>
+                  <span className="text-sm leading-tight font-bold text-ink group-hover:text-ut-red">{q.label}</span>
+                  <span className="text-[0.7rem] leading-tight text-muted">{q.text}</span>
+                </Link>
+              ))}
+            </div>
+          </Card>
         )}
       </div>
 
-      {data?.indicators && (
-        <section className={`${card} flex flex-wrap items-center gap-4`}>
-          <div className="min-w-56 flex-1">
-            <div className="flex items-end justify-between"><p className="text-sm font-semibold text-ink">Indicadores con datos publicados</p><p className="text-xl font-extrabold text-ink">{data.indicators.con_datos_publicados}<span className="text-sm font-semibold text-muted"> / {data.indicators.total}</span></p></div>
-            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-ut-red-50"><div className="h-full rounded-full bg-ut-red" style={{ width: `${pct}%` }} /></div>
-            <p className="mt-1.5 text-xs text-muted">{data.indicators.metodologia_validada} con metodología validada</p>
+      {data && Object.keys(data.pending).length > 0 && (
+        <section aria-labelledby="mis-pendientes">
+          <h2 id="mis-pendientes" className="mb-3 text-[1.05rem] font-extrabold text-ink">Mis pendientes</h2>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
+              <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className={`admin-card admin-card-hover relative overflow-hidden p-4 ${v > 0 ? '!border-ut-red/30' : ''}`}>
+                <span className={`absolute inset-x-0 top-0 h-1 ${v > 0 ? 'bg-ut-red' : 'bg-idead-teal'}`} aria-hidden />
+                <div className="flex items-start justify-between">
+                  <p className={`font-display text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-ink'}`}>{v}</p>
+                  <span className={`grid h-9 w-9 place-items-center rounded-full text-lg ${v > 0 ? 'bg-ut-red text-white' : 'bg-idead-teal-50 text-idead-teal-dark'}`}><Icon name={v > 0 ? PENDING_LABELS[k]?.[2] ?? 'info' : 'check'} /></span>
+                </div>
+                <p className="mt-1 text-sm">{PENDING_LABELS[k]?.[0] ?? k}</p>
+                {v === 0 && <p className="text-xs text-idead-teal-dark">Al día</p>}
+              </Link>
+            ))}
           </div>
         </section>
       )}
 
-      {data && Object.keys(data.pending).length > 0 && (
-        <section>
-          <h2 className="mb-3 text-lg font-extrabold text-ink">Pendientes</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
-              <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className={`relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md ${v > 0 ? 'border-ut-red/30' : 'border-line'}`}>
-                <span className={`absolute inset-x-0 top-0 h-1 ${v > 0 ? 'bg-ut-red' : 'bg-ut-red/25'}`} aria-hidden />
-                <div className="flex items-start justify-between">
-                  <p className={`text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-ink'}`}>{v}</p>
-                  <span className={`grid h-9 w-9 place-items-center rounded-full text-lg ${v > 0 ? 'bg-ut-red text-white' : 'bg-ut-red-50 text-ut-red'}`}><Icon name={PENDING_LABELS[k]?.[2] ?? 'info'} /></span>
-                </div>
-                <p className="mt-1 text-sm">{PENDING_LABELS[k]?.[0] ?? k}</p>
-                {v === 0 && <p className="text-xs text-muted">Al día</p>}
-              </Link>
-            ))}
+      {data?.indicators && (
+        <section className="admin-card flex flex-wrap items-center gap-5 p-5">
+          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-idead-teal-50 text-2xl text-idead-teal-dark"><Icon name="chart" /></span>
+          <div className="min-w-56 flex-1">
+            <div className="flex items-end justify-between"><p className="text-sm font-semibold text-ink">Indicadores con datos publicados</p><p className="font-display text-xl font-extrabold text-ink">{data.indicators.con_datos_publicados}<span className="text-sm font-semibold text-muted"> / {data.indicators.total}</span></p></div>
+            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#f3eee9]"><div className="h-full rounded-full bg-gradient-to-r from-idead-teal to-idead-teal-dark" style={{ width: `${Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100)}%` }} /></div>
+            <p className="mt-1.5 text-xs text-muted">{data.indicators.metodologia_validada} con metodología validada</p>
           </div>
         </section>
       )}
@@ -207,9 +295,9 @@ export function Documents() {
       </div>
       {error && <ErrorBox message={error} />}
       {loading && <Spinner />}
-      <div className="overflow-x-auto rounded-xl border border-line bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Documento</th><th className="px-3 py-2">Categoría</th><th className="px-3 py-2">Reserva</th><th className="px-3 py-2">Dependencia</th><th className="px-3 py-2">Versión</th><th className="px-3 py-2">Cargó</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
+      <div className="overflow-x-auto admin-card">
+        <table className="admin-table w-full text-left text-sm">
+          <thead className="text-[0.7rem] uppercase"><tr><th className="px-3 py-2">Documento</th><th className="px-3 py-2">Categoría</th><th className="px-3 py-2">Reserva</th><th className="px-3 py-2">Dependencia</th><th className="px-3 py-2">Versión</th><th className="px-3 py-2">Cargó</th><th className="px-3 py-2">Actualizado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">
             {data?.data.length === 0 && <tr><td colSpan={8} className="px-3 py-6 text-center text-muted">Sin documentos visibles.</td></tr>}
             {data?.data.map((d: Row) => (
@@ -252,8 +340,8 @@ function DocumentEditor({ id, onClose, onSaved }: { id: number | null; onClose: 
     try { await admin.upload(`documents/${id}/versions`, file, { change_note: note }); setFile(null); setNote(''); setMsg({ k: 'ok', t: 'Nueva versión cargada.' }); await load(); onSaved(); } catch (e) { setMsg({ k: 'error', t: errorText(e) }); }
   };
   return (
-    <div className="fixed inset-0 z-40 flex justify-end bg-black/30" role="dialog" aria-modal="true" aria-label="Documento">
-      <div className="flex h-full w-full max-w-2xl flex-col overflow-y-auto bg-white p-5 shadow-2xl">
+    <div className="fade-in fixed inset-0 z-50 flex justify-end bg-[#2b1416]/40 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-label="Documento">
+      <div className="admin-ui flex h-full w-full max-w-2xl flex-col overflow-y-auto bg-ivory p-5 shadow-2xl sm:rounded-l-[1.375rem]">
         <div className="mb-4 flex items-center"><h2 className="text-lg font-bold">{id ? doc?.title : 'Cargar documento'}</h2><button onClick={onClose} autoFocus className="ml-auto p-2 text-xl" aria-label="Cerrar"><Icon name="close" /></button></div>
         {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
         <div className="mt-3 grid gap-4 md:grid-cols-2">
@@ -313,9 +401,9 @@ export function Users() {
         actions={can('users.manage') ? <Button variant="primary" onClick={() => { setMsg(null); setOpen({ name: '', email: '', password: '', is_active: true, role_ids: [], dependency_ids: [] }); }}><Icon name="plus" /> Nuevo usuario</Button> : undefined} />
       <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar por nombre o correo" className={`${inputCls} mb-3 max-w-sm`} />
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
-      <div className="overflow-x-auto rounded-xl border border-line bg-white">
-        <table className="w-full text-left text-sm">
-          <thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Nombre</th><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Roles</th><th className="px-3 py-2">Dependencias</th><th className="px-3 py-2">Verificación en dos pasos</th><th className="px-3 py-2">Último acceso</th><th className="px-3 py-2">Estado</th><th /></tr></thead>
+      <div className="overflow-x-auto admin-card">
+        <table className="admin-table w-full text-left text-sm">
+          <thead className="text-[0.7rem] uppercase"><tr><th className="px-3 py-2">Nombre</th><th className="px-3 py-2">Correo</th><th className="px-3 py-2">Roles</th><th className="px-3 py-2">Dependencias</th><th className="px-3 py-2">Verificación en dos pasos</th><th className="px-3 py-2">Último acceso</th><th className="px-3 py-2">Estado</th><th /></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((u: Row) => (
             <tr key={u.id}><td className="px-3 py-2 font-semibold">{u.name}</td><td className="px-3 py-2">{u.email}</td><td className="px-3 py-2">{u.roles.map((r: Row) => r.name).join(', ')}</td><td className="px-3 py-2">{(u.dependencies.length > 4 ? `${u.dependencies.length} oficinas` : u.dependencies.map((d: Row) => d.name ?? d.code).join(', ')) || '—'}</td><td className="px-3 py-2">{u.mfa_enabled ? <Badge tone="green">Activo</Badge> : <Badge>No</Badge>}</td><td className="px-3 py-2">{fmtDateTime(u.last_login_at) || '—'}</td><td className="px-3 py-2">{u.is_active ? <Badge tone="green">Activo</Badge> : <Badge tone="red">Inactivo</Badge>}</td>
               <td className="px-3 py-2 text-right">{can('users.manage') && <button className="font-semibold text-ut-red hover:underline" onClick={() => { setMsg(null); setOpen({ ...u, password: '', role_ids: u.roles.map((r: Row) => r.id), dependency_ids: u.dependencies.map((d: Row) => d.id) }); }}>Editar</button>}</td></tr>
@@ -323,7 +411,7 @@ export function Users() {
         </table>
       </div>
       {open && (
-        <div className="fixed inset-0 z-40 flex justify-end bg-black/30" role="dialog" aria-modal="true" aria-label="Usuario">
+        <div className="fade-in fixed inset-0 z-50 flex justify-end bg-[#2b1416]/40 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-label="Usuario">
           <div className="h-full w-full max-w-xl overflow-y-auto bg-white p-5 shadow-2xl">
             <div className="mb-3 flex"><h2 className="text-lg font-bold">{open.id ? 'Editar usuario' : 'Nuevo usuario'}</h2><button autoFocus className="ml-auto p-2 text-xl" onClick={() => setOpen(null)} aria-label="Cerrar"><Icon name="close" /></button></div>
             {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
@@ -369,7 +457,7 @@ export function Roles() {
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       <div className="mt-3 grid gap-4 md:grid-cols-2">
         {data?.map((r) => (
-          <div key={r.id} className="rounded-xl border border-line bg-white p-4">
+          <div key={r.id} className="admin-card p-4">
             <div className="flex items-start gap-2"><div><p className="font-bold">{r.name}</p><p className="text-xs text-muted">{r.users_count} {r.users_count === 1 ? 'usuario' : 'usuarios'}</p></div>
               {can('roles.manage') && !mine.has(r.id) && <button className="ml-auto text-sm font-semibold text-ut-red hover:underline" onClick={() => setEdit({ ...r, permission_ids: r.permissions.map((p: Row) => p.id) })}>Editar</button>}</div>
             <p className="mt-1 text-sm text-muted">{r.description}</p>
@@ -378,7 +466,7 @@ export function Roles() {
         ))}
       </div>
       {edit && (
-        <div className="fixed inset-0 z-40 flex justify-end bg-black/30" role="dialog" aria-modal="true" aria-label="Rol">
+        <div className="fade-in fixed inset-0 z-50 flex justify-end bg-[#2b1416]/40 backdrop-blur-[2px]" role="dialog" aria-modal="true" aria-label="Rol">
           <div className="h-full w-full max-w-2xl overflow-y-auto bg-white p-5 shadow-2xl">
             <div className="mb-3 flex"><h2 className="text-lg font-bold">{edit.id ? 'Editar rol' : 'Nuevo rol'}</h2><button autoFocus className="ml-auto p-2 text-xl" onClick={() => setEdit(null)} aria-label="Cerrar"><Icon name="close" /></button></div>
             <div className="grid gap-3 md:grid-cols-2">
@@ -433,8 +521,8 @@ export function Audit() {
         <label className="text-xs font-bold text-muted uppercase">Hasta<input type="date" value={f.to} onChange={(e) => setF({ ...f, to: e.target.value })} className={inputCls} /></label>
       </div>
       {loading && <Spinner />}{error && <ErrorBox message={error} />}
-      <div className="overflow-x-auto rounded-xl border border-line bg-white">
-        <table className="w-full text-left text-sm"><thead className="bg-surface text-xs text-muted uppercase"><tr><th className="px-3 py-2">Fecha</th><th className="px-3 py-2">Usuario</th><th className="px-3 py-2">Qué pasó</th><th className="px-3 py-2">Sobre</th><th className="px-3 py-2">Detalle</th><th className="px-3 py-2">Equipo (IP)</th></tr></thead>
+      <div className="overflow-x-auto admin-card">
+        <table className="admin-table w-full text-left text-sm"><thead className="text-[0.7rem] uppercase"><tr><th className="px-3 py-2">Fecha</th><th className="px-3 py-2">Usuario</th><th className="px-3 py-2">Qué pasó</th><th className="px-3 py-2">Sobre</th><th className="px-3 py-2">Detalle</th><th className="px-3 py-2">Equipo (IP)</th></tr></thead>
           <tbody className="divide-y divide-line">{data?.data.map((a: Row) => <tr key={a.id}><td className="px-3 py-1.5 whitespace-nowrap">{fmtDateTime(a.created_at)}</td><td className="px-3 py-1.5">{a.user?.name ?? '—'}</td><td className="px-3 py-1.5">{AUDIT_LABELS[a.action] ?? a.action}</td><td className="px-3 py-1.5">{a.entity_type ? `${ENTITY_LABELS[a.entity_type] ?? a.entity_type} n.º ${a.entity_id}` : '—'}</td><td className="max-w-xs truncate px-3 py-1.5 text-xs text-muted" title={metaText(a.meta)}>{metaText(a.meta)}</td><td className="px-3 py-1.5">{a.ip}</td></tr>)}</tbody>
         </table>
       </div>
@@ -458,7 +546,7 @@ export function Settings() {
     <div className="max-w-3xl space-y-4">
       <PageHeader title="Configuración" icon="settings" eyebrow="Administración" description="Logotipo, datos de contacto y parámetros generales del portal." />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
-      <section className="grid gap-4 rounded-xl border border-line bg-white p-5 md:grid-cols-2">
+      <section className="grid gap-4 admin-card p-5 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">Identidad y contacto</h2>
         {t('site_name', 'Nombre del sitio')}{t('university_name', 'Universidad')}
         {t('contact_address', 'Dirección')}{t('contact_phone', 'Teléfono')}{t('contact_email', 'Correo')}
@@ -468,7 +556,7 @@ export function Settings() {
         <div className="md:col-span-2"><FieldInput def={{ name: 'official_links', label: 'Enlaces oficiales (pie de página del portal)', type: 'repeater', fields: [{ name: 'label', label: 'Nombre', type: 'text' }, { name: 'url', label: 'Dirección (https://…)', type: 'url' }] }} value={form.official_links} onChange={(v) => setForm({ ...form, official_links: v })} /></div>
         <div className="md:col-span-2"><FieldInput def={{ name: 'social_links', label: 'Redes sociales', type: 'repeater', fields: [{ name: 'label', label: 'Red (Facebook, Instagram…)', type: 'text' }, { name: 'url', label: 'Dirección (https://…)', type: 'url' }] }} value={form.social_links} onChange={(v) => setForm({ ...form, social_links: v })} /></div>
       </section>
-      <section className="grid gap-4 rounded-xl border border-line bg-white p-5 md:grid-cols-2">
+      <section className="grid gap-4 admin-card p-5 md:grid-cols-2">
         <h2 className="font-bold md:col-span-2">Seguridad y publicación</h2>
         {t('max_upload_mb', 'Tamaño máximo de archivo (MB)', 'number')}
         {t('min_cell_size', 'Umbral general de supresión de celdas pequeñas (k)', 'number')}
@@ -497,7 +585,7 @@ export function Reports() {
     <div className="max-w-4xl space-y-6">
       <PageHeader title="Informes" icon="download" eyebrow="Información e indicadores" description="Descargue en Excel los indicadores y la caja menor para informes de gestión." />
       {can('reports.internal.export') && (
-        <section className="rounded-xl border border-line bg-white p-5">
+        <section className="admin-card p-5">
           <h2 className="font-bold">Informe interno de indicadores</h2>
           <p className="mb-3 text-sm text-muted">Incluye datos aprobados aún no publicados. Respeta su rol: sin el permiso financiero se excluye el módulo de gestión financiera; los coordinadores solo exportan sus dependencias. Cada exportación queda auditada.</p>
           <div className="grid gap-3 md:grid-cols-3">
@@ -512,7 +600,7 @@ export function Reports() {
         </section>
       )}
       {can('petty_cash.view') && (
-        <section className="rounded-xl border border-line bg-white p-5">
+        <section className="admin-card p-5">
           <h2 className="font-bold">Informe de caja menor</h2>
           <div className="mt-2 flex flex-wrap items-end gap-3">
             <label className="text-xs font-bold text-muted uppercase">Presupuesto<select value={pc} onChange={(e) => setPc(e.target.value)} className={inputCls}><option value="">Todos</option>{budgets.map((b) => <option key={String(b.id)} value={String(b.id)}>{String(b.year)} — {String(b.name)}</option>)}</select></label>

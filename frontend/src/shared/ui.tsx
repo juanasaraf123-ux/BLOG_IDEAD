@@ -22,18 +22,21 @@ export function useAsync<T>(fn: () => Promise<T>, deps: unknown[]) {
 export function Spinner({ label = 'Cargando…' }: { label?: string }) {
   return (
     <div role="status" className="flex items-center gap-3 py-6 text-muted">
-      <span className="h-5 w-5 animate-spin rounded-full border-2 border-ut-red border-t-transparent" aria-hidden />
-      <span>{label}</span>
+      <span className="relative h-6 w-6" aria-hidden>
+        <span className="absolute inset-0 rounded-full border-[3px] border-ut-red/15" />
+        <span className="absolute inset-0 animate-spin rounded-full border-[3px] border-ut-red border-r-idead-teal border-b-transparent border-l-transparent" />
+      </span>
+      <span className="text-sm font-medium">{label}</span>
     </div>
   );
 }
 
 export function ErrorBox({ message, onRetry }: { message: string; onRetry?: () => void }) {
   return (
-    <div role="alert" className="flex flex-wrap items-center gap-3 rounded-lg border border-ut-red/30 bg-ut-red-50 px-4 py-3 text-ut-red-dark">
+    <div role="alert" className="flex flex-wrap items-center gap-3 rounded-2xl border border-ut-red/30 bg-ut-red-50 px-4 py-3 text-ut-red-dark">
       <Icon name="alert" className="text-xl" />
       <span>{message}</span>
-      {onRetry && <button onClick={onRetry} className="ml-auto rounded border border-ut-red px-3 py-1 text-sm font-semibold hover:bg-white">Reintentar</button>}
+      {onRetry && <button onClick={onRetry} className="ml-auto rounded-xl border border-ut-red px-3 py-1 text-sm font-semibold hover:bg-white">Reintentar</button>}
     </div>
   );
 }
@@ -61,10 +64,10 @@ export function DemoBadge({ className = '' }: { className?: string }) {
 
 export function Badge({ children, tone = 'gray' }: { children: ReactNode; tone?: 'gray' | 'red' | 'green' | 'amber' | 'teal' | 'blue' }) {
   const tones = {
-    gray: 'bg-gray-100 text-gray-700', red: 'bg-ut-red-50 text-ut-red-dark', green: 'bg-emerald-50 text-emerald-800',
-    amber: 'bg-amber-50 text-amber-900', teal: 'bg-teal-50 text-green-dark', blue: 'bg-sky-50 text-sky-900',
+    gray: 'bg-warm text-[#55504b] ring-[#ddd6cf]', red: 'bg-ut-red-50 text-ut-red-dark ring-ut-red/20', green: 'bg-idead-teal-50 text-idead-teal-dark ring-idead-teal/25',
+    amber: 'bg-amber-50 text-amber-900 ring-amber-300/50', teal: 'bg-idead-teal-50 text-idead-teal-dark ring-idead-teal/25', blue: 'bg-idead-blue-50 text-[#1d4f88] ring-idead-blue/20',
   };
-  return <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold ${tones[tone]}`}>{children}</span>;
+  return <span className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-semibold whitespace-nowrap ring-1 ring-inset ${tones[tone]}`}><span className="h-1.5 w-1.5 rounded-full bg-current opacity-70" aria-hidden />{children}</span>;
 }
 
 export const STATUS_TONE: Record<string, 'gray' | 'red' | 'green' | 'amber' | 'teal' | 'blue'> = {

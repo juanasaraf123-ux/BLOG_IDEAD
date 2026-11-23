@@ -9,21 +9,43 @@ import { Button, inputCls, Notice } from '../components/Form';
 
 function Frame({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="flex min-h-screen flex-col bg-surface">
-      <div className="h-1.5 bg-ut-red" aria-hidden />
-      <div className="grid flex-1 place-items-center p-4">
-        <main className="w-full max-w-md rounded-2xl border border-line bg-white p-8 shadow-xl">
-          <div className="mb-6 flex items-center gap-3">
-            <img src="/img/logo-ut-temporal.png" alt="Universidad del Tolima" className="h-12 w-auto" />
-            <span className="border-l border-gray-300 pl-3 text-[0.7rem] leading-tight font-medium text-ink uppercase">Instituto de<br />Educación<br />a Distancia</span>
-          </div>
-          <p className="text-xs font-bold tracking-wider text-muted uppercase">Panel de gestión</p>
-          <h1 className="text-2xl font-extrabold text-ut-red">{title}</h1>
-          <p className="mb-6 text-sm text-muted">Acceso exclusivo para funcionarios autorizados del IDEAD.</p>
-          {children}
-        </main>
+    <div className="admin-ui admin-bg flex min-h-screen">
+      {/* Panel institucional: fotografía real del IDEAD sobre degradado rojo, círculos y lema */}
+      <aside className="relative hidden w-[46%] overflow-hidden bg-gradient-to-br from-ut-red via-[#b3161f] to-ut-red-900 text-white lg:flex lg:flex-col">
+        <div className="absolute top-32 right-10 left-10 grid grid-cols-5 grid-rows-2 gap-3" aria-hidden>
+          <img src="/img/home/estudiantes-circulo.jpg" alt="" className="col-span-3 h-44 w-full rounded-[1.375rem] object-cover shadow-2xl ring-4 ring-white/15" />
+          <img src="/img/home/grupo-idead.jpg" alt="" className="col-span-2 row-span-2 h-[23rem] w-full rounded-[1.375rem] object-cover shadow-2xl ring-4 ring-white/15" />
+          <img src="/img/home/estudiante-campo.jpg" alt="" className="col-span-3 h-44 w-full rounded-[1.375rem] object-cover shadow-2xl ring-4 ring-white/15" />
+        </div>
+        <span className="absolute -top-28 -right-24 h-80 w-80 rounded-full border-[28px] border-white/10" aria-hidden />
+        <span className="absolute bottom-40 -left-16 h-48 w-48 rounded-full bg-idead-teal/25 blur-2xl" aria-hidden />
+        <div className="relative flex items-center gap-3 p-10">
+          <span className="rounded-2xl bg-white p-2 shadow-lg"><img src="/img/logo-ut-temporal.png" alt="Universidad del Tolima" className="h-12 w-auto" /></span>
+          <span className="text-sm leading-tight font-bold">Instituto de Educación<br />a Distancia – IDEAD</span>
+        </div>
+        <div className="relative mt-auto p-10">
+          <p className="font-display text-5xl leading-none font-extrabold">Conocimiento</p>
+          <p className="font-serif text-4xl italic">que Transforma</p>
+          <p className="mt-5 max-w-md text-white/85">Panel de gestión del portal institucional: indicadores, CAT, programas, contenidos y documentos del IDEAD en un solo lugar.</p>
+          <svg className="mt-8 h-8 w-full" viewBox="0 0 600 40" preserveAspectRatio="none" aria-hidden><path d="M0 26 C 120 6, 240 40, 360 20 S 540 6, 600 18" stroke="#20a99c" strokeWidth="3" fill="none" /><path d="M0 34 C 140 18, 260 44, 380 28 S 540 16, 600 26" stroke="#fff" strokeOpacity=".4" strokeWidth="2" fill="none" /></svg>
+        </div>
+      </aside>
+      <div className="flex flex-1 flex-col">
+        <div className="grid flex-1 place-items-center p-4 md:p-8">
+          <main className="admin-card fade-in w-full max-w-md p-8 md:p-10">
+            <div className="mb-6 flex items-center gap-3 lg:hidden">
+              <img src="/img/logo-ut-temporal.png" alt="Universidad del Tolima" className="h-12 w-auto" />
+              <span className="border-l border-gray-300 pl-3 text-[0.7rem] leading-tight font-medium text-ink uppercase">Instituto de<br />Educación<br />a Distancia</span>
+            </div>
+            <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-ut-red to-ut-red-dark text-2xl text-white shadow-lg shadow-ut-red/30"><Icon name="lock" /></span>
+            <p className="mt-4 text-[0.7rem] font-bold tracking-[0.14em] text-idead-teal-dark uppercase">Panel Administrativo · IDEAD</p>
+            <h1 className="text-[1.75rem] font-extrabold text-ink">{title}</h1>
+            <p className="mb-6 text-sm text-muted">Acceso exclusivo para funcionarios autorizados del IDEAD.</p>
+            {children}
+          </main>
+        </div>
+        <footer className="px-4 py-4 text-center text-xs text-muted">Universidad del Tolima · Instituto de Educación a Distancia</footer>
       </div>
-      <footer className="bg-ut-red-dark px-4 py-3 text-center text-xs text-white/80">Universidad del Tolima · Instituto de Educación a Distancia</footer>
     </div>
   );
 }
@@ -135,12 +157,12 @@ export function Account() {
       <PageHeader title="Mi cuenta" icon="user" description="Sus datos, la verificación en dos pasos y el cambio de contraseña." />
       {msg && <Notice kind={msg.k}>{msg.t}</Notice>}
       {me.must_setup_mfa && <Notice kind="info">La política institucional exige configurar el segundo factor antes de usar el panel.</Notice>}
-      <section className="rounded-xl border border-line bg-white p-5">
+      <section className="admin-card p-5">
         <h2 className="font-bold">Datos</h2>
         <p className="text-sm">{me.user.name} · {me.user.email}</p>
         <p className="text-sm text-muted">Roles: {me.user.roles.map((r) => r.name).join(', ') || 'ninguno'} · Dependencias: {me.user.dependencies.map((d) => d.code).join(', ') || 'ninguna'}</p>
       </section>
-      <section className="rounded-xl border border-line bg-white p-5">
+      <section className="admin-card p-5">
         <h2 className="flex items-center gap-2 font-bold"><Icon name="shield" /> Verificación en dos pasos (TOTP)</h2>
         {me.user.mfa_enabled ? (
           <div className="mt-2 space-y-3">
@@ -166,7 +188,7 @@ export function Account() {
           </div>
         )}
       </section>
-      <section className="rounded-xl border border-line bg-white p-5">
+      <section className="admin-card p-5">
         <h2 className="font-bold">Cambiar contraseña</h2>
         <div className="mt-3 grid gap-3 md:grid-cols-3">
           <label className="text-sm font-semibold">Actual<input type="password" autoComplete="current-password" value={pw.current_password} onChange={(e) => setPw({ ...pw, current_password: e.target.value })} className={inputCls} /></label>

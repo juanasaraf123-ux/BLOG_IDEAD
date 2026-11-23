@@ -80,13 +80,13 @@ export function HubPage() {
   if (!tabs.length) return <p>No tiene permisos para esta sección.</p>;
   const active = tabs.find((t) => t.key === params.get('tab')) ?? tabs[0];
   return (
-    <div className="mx-auto max-w-7xl">
+    <div className="mx-auto max-w-[1600px]">
       <PageHeader title={cfg.title} description={cfg.description} icon={cfg.icon} eyebrow={cfg.eyebrow} />
       {tabs.length > 1 && (
-        <nav role="tablist" aria-label="Secciones" className="mb-5 flex gap-1 overflow-x-auto rounded-2xl border border-line bg-white p-1.5 shadow-sm">
+        <nav role="tablist" aria-label="Secciones" className="admin-card mb-5 flex gap-1 overflow-x-auto p-1.5">
           {tabs.map((t) => (
             <button key={t.key} role="tab" aria-selected={t.key === active.key} onClick={() => setParams({ tab: t.key })}
-              className={`flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold whitespace-nowrap transition ${t.key === active.key ? 'bg-ut-red text-white shadow' : 'text-[#4a4f55] hover:bg-ut-red-50 hover:text-ut-red'}`}>
+              className={`flex shrink-0 items-center gap-1.5 rounded-xl px-4 py-2 text-sm font-semibold whitespace-nowrap transition ${t.key === active.key ? 'bg-gradient-to-b from-[#d6232d] to-ut-red text-white shadow-md shadow-ut-red/25' : 'text-[#4a4f55] hover:bg-ut-red-50 hover:text-ut-red'}`}>
               {RESOURCES[t.key].icon && <Icon name={RESOURCES[t.key].icon!} />} {t.label}
             </button>
           ))}

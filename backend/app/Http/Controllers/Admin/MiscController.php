@@ -150,26 +150,45 @@ class MiscController extends Controller
         return ($now !== null && $before) ? round(($now - $before) / $before * 100, 1) : null;
     }
 
-    private function studentsResult(): ?array
+    /** Resultado de un indicador con la misma consulta que usa el portal público (solo datos publicados). */
+    private function indicatorResult(string $code, array $filters = []): ?array
     {
-        $i = Indicator::where('code', 'M02-I03')->first();
+        $i = Indicator::where('code', $code)->first();
 
-        return $i ? app(\App\Services\IndicatorQuery::class)->run($i, []) : null;
+        return $i ? app(\App\Services\IndicatorQuery::class)->run($i, $filters) : null;
+    }
+
+    /** Último valor, período, variación frente al período anterior (si existe) y marca de demostración. */
+    private function indicatorKpi(string $code, array $filters = [], string $empty = 'Sin datos publicados'): array
+    {
+        $r = $this->indicatorResult($code, $filters);
+        $trend = collect($r['trend'] ?? [])->where('suppressed', false)->values();
+        $last = $trend->last();
+        $prev = $trend->count() > 1 ? $trend[$trend->count() - 2] : null;
+
+        return [
+            'value' => $last['value'] ?? null,
+            'note' => $last ? 'Período '.$last['period'] : $empty,
+            'change' => self::change($last['value'] ?? null, $prev['value'] ?? null),
+            'versus' => $prev['period'] ?? null,
+            'is_demo' => (bool) ($r['is_demo'] ?? false),
+        ];
     }
 
     private function dashboardKpis(): array
     {
-        $r = $this->studentsResult();
-        $trend = collect($r['trend'] ?? [])->where('suppressed', false)->values();
-        $last = $trend->last();
-        $prev = $trend->count() > 1 ? $trend[$trend->count() - 2] : null;
         $year = (int) now()->year;
         $eventsNow = Event::whereYear('starts_at', $year)->count();
         $eventsBefore = Event::whereYear('starts_at', $year - 1)->count();
+        $municipalitiesItem = \App\Models\HomeHighlight::where('label', 'Municipios')->value('classifier_item_id');
 
         return [
             'cats' => ['value' => \App\Models\Cat::where('status', '!=', 'inactivo')->count(), 'note' => 'Centros de Atención Tutorial activos'],
-            'students' => ['value' => $last['value'] ?? null, 'note' => $last ? 'Período '.$last['period'] : 'Sin datos publicados', 'change' => self::change($last['value'] ?? null, $prev['value'] ?? null), 'versus' => $prev['period'] ?? null, 'is_demo' => (bool) ($r['is_demo'] ?? false)],
+            'students' => $this->indicatorKpi('M02-I01'),
+            'teachers' => $this->indicatorKpi('M04-I01'),
+            'municipalities' => $municipalitiesItem ? $this->indicatorKpi('M07-I01', ['classifier' => $municipalitiesItem])
+                : ['value' => null, 'note' => 'Sin datos publicados'],
+            'programs' => ['value' => \App\Models\Program::where('status', 'activo')->count(), 'note' => \App\Models\Program::count().' programas en el catálogo'],
             'events' => ['value' => $eventsNow, 'note' => 'Programadas en '.$year, 'change' => self::change($eventsNow, $eventsBefore), 'versus' => (string) ($year - 1)],
             'projects' => ['value' => \App\Models\Project::count(), 'note' => \App\Models\Project::where('status', 'en_ejecucion')->count().' en ejecución'],
         ];
@@ -177,19 +196,50 @@ class MiscController extends Controller
 
     private function dashboardCharts(): array
     {
-        $r = $this->studentsResult();
-        if (! $r) {
-            return ['enrollment' => [], 'by_cat' => [], 'period' => null, 'is_demo' => false];
-        }
-        $series = collect($r['trend'])->where('suppressed', false)->take(-6)->map(fn ($t) => ['period' => $t['period'], 'value' => $t['value']])->values();
-        $parts = collect($r['breakdown'])->where('suppressed', false)->sortByDesc('value')->values();
+        $total = $this->indicatorResult('M02-I01');
+        $byCat = $this->indicatorResult('M02-I03');
+        $new = $this->indicatorResult('M02-I04');
+        $series = fn (?array $r, int $n = 6) => collect($r['trend'] ?? [])->where('suppressed', false)->take(-$n)->map(fn ($t) => ['period' => $t['period'], 'value' => $t['value']])->values();
+
+        // Distribución por CAT (5 mayores + «Otros») y agregado territorial por departamento del CAT.
+        $parts = collect($byCat['breakdown'] ?? [])->where('suppressed', false)->sortByDesc('value')->values();
         $top = $parts->take(5)->map(fn ($b) => ['label' => $b['label'], 'value' => $b['value']]);
         $rest = $parts->slice(5)->sum('value');
         if ($rest > 0) {
             $top->push(['label' => 'Otros CAT ('.($parts->count() - 5).')', 'value' => $rest]);
         }
+        $deptOf = \App\Models\Cat::with('municipality.department:id,code,name')->get()->mapWithKeys(fn ($c) => [$c->id => $c->municipality?->department]);
+        $territory = [];
+        foreach ($parts as $b) {
+            $d = $deptOf[$b['key']] ?? null;
+            if ($d) {
+                $territory[$d->code] = ['name' => $d->name, 'value' => ($territory[$d->code]['value'] ?? 0) + $b['value']];
+            }
+        }
 
-        return ['enrollment' => $series, 'by_cat' => $top->values(), 'period' => $r['kpi']['period'] ?? null, 'is_demo' => (bool) $r['is_demo']];
+        // Comportamiento de los indicadores: por módulo, cuántos tienen datos publicados y cuántos esperan publicación.
+        $modules = \App\Models\IndicatorModule::orderBy('number')->get()->map(function ($m) {
+            $ids = Indicator::where('module_id', $m->id)->pluck('id');
+
+            return [
+                'number' => $m->number,
+                'name' => $m->name,
+                'total' => $ids->count(),
+                'published' => Indicator::whereIn('id', $ids)->whereHas('submissions', fn ($s) => $s->where('status', 'publicado'))->count(),
+                'approved' => Indicator::whereIn('id', $ids)->whereDoesntHave('submissions', fn ($s) => $s->where('status', 'publicado'))->whereHas('submissions', fn ($s) => $s->where('status', 'aprobado'))->count(),
+            ];
+        });
+
+        return [
+            'enrollment' => $series($total),
+            'new_students' => $series($new),
+            'by_cat' => $top->values(),
+            'territory' => $territory,
+            'modules' => $modules,
+            'submissions' => DataSubmission::selectRaw('status, count(*) as c')->groupBy('status')->pluck('c', 'status'),
+            'period' => $byCat['kpi']['period'] ?? null,
+            'is_demo' => (bool) (($total['is_demo'] ?? false) || ($byCat['is_demo'] ?? false)),
+        ];
     }
 
     private function recentActivity(): array
