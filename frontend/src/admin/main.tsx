@@ -1,9 +1,10 @@
-import { StrictMode, useEffect, useState, type ReactNode } from 'react';
+import { StrictMode, useEffect, useRef, useState, type ReactNode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter, Navigate, NavLink, Route, Routes, useLocation, useParams } from 'react-router-dom';
 import '../styles.css';
 import { Icon } from '../shared/icons';
 import { Spinner } from '../shared/ui';
+import { admin } from '../shared/api';
 import { AuthProvider, useAuth } from './auth';
 import { ResourcePage } from './components/ResourcePage';
 import { RESOURCES } from './resources';
@@ -14,46 +15,48 @@ import { RecordDetail, RecordsHome } from './pages/Records';
 import { HubPage } from './pages/Hubs';
 
 /**
- * Menú lateral agrupado por tareas. Cada entrada se muestra solo si el rol tiene alguno de los permisos indicados ([] = cualquiera);
- * los grupos se pliegan y queda abierto el de la página actual.
+ * Menú lateral del boceto: entradas directas (Panel Principal, Programas, Actividades…) y grupos plegables con flecha
+ * (Gestión de CAT, Configuración…). Cada entrada se muestra solo si el rol tiene alguno de los permisos indicados ([] = cualquiera).
  */
 type Item = { to: string; label: string; icon: string; perms: string[] };
-const MENU: { group: string; icon: string; items: Item[] }[] = [
-  { group: 'Información e indicadores', icon: 'chart', items: [
+type Entry = Item | { group: string; icon: string; items: Item[] };
+const MENU: Entry[] = [
+  { to: '/', label: 'Panel Principal', icon: 'home', perms: [] },
+  { group: 'Gestión de CAT', icon: 'building', items: [
+    { to: '/h/cat', label: 'Fichas de los CAT', icon: 'building', perms: ['cats.edit', 'entities.publish', 'programs.edit'] },
+    { to: '/r/convenios', label: 'Convenios', icon: 'hands', perms: ['agreements.view', 'agreements.manage'] },
+  ] },
+  { to: '/r/programas', label: 'Programas', icon: 'graduation', perms: ['programs.edit', 'entities.publish'] },
+  { to: '/r/actividades', label: 'Actividades', icon: 'calendar', perms: ['content.create', 'content.publish'] },
+  { to: '/h/proyectos', label: 'Proyectos', icon: 'project', perms: ['projects.edit', 'entities.publish'] },
+  { to: '/r/noticias', label: 'Noticias', icon: 'book', perms: ['content.create', 'content.publish'] },
+  { to: '/r/multimedia', label: 'Multimedia', icon: 'image', perms: ['media.manage', 'content.publish'] },
+  { group: 'Indicadores y datos', icon: 'chart', items: [
     { to: '/bases', label: 'Bases de datos', icon: 'table', perms: ['records.view', 'records.import'] },
     { to: '/indicadores', label: 'Indicadores', icon: 'chart', perms: ['indicators.view_internal', 'indicators.submit', 'indicators.catalog.manage', 'indicators.review'] },
     { to: '/cargas', label: 'Cargas de indicadores', icon: 'upload', perms: ['indicators.submit', 'indicators.review', 'indicators.publish'] },
     { to: '/r/solicitudes', label: 'Solicitudes a oficinas', icon: 'mail', perms: ['indicators.review', 'indicators.submit'] },
-    { to: '/informes', label: 'Informes', icon: 'download', perms: ['reports.internal.export', 'petty_cash.view'] },
   ] },
-  { group: 'Portal público', icon: 'globe', items: [
-    { to: '/r/noticias', label: 'Noticias', icon: 'book', perms: ['content.create', 'content.publish'] },
-    { to: '/r/actividades', label: 'Actividades', icon: 'calendar', perms: ['content.create', 'content.publish'] },
-    { to: '/r/multimedia', label: 'Multimedia', icon: 'image', perms: ['media.manage', 'content.publish'] },
-    { to: '/r/paginas', label: 'Páginas', icon: 'file', perms: ['content.create', 'content.publish'] },
+  { group: 'Contenidos del portal', icon: 'globe', items: [
     { to: '/h/inicio-portal', label: 'Página de inicio', icon: 'home', perms: ['content.site'] },
-  ] },
-  { group: 'Fichas institucionales', icon: 'building', items: [
-    { to: '/h/cat', label: 'CAT', icon: 'building', perms: ['cats.edit', 'entities.publish', 'programs.edit'] },
-    { to: '/r/programas', label: 'Programas', icon: 'graduation', perms: ['programs.edit', 'entities.publish'] },
-    { to: '/h/proyectos', label: 'Proyectos', icon: 'project', perms: ['projects.edit', 'entities.publish'] },
-    { to: '/r/convenios', label: 'Convenios', icon: 'hands', perms: ['agreements.view', 'agreements.manage'] },
+    { to: '/r/paginas', label: 'Páginas', icon: 'file', perms: ['content.create', 'content.publish'] },
     { to: '/h/publicaciones', label: 'Publicaciones y listados', icon: 'book', perms: ['lists.edit', 'entities.publish'] },
   ] },
   { group: 'Documentos y caja menor', icon: 'file', items: [
     { to: '/documentos', label: 'Documentos', icon: 'file', perms: ['documents.view.internal', 'documents.view.restricted', 'documents.view.financial', 'documents.upload'] },
     { to: '/h/caja-menor', label: 'Caja menor', icon: 'money', perms: ['petty_cash.view'] },
   ] },
-  { group: 'Administración', icon: 'shield', items: [
+  { to: '/informes', label: 'Reportes', icon: 'download', perms: ['reports.internal.export', 'petty_cash.view'] },
+  { group: 'Configuración', icon: 'settings', items: [
+    { to: '/configuracion', label: 'Configuración general', icon: 'settings', perms: ['settings.manage'] },
     { to: '/usuarios', label: 'Usuarios', icon: 'user', perms: ['users.view', 'users.manage'] },
     { to: '/roles', label: 'Roles y permisos', icon: 'shield', perms: ['roles.manage', 'users.view'] },
     { to: '/auditoria', label: 'Auditoría', icon: 'history', perms: ['audit.view'] },
-    { to: '/configuracion', label: 'Configuración', icon: 'settings', perms: ['settings.manage'] },
     { to: '/h/referencias', label: 'Listas de referencia', icon: 'filter', perms: ['catalogs.manage'] },
   ] },
 ];
 
-const isActive = (to: string, pathname: string) => pathname === to || pathname.startsWith(to + '/');
+const isActive = (to: string, pathname: string) => (to === '/' ? pathname === '/' : pathname === to || pathname.startsWith(to + '/'));
 
 /** Logotipo oficial (configurable desde el panel) igual que en el portal público. */
 function useLogo() {
@@ -64,64 +67,119 @@ function useLogo() {
   return logo;
 }
 
+const PENDING_TEXT: Record<string, [string, string]> = {
+  lotes_por_revisar: ['Cargas de indicadores por revisar', '/cargas'], lotes_por_publicar: ['Cargas aprobadas por publicar', '/cargas'],
+  mis_lotes_devueltos: ['Mis cargas devueltas para corregir', '/cargas'], mis_borradores: ['Mis cargas en borrador', '/cargas'],
+  contenidos_en_revision: ['Contenidos en revisión', '/r/noticias'], solicitudes_abiertas: ['Solicitudes para mi dependencia', '/r/solicitudes'],
+  solicitudes_vencidas: ['Solicitudes vencidas', '/r/solicitudes'],
+};
+
+/** Menú desplegable simple que se cierra al hacer clic fuera o con Escape. */
+function Dropdown({ button, children, label }: { button: ReactNode; children: ReactNode; label: string }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+  const { pathname } = useLocation();
+  useEffect(() => setOpen(false), [pathname]);
+  useEffect(() => {
+    const close = (e: MouseEvent) => ref.current && !ref.current.contains(e.target as Node) && setOpen(false);
+    document.addEventListener('click', close);
+    return () => document.removeEventListener('click', close);
+  }, []);
+  return (
+    <div ref={ref} className="relative" onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}>
+      <button type="button" aria-label={label} aria-expanded={open} aria-haspopup="true" onClick={() => setOpen(!open)} className="flex items-center gap-2 rounded-full p-1.5 hover:bg-surface">{button}</button>
+      {open && <div className="fade-in absolute right-0 z-40 mt-2 w-72 rounded-2xl border border-line bg-white p-2 shadow-xl">{children}</div>}
+    </div>
+  );
+}
+
 function Shell({ children }: { children: ReactNode }) {
   const { me, can, logout } = useAuth();
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   const logo = useLogo();
-  const visible = MENU.map((g) => ({ ...g, items: g.items.filter((i) => i.perms.length === 0 || can(...i.perms)) })).filter((g) => g.items.length);
-  const current = visible.find((g) => g.items.some((i) => isActive(i.to, pathname)))?.group;
+  const [pending, setPending] = useState<Record<string, number>>({});
+  useEffect(() => { admin.get<{ pending: Record<string, number> }>('dashboard').then((d) => setPending(d.pending ?? {})).catch(() => {}); }, [pathname]);
+  const allowed = (i: Item) => i.perms.length === 0 || can(...i.perms);
+  const visible = MENU.map((e) => ('group' in e ? { ...e, items: e.items.filter(allowed) } : e)).filter((e) => ('group' in e ? e.items.length > 0 : allowed(e)));
+  const current = visible.find((e) => 'group' in e && e.items.some((i) => isActive(i.to, pathname)));
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
-  const isOpen = (g: string) => expanded[g] ?? (g === current || (!current && g === visible[0]?.group));
+  const isOpen = (g: string) => expanded[g] ?? (current && 'group' in current && current.group === g);
   useEffect(() => setOpen(false), [pathname]);
+  const pendingItems = Object.entries(pending).filter(([, v]) => v > 0);
+  const pendingTotal = pendingItems.reduce((a, [, v]) => a + v, 0);
+  const initials = (me?.user.name ?? '?').replace(/[^\p{L}\s]/gu, '').split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase();
+  const role = me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado';
 
-  const link = (i: Item, end = false) => (
-    <NavLink key={i.to} to={i.to} end={end} className={({ isActive: a }) => `relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-[0.9rem] transition ${a ? 'bg-ut-red font-semibold text-white shadow-sm' : 'text-[#4a4f55] hover:bg-ut-red-50 hover:text-ut-red'}`}>
-      <Icon name={i.icon} className="shrink-0 text-lg" />{i.label}
-    </NavLink>
-  );
+  const itemCls = (a: boolean, sub = false) => `flex items-center gap-3 rounded-xl px-3 ${sub ? 'py-1.5 text-[0.86rem]' : 'py-2.5 text-[0.93rem]'} font-medium transition ${a ? 'bg-white/20 font-semibold text-white shadow-inner ring-1 ring-white/25' : 'text-white/85 hover:bg-white/10 hover:text-white'}`;
   const nav = (
     <nav aria-label="Menú del panel" className="space-y-1">
-      {link({ to: '/', label: 'Inicio', icon: 'home', perms: [] }, true)}
-      {visible.map((g) => (
-        <div key={g.group} className="pt-1">
-          <button type="button" aria-expanded={isOpen(g.group)} onClick={() => setExpanded({ ...expanded, [g.group]: !isOpen(g.group) })}
-            className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-[0.72rem] font-bold tracking-wider uppercase hover:bg-surface ${g.group === current ? 'text-ut-red' : 'text-muted'}`}>
-            {g.group}
-            <Icon name="chevronDown" className={`ml-auto text-base transition ${isOpen(g.group) ? 'rotate-180' : ''}`} />
+      {visible.map((e) => 'group' in e ? (
+        <div key={e.group}>
+          <button type="button" aria-expanded={!!isOpen(e.group)} onClick={() => setExpanded({ ...expanded, [e.group]: !isOpen(e.group) })}
+            className={`${itemCls(false)} w-full text-left ${current === e ? 'text-white' : ''}`}>
+            <Icon name={e.icon} className="shrink-0 text-xl" />{e.group}
+            <Icon name="chevronDown" className={`ml-auto text-base transition ${isOpen(e.group) ? 'rotate-180' : '-rotate-90'}`} />
           </button>
-          {isOpen(g.group) && <div className="mt-0.5 space-y-0.5">{g.items.map((i) => link(i))}</div>}
+          {isOpen(e.group) && (
+            <div className="mt-0.5 ml-5 space-y-0.5 border-l border-white/20 pl-3">
+              {e.items.map((i) => <NavLink key={i.to} to={i.to} className={({ isActive: a }) => itemCls(a, true)}>{i.label}</NavLink>)}
+            </div>
+          )}
         </div>
+      ) : (
+        <NavLink key={e.to} to={e.to} end={e.to === '/'} className={({ isActive: a }) => itemCls(a)}><Icon name={e.icon} className="shrink-0 text-xl" />{e.label}</NavLink>
       ))}
     </nav>
   );
   return (
-    <div className="min-h-screen bg-surface">
+    <div className="min-h-screen bg-[#f6f6f7] lg:grid lg:grid-cols-[17rem_1fr]">
       <a href="#contenido" className="skip-link">Saltar al contenido</a>
-      <header className="sticky top-0 z-30 border-b-4 border-ut-red bg-white/95 shadow-sm backdrop-blur">
-        <div className="flex items-center gap-3 px-4 py-2.5 lg:px-6">
-          <button className="rounded-lg p-2 text-2xl text-ink lg:hidden" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} onClick={() => setOpen(!open)}><Icon name={open ? 'close' : 'menu'} /></button>
-          <NavLink to="/" className="flex shrink-0 items-center gap-3" aria-label="Inicio del panel">
-            <img src={logo} alt="Universidad del Tolima" className="h-10 w-auto md:h-12" />
-            <span className="hidden border-l border-gray-300 pl-3 text-[0.7rem] leading-tight font-medium whitespace-nowrap text-ink uppercase sm:block">Instituto de<br />Educación<br />a Distancia</span>
-          </NavLink>
-          <span className="ml-1 hidden rounded-full bg-ut-red-50 px-3 py-1 text-xs font-bold text-ut-red md:inline">Panel de gestión</span>
-          <a href="/" target="_blank" rel="noopener" className="ml-auto hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-[#4a4f55] hover:border-ut-red hover:text-ut-red sm:flex"><Icon name="external" /> Ver portal</a>
-          <NavLink to="/cuenta" className="ml-auto flex items-center gap-2 rounded-full px-2 py-1 text-sm hover:bg-surface sm:ml-0">
-            <span className="grid h-8 w-8 place-items-center rounded-full bg-ut-red text-xs font-bold text-white">{(me?.user.name ?? '?').replace(/[^\p{L}\s]/gu, '').split(/\s+/).filter(Boolean).map((w) => w[0]).slice(0, 2).join('').toUpperCase()}</span>
-            <span className="hidden max-w-40 truncate md:inline">{me?.user.name}</span>
-          </NavLink>
-          <button onClick={logout} className="flex items-center gap-1 rounded-full px-3 py-1.5 text-sm font-semibold text-ut-red hover:bg-ut-red-50"><Icon name="logout" /> <span className="hidden sm:inline">Salir</span></button>
-        </div>
-      </header>
-      <div className="lg:grid lg:grid-cols-[16.5rem_1fr]">
-        <aside className={`fixed inset-y-0 left-0 z-20 w-72 overflow-y-auto border-r border-line bg-white px-3 pt-20 pb-6 transition-transform lg:sticky lg:top-[69px] lg:z-0 lg:h-[calc(100vh-69px)] lg:w-auto lg:translate-x-0 lg:pt-4 ${open ? 'translate-x-0 shadow-xl' : '-translate-x-full'}`}>
-          {nav}
-          <p className="mt-8 px-3 text-[0.7rem] leading-snug text-muted">Universidad del Tolima<br />Instituto de Educación a Distancia</p>
-        </aside>
+      <aside className={`fixed inset-y-0 left-0 z-40 flex w-72 flex-col overflow-y-auto bg-gradient-to-b from-ut-red via-ut-red to-ut-red-900 px-4 pb-6 text-white transition-transform lg:sticky lg:top-0 lg:h-screen lg:w-auto lg:translate-x-0 ${open ? 'translate-x-0 shadow-2xl' : '-translate-x-full'}`}>
+        <NavLink to="/" className="flex items-center gap-3 py-5" aria-label="Inicio del panel">
+          <span className="rounded-xl bg-white p-1.5 shadow"><img src={logo} alt="" className="h-9 w-auto" /></span>
+          <span className="text-[0.95rem] leading-tight font-extrabold">Universidad<br />del Tolima</span>
+        </NavLink>
+        <div className="mb-4 h-px bg-white/20" />
+        {nav}
+        <p className="mt-auto pt-8 text-[0.7rem] leading-snug text-white/60">Instituto de Educación a Distancia – IDEAD</p>
+      </aside>
+      {open && <div className="fixed inset-0 z-30 bg-black/30 lg:hidden" onClick={() => setOpen(false)} aria-hidden />}
+      <div className="min-w-0">
+        <header className="sticky top-0 z-20 border-b border-line bg-white/95 backdrop-blur">
+          <div className="flex items-center gap-3 px-4 py-2.5 lg:px-7">
+            <button className="rounded-lg p-2 text-2xl text-ink hover:bg-surface lg:hidden" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} aria-expanded={open} onClick={() => setOpen(!open)}><Icon name={open ? 'close' : 'menu'} /></button>
+            <span className="hidden rounded-lg p-2 text-2xl text-muted lg:block" aria-hidden><Icon name="menu" /></span>
+            <p className="text-lg font-bold text-ink">Panel Administrativo <span className="font-medium text-muted">- IDEAD</span></p>
+            <a href="/" target="_blank" rel="noopener" className="ml-auto hidden items-center gap-1.5 rounded-full border border-line px-3 py-1.5 text-sm font-medium text-[#4a4f55] hover:border-ut-red hover:text-ut-red md:flex"><Icon name="external" /> Ver portal</a>
+            <div className="ml-auto md:ml-0">
+              <Dropdown label={`Notificaciones: ${pendingTotal} pendientes`} button={
+                <span className="relative grid h-9 w-9 place-items-center text-2xl text-[#4a4f55]">
+                  <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" strokeWidth={1.6} strokeLinecap="round" strokeLinejoin="round" aria-hidden><path d="M6 16V11a6 6 0 1 1 12 0v5l1.5 2h-15L6 16zM10 20.5a2 2 0 0 0 4 0" /></svg>
+                  {pendingTotal > 0 && <span className="absolute -top-0.5 -right-0.5 grid h-5 min-w-5 place-items-center rounded-full bg-ut-red px-1 text-[0.65rem] font-bold text-white ring-2 ring-white">{pendingTotal > 99 ? '99+' : pendingTotal}</span>}
+                </span>}>
+                <p className="px-3 py-2 text-xs font-bold text-muted uppercase">Pendientes</p>
+                {pendingItems.length === 0 ? <p className="px-3 pb-3 text-sm text-muted">Todo al día.</p> : pendingItems.map(([k, v]) => (
+                  <NavLink key={k} to={PENDING_TEXT[k]?.[1] ?? '/'} className="flex items-center gap-3 rounded-xl px-3 py-2 text-sm hover:bg-surface">
+                    <span className="grid h-7 min-w-7 place-items-center rounded-full bg-ut-red-50 px-1.5 text-xs font-bold text-ut-red">{v}</span>{PENDING_TEXT[k]?.[0] ?? k}
+                  </NavLink>
+                ))}
+              </Dropdown>
+            </div>
+            <Dropdown label="Menú de la cuenta" button={
+              <>
+                <span className="grid h-9 w-9 place-items-center rounded-full bg-gradient-to-br from-ut-red to-ut-red-dark text-xs font-bold text-white">{initials}</span>
+                <span className="hidden text-left leading-tight md:block"><span className="block max-w-44 truncate text-sm font-bold text-ink">{me?.user.name}</span><span className="block max-w-44 truncate text-xs text-muted">{role}</span></span>
+                <Icon name="chevronDown" className="hidden text-muted md:block" />
+              </>}>
+              <NavLink to="/cuenta" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-surface"><Icon name="user" /> Mi cuenta</NavLink>
+              <a href="/" target="_blank" rel="noopener" className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm hover:bg-surface"><Icon name="external" /> Ver portal público</a>
+              <button onClick={logout} className="flex w-full items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-ut-red hover:bg-ut-red-50"><Icon name="logout" /> Cerrar sesión</button>
+            </Dropdown>
+          </div>
+        </header>
         <main id="contenido" className="min-w-0 p-4 md:p-7">{children}</main>
       </div>
-      {open && <div className="fixed inset-0 z-10 bg-black/30 lg:hidden" onClick={() => setOpen(false)} aria-hidden />}
     </div>
   );
 }

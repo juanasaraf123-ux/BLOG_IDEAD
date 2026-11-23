@@ -136,7 +136,86 @@ class MiscController extends Controller
             $out['documents'] = Document::whereIn('confidentiality', DocumentController::visibleLevels($u))->count();
         }
 
+        // Cifras generales, gráficas y actividad reciente (solo agregados y contenidos institucionales, sin datos personales).
+        $out['kpis'] = $this->dashboardKpis();
+        $out['charts'] = $this->dashboardCharts();
+        $out['recent'] = $this->recentActivity();
+
         return $out;
+    }
+
+    /** Variación porcentual solo cuando existe un valor anterior comparable (nunca se inventa una tendencia). */
+    private static function change(?float $now, ?float $before): ?float
+    {
+        return ($now !== null && $before) ? round(($now - $before) / $before * 100, 1) : null;
+    }
+
+    private function studentsResult(): ?array
+    {
+        $i = Indicator::where('code', 'M02-I03')->first();
+
+        return $i ? app(\App\Services\IndicatorQuery::class)->run($i, []) : null;
+    }
+
+    private function dashboardKpis(): array
+    {
+        $r = $this->studentsResult();
+        $trend = collect($r['trend'] ?? [])->where('suppressed', false)->values();
+        $last = $trend->last();
+        $prev = $trend->count() > 1 ? $trend[$trend->count() - 2] : null;
+        $year = (int) now()->year;
+        $eventsNow = Event::whereYear('starts_at', $year)->count();
+        $eventsBefore = Event::whereYear('starts_at', $year - 1)->count();
+
+        return [
+            'cats' => ['value' => \App\Models\Cat::where('status', '!=', 'inactivo')->count(), 'note' => 'Centros de Atención Tutorial activos'],
+            'students' => ['value' => $last['value'] ?? null, 'note' => $last ? 'Período '.$last['period'] : 'Sin datos publicados', 'change' => self::change($last['value'] ?? null, $prev['value'] ?? null), 'versus' => $prev['period'] ?? null, 'is_demo' => (bool) ($r['is_demo'] ?? false)],
+            'events' => ['value' => $eventsNow, 'note' => 'Programadas en '.$year, 'change' => self::change($eventsNow, $eventsBefore), 'versus' => (string) ($year - 1)],
+            'projects' => ['value' => \App\Models\Project::count(), 'note' => \App\Models\Project::where('status', 'en_ejecucion')->count().' en ejecución'],
+        ];
+    }
+
+    private function dashboardCharts(): array
+    {
+        $r = $this->studentsResult();
+        if (! $r) {
+            return ['enrollment' => [], 'by_cat' => [], 'period' => null, 'is_demo' => false];
+        }
+        $series = collect($r['trend'])->where('suppressed', false)->take(-6)->map(fn ($t) => ['period' => $t['period'], 'value' => $t['value']])->values();
+        $parts = collect($r['breakdown'])->where('suppressed', false)->sortByDesc('value')->values();
+        $top = $parts->take(5)->map(fn ($b) => ['label' => $b['label'], 'value' => $b['value']]);
+        $rest = $parts->slice(5)->sum('value');
+        if ($rest > 0) {
+            $top->push(['label' => 'Otros CAT ('.($parts->count() - 5).')', 'value' => $rest]);
+        }
+
+        return ['enrollment' => $series, 'by_cat' => $top->values(), 'period' => $r['kpi']['period'] ?? null, 'is_demo' => (bool) $r['is_demo']];
+    }
+
+    private function recentActivity(): array
+    {
+        $types = ['News' => 'Noticia', 'Event' => 'Actividad', 'MediaItem' => 'Multimedia', 'Page' => 'Página', 'Cat' => 'CAT', 'Program' => 'Programa', 'Project' => 'Proyecto', 'HeroSlide' => 'Carrusel', 'DataSubmission' => 'Carga de indicador', 'Document' => 'Documento'];
+        $verbs = ['created' => 'creó', 'updated' => 'actualizó', 'deleted' => 'eliminó'];
+
+        return ChangeHistory::with('user:id,name')->whereIn('entity_type', array_keys($types))->latest('id')->limit(6)->get()->map(function ($h) use ($types, $verbs) {
+            $c = $h->changes ?? [];
+            $title = $c['title'] ?? $c['name'] ?? null;
+            if (! $title) {
+                $cls = 'App\\Models\\'.$h->entity_type;
+                $m = class_exists($cls) ? $cls::find($h->entity_id) : null;
+                $title = $m?->title ?? $m?->name ?? ($h->entity_type === 'DataSubmission' && $m ? optional($m->indicator)->code : null);
+            }
+
+            return [
+                'id' => $h->id,
+                'type' => $types[$h->entity_type],
+                'entity' => $h->entity_type,
+                'title' => $title ?? '#'.$h->entity_id,
+                'action' => $verbs[$h->event] ?? $h->event,
+                'user' => $h->user?->name ?? 'Carga inicial del sistema',
+                'at' => $h->created_at?->toIso8601String(),
+            ];
+        })->all();
     }
 
     /**

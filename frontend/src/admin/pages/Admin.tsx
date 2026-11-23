@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { admin, errorText } from '../../shared/api';
-import { fmtBytes, fmtDateTime, label } from '../../shared/format';
+import { fmtBytes, fmtDateTime, fmtNumber, label } from '../../shared/format';
+import { Donut, LineChart } from '../components/DashCharts';
 import { Icon } from '../../shared/icons';
 import { Badge, ErrorBox, Spinner, useAsync } from '../../shared/ui';
 import { PageHeader } from '../components/PageHeader';
@@ -22,73 +23,150 @@ const PENDING_LABELS: Record<string, [string, string, string]> = {
   solicitudes_vencidas: ['Solicitudes vencidas', '/r/solicitudes', 'clock'],
 };
 
-/** Accesos rápidos del inicio (solo los que el rol puede usar). */
-const QUICK: { to: string; label: string; text: string; icon: string; color: string; perms: string[] }[] = [
-  { to: '/bases', label: 'Bases de datos', text: 'Cargar y consultar estudiantes, docentes, graduados y personal', icon: 'table', color: 'from-ut-red to-ut-red-dark', perms: ['records.view', 'records.import'] },
-  { to: '/indicadores', label: 'Indicadores', text: 'Los 76 indicadores del portal y su estado', icon: 'chart', color: 'from-ut-red-dark to-ut-red-900', perms: ['indicators.view_internal', 'indicators.submit'] },
-  { to: '/r/noticias', label: 'Noticias', text: 'Publicar noticias y novedades', icon: 'book', color: 'from-ut-red to-ut-red-dark', perms: ['content.create', 'content.publish'] },
-  { to: '/r/actividades', label: 'Actividades', text: 'Agenda de eventos del IDEAD', icon: 'calendar', color: 'from-ut-red-dark to-ut-red-900', perms: ['content.create', 'content.publish'] },
-  { to: '/documentos', label: 'Documentos', text: 'Actas, resoluciones, contratos y convenios', icon: 'file', color: 'from-ut-red to-ut-red-dark', perms: ['documents.view.internal', 'documents.upload'] },
-  { to: '/h/caja-menor', label: 'Caja menor', text: 'Gastos, facturas y soportes', icon: 'money', color: 'from-ut-red-dark to-ut-red-900', perms: ['petty_cash.view'] },
-  { to: '/h/cat', label: 'CAT', text: 'Fichas de los Centros de Atención Tutorial', icon: 'building', color: 'from-ut-red to-ut-red-dark', perms: ['cats.edit', 'entities.publish'] },
-  { to: '/usuarios', label: 'Usuarios', text: 'Cuentas, roles y permisos', icon: 'user', color: 'from-ut-red-dark to-ut-red-900', perms: ['users.view', 'users.manage'] },
+/** Accesos rápidos del boceto (solo los que el rol puede usar). */
+const QUICK: { to: string; label: string; icon: string; perms: string[] }[] = [
+  { to: '/r/noticias', label: 'Gestionar Noticias', icon: 'book', perms: ['content.create', 'content.publish'] },
+  { to: '/r/actividades', label: 'Crear Actividad', icon: 'calendar', perms: ['content.create', 'content.publish'] },
+  { to: '/informes', label: 'Generar Reportes', icon: 'download', perms: ['reports.internal.export', 'petty_cash.view'] },
+  { to: '/h/cat', label: 'Ver Mapas y CAT', icon: 'pin', perms: ['cats.edit', 'entities.publish', 'programs.edit'] },
+  { to: '/bases', label: 'Bases de datos', icon: 'table', perms: ['records.view', 'records.import'] },
+  { to: '/h/caja-menor', label: 'Caja menor', icon: 'money', perms: ['petty_cash.view'] },
+  { to: '/documentos', label: 'Documentos', icon: 'file', perms: ['documents.view.internal', 'documents.upload'] },
+  { to: '/indicadores', label: 'Indicadores', icon: 'chart', perms: ['indicators.view_internal', 'indicators.submit'] },
 ];
+
+const KPI_CARDS: { key: string; label: string; icon: string; tone: string }[] = [
+  { key: 'cats', label: 'CAT Activos', icon: 'building', tone: 'bg-ut-red-50 text-ut-red' },
+  { key: 'students', label: 'Estudiantes', icon: 'students', tone: 'bg-[#e6f6f0] text-[#14805a]' },
+  { key: 'events', label: 'Actividades', icon: 'calendar', tone: 'bg-[#fdf3dc] text-[#9a6700]' },
+  { key: 'projects', label: 'Proyectos', icon: 'project', tone: 'bg-[#e8f0fc] text-[#1f5fae]' },
+];
+
+const ACTIVITY_ICON: Record<string, string> = { News: 'book', Event: 'calendar', MediaItem: 'image', Page: 'file', Cat: 'building', Program: 'graduation', Project: 'project', HeroSlide: 'home', DataSubmission: 'upload', Document: 'file' };
+
+function timeAgo(iso: string) {
+  const m = Math.round((Date.now() - new Date(iso).getTime()) / 60000);
+  if (m < 1) return 'hace un momento';
+  if (m < 60) return `hace ${m} min`;
+  if (m < 60 * 24) return `hace ${Math.round(m / 60)} h`;
+  return fmtDateTime(iso);
+}
+
+const card = 'rounded-2xl border border-line bg-white p-5 shadow-[0_4px_18px_rgba(0,0,0,0.05)]';
 
 export function Dashboard() {
   const { me, can } = useAuth();
   const { data, loading } = useAsync(() => admin.get<Row>('dashboard'), []);
-  const hour = new Date().getHours();
-  const greet = hour < 12 ? 'Buenos días' : hour < 19 ? 'Buenas tardes' : 'Buenas noches';
-  const today = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
-  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 6);
+  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 4);
+  const first = (me?.user.name ?? '').split(/\s+/)[0];
   const pct = data?.indicators ? Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100) : 0;
   return (
-    <div className="mx-auto max-w-6xl space-y-6">
-      <section className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-ut-red via-ut-red to-ut-red-dark p-6 text-white shadow-lg md:p-8">
-        <span className="pointer-events-none absolute -top-16 -right-10 h-56 w-56 rounded-full bg-white/10" aria-hidden />
-        <span className="pointer-events-none absolute -right-24 bottom-[-6rem] h-64 w-64 rounded-full bg-ut-red-900/40" aria-hidden />
-        <span className="pointer-events-none absolute top-6 right-40 hidden h-16 w-16 rounded-full border-4 border-white/15 md:block" aria-hidden />
-        <div className="relative">
-          <p className="text-sm text-white/80 first-letter:uppercase">{today}</p>
-          <h1 className="mt-1 text-3xl font-extrabold md:text-4xl">{greet}, {me?.user.name}</h1>
-          <p className="mt-1 text-white/85">{me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
-          {data?.indicators && (
-            <div className="mt-5 max-w-xl rounded-2xl bg-white/10 p-4 backdrop-blur">
-              <div className="flex items-end justify-between gap-3">
-                <p className="text-sm font-semibold">Indicadores con datos publicados</p>
-                <p className="text-2xl font-extrabold whitespace-nowrap">{data.indicators.con_datos_publicados}<span className="text-base font-semibold text-white/70"> / {data.indicators.total}</span></p>
-              </div>
-              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-white/20"><div className="h-full rounded-full bg-white" style={{ width: `${pct}%` }} /></div>
-              <p className="mt-1.5 text-xs text-white/75">{data.indicators.metodologia_validada} con metodología validada</p>
-            </div>
-          )}
+    <div className="mx-auto max-w-7xl space-y-6">
+      {/* Banner de bienvenida del boceto */}
+      <section className="relative flex min-h-40 overflow-hidden rounded-3xl bg-gradient-to-r from-[#f4c6c9] via-[#e0565c] to-ut-red text-white shadow-lg">
+        <img src="/img/home/grupo-idead.jpg" alt="" className="hidden w-64 shrink-0 object-cover [mask-image:linear-gradient(to_right,black_65%,transparent)] md:block" />
+        <div className="relative z-10 flex flex-1 flex-col justify-center px-6 py-6 md:pl-2">
+          <h1 className="text-3xl font-extrabold drop-shadow-sm md:text-4xl">¡Te damos la bienvenida, {first}!</h1>
+          <p className="mt-1 text-lg text-white/95">Gestiona y administra el contenido del portal IDEAD</p>
+          <p className="mt-2 text-sm text-white/85">{me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
         </div>
+        <div className="relative z-10 hidden flex-col items-end justify-center pr-8 text-right lg:flex" aria-hidden>
+          <span className="text-4xl leading-none font-extrabold">Conocimiento</span>
+          <span className="font-serif text-3xl italic">que Transforma</span>
+        </div>
+        <span className="pointer-events-none absolute -top-20 right-56 h-56 w-56 rounded-full bg-white/10" aria-hidden />
       </section>
 
       {!me?.user.mfa_enabled && <Notice kind="info">Recomendación de seguridad: active la verificación en dos pasos en <Link to="/cuenta" className="font-semibold underline">Mi cuenta</Link>.</Notice>}
+      {loading && <Spinner />}
 
-      {quick.length > 0 && (
-        <section>
-          <h2 className="mb-3 text-lg font-extrabold text-ut-red">Accesos rápidos</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            {quick.map((q) => (
-              <Link key={q.to} to={q.to} className="group flex items-center gap-4 rounded-2xl border border-line bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md">
-                <span className="grid h-14 w-14 shrink-0 place-items-center rounded-2xl bg-ut-red-50 text-2xl text-ut-red transition group-hover:bg-ut-red group-hover:text-white"><Icon name={q.icon} /></span>
-                <span className="min-w-0">
-                  <span className="block font-bold text-ink group-hover:text-ut-red">{q.label}</span>
-                  <span className="block text-sm text-muted">{q.text}</span>
-                </span>
-                <Icon name="arrowRight" className="ml-auto shrink-0 text-xl text-line transition group-hover:text-ut-red" />
-              </Link>
-            ))}
+      {data?.kpis && (
+        <section aria-label="Cifras generales" className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+          {KPI_CARDS.map((k) => {
+            const v = data.kpis[k.key] as Row;
+            return (
+              <div key={k.key} className={`${card} flex items-center gap-4`}>
+                <span className={`grid h-14 w-14 shrink-0 place-items-center rounded-full text-2xl ${k.tone}`}><Icon name={k.icon} /></span>
+                <div className="min-w-0">
+                  <p className="text-sm font-medium text-muted">{k.label} {v.is_demo && <Badge tone="amber">DEMO</Badge>}</p>
+                  <p className="text-[1.75rem] leading-tight font-extrabold text-ink tabular-nums">{v.value === null ? '—' : fmtNumber(v.value, 0)}</p>
+                  {typeof v.change === 'number' ? (
+                    <p className={`text-xs font-semibold ${v.change >= 0 ? 'text-[#14805a]' : 'text-ut-red'}`}>{v.change >= 0 ? '▲' : '▼'} {Math.abs(v.change).toLocaleString('es-CO')} % <span className="font-normal text-muted">vs {v.versus}</span></p>
+                  ) : <p className="truncate text-xs text-muted">{v.note}</p>}
+                </div>
+              </div>
+            );
+          })}
+        </section>
+      )}
+
+      {data?.charts && (
+        <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+          <section className={card}>
+            <div className="mb-2 flex flex-wrap items-baseline gap-x-3">
+              <h2 className="text-lg font-extrabold text-ink">Estudiantes matriculados</h2>
+              <p className="text-sm text-muted">Últimos {data.charts.enrollment.length} semestres · indicador M02-I03</p>
+              {data.charts.is_demo && <Badge tone="amber">DEMO</Badge>}
+            </div>
+            <LineChart data={data.charts.enrollment} label="Estudiantes matriculados por semestre" />
+          </section>
+          <section className={card}>
+            <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
+              <h2 className="text-lg font-extrabold text-ink">Distribución por CAT</h2>
+              <p className="text-sm text-muted">Estudiantes · período {data.charts.period ?? '—'}</p>
+            </div>
+            <Donut data={data.charts.by_cat} center="estudiantes" />
+          </section>
+        </div>
+      )}
+
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+        {data?.recent && (
+          <section className={card}>
+            <h2 className="mb-3 text-lg font-extrabold text-ink">Actividad Reciente</h2>
+            {data.recent.length === 0 ? <p className="text-sm text-muted">Sin cambios registrados.</p> : (
+              <ul className="divide-y divide-line">
+                {data.recent.map((r: Row) => (
+                  <li key={r.id} className="flex items-center gap-3 py-2.5">
+                    <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-ut-red-50 text-lg text-ut-red"><Icon name={ACTIVITY_ICON[r.entity] ?? 'info'} /></span>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-ink"><span className="font-semibold">{r.user}</span> {r.action} {r.type.toLowerCase()}: <span className="font-medium">{r.title}</span></p>
+                      <p className="text-xs text-muted">{timeAgo(r.at)}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </section>
+        )}
+        {quick.length > 0 && (
+          <section className={card}>
+            <h2 className="mb-3 text-lg font-extrabold text-ink">Accesos Rápidos</h2>
+            <div className="grid grid-cols-2 gap-3">
+              {quick.map((q) => (
+                <Link key={q.to} to={q.to} className="group flex flex-col items-center gap-2 rounded-2xl border border-line p-4 text-center transition hover:-translate-y-0.5 hover:border-ut-red/40 hover:shadow-md">
+                  <span className="grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br from-ut-red to-ut-red-dark text-2xl text-white shadow-md shadow-ut-red/25"><Icon name={q.icon} /></span>
+                  <span className="text-sm font-bold text-ink group-hover:text-ut-red">{q.label}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+        )}
+      </div>
+
+      {data?.indicators && (
+        <section className={`${card} flex flex-wrap items-center gap-4`}>
+          <div className="min-w-56 flex-1">
+            <div className="flex items-end justify-between"><p className="text-sm font-semibold text-ink">Indicadores con datos publicados</p><p className="text-xl font-extrabold text-ink">{data.indicators.con_datos_publicados}<span className="text-sm font-semibold text-muted"> / {data.indicators.total}</span></p></div>
+            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-ut-red-50"><div className="h-full rounded-full bg-ut-red" style={{ width: `${pct}%` }} /></div>
+            <p className="mt-1.5 text-xs text-muted">{data.indicators.metodologia_validada} con metodología validada</p>
           </div>
         </section>
       )}
 
-      {loading && <Spinner />}
       {data && Object.keys(data.pending).length > 0 && (
         <section>
-          <h2 className="mb-3 text-lg font-extrabold text-ut-red">Pendientes</h2>
+          <h2 className="mb-3 text-lg font-extrabold text-ink">Pendientes</h2>
           <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
               <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className={`relative overflow-hidden rounded-2xl border bg-white p-4 shadow-sm transition hover:shadow-md ${v > 0 ? 'border-ut-red/30' : 'border-line'}`}>

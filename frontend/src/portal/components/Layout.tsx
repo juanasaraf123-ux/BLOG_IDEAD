@@ -17,7 +17,7 @@ export function Logo() {
 }
 
 const NAV = [
-  { to: '/', label: 'Inicio', end: true },
+  { to: '/', label: 'Inicio', end: true, icon: 'home' },
   { to: '/cat', label: 'CAT' },
   { to: '/programas', label: 'Programas' },
   { to: '/actividades', label: 'Actividades' },
@@ -25,6 +25,13 @@ const NAV = [
   { to: '/noticias', label: 'Noticias' },
   { to: '/multimedia', label: 'Multimedia' },
 ];
+const NAV_END = [
+  { to: '/transparencia', label: 'Transparencia' },
+  { to: '/sobre-idead', label: 'Sobre IDEAD' },
+];
+
+const pill = (active: boolean) =>
+  `flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.86rem] font-semibold whitespace-nowrap transition ${active ? 'bg-ut-red text-white shadow-md shadow-ut-red/25' : 'text-[#4a4f55] hover:bg-ut-red-50 hover:text-ut-red'}`;
 
 function StatsMenu({ onNavigate }: { onNavigate?: () => void }) {
   const site = useSite();
@@ -40,12 +47,11 @@ function StatsMenu({ onNavigate }: { onNavigate?: () => void }) {
   const active = pathname.startsWith('/estadisticas');
   return (
     <li ref={ref} className="relative" onKeyDown={(e) => e.key === 'Escape' && setOpen(false)}>
-      <button type="button" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)}
-        className={`flex items-center gap-1 py-2 text-[0.9rem] font-medium whitespace-nowrap hover:text-ut-red ${active ? 'text-ut-red' : 'text-[#4a4f55]'}`}>
+      <button type="button" aria-expanded={open} aria-haspopup="true" onClick={() => setOpen((o) => !o)} className={pill(active)}>
         Estadísticas <Icon name="chevronDown" className={`transition ${open ? 'rotate-180' : ''}`} />
       </button>
       {open && (
-        <div className="fade-in z-40 mt-1 w-full rounded-xl border border-line bg-white p-2 shadow-xl min-[1360px]:absolute min-[1360px]:left-1/2 min-[1360px]:w-[34rem] min-[1360px]:-translate-x-1/2">
+        <div className="fade-in z-40 mt-1 w-full rounded-xl border border-line bg-white p-2 shadow-xl lg:absolute lg:left-1/2 lg:w-[34rem] lg:-translate-x-1/2">
           <Link to="/estadisticas" onClick={onNavigate} className="mb-1 block rounded-lg px-3 py-2 font-semibold text-ut-red hover:bg-ut-red-50">Todos los indicadores →</Link>
           <ul className="grid gap-0.5 sm:grid-cols-2">
             {site?.modules.map((m) => (
@@ -70,12 +76,28 @@ function SearchBox({ className = '' }: { className?: string }) {
     if (q.trim().length >= 2) nav(`/buscar?q=${encodeURIComponent(q.trim())}`);
   };
   return (
-    <form role="search" onSubmit={submit} className={`flex items-center rounded-full bg-[#e3e3e3] pr-2 pl-5 focus-within:ring-2 focus-within:ring-teal ${className}`}>
+    <form role="search" onSubmit={submit} className={`flex items-center rounded-full border border-line bg-white pr-2 pl-4 shadow-sm focus-within:ring-2 focus-within:ring-ut-red/30 ${className}`}>
       <label htmlFor="site-search" className="sr-only">Buscar en el portal</label>
-      <input id="site-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar" minLength={2}
-        className="w-full bg-transparent py-2 text-[1rem] text-ink placeholder:text-gray-500 focus:outline-none" />
-      <button type="submit" aria-label="Buscar" className="p-1 text-2xl text-ink hover:text-ut-red"><Icon name="search" /></button>
+      <input id="site-search" value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar..." minLength={2}
+        className="w-full bg-transparent py-2 text-[0.95rem] text-ink placeholder:text-gray-400 focus:outline-none" />
+      <button type="submit" aria-label="Buscar" className="p-1 text-xl text-muted hover:text-ut-red"><Icon name="search" /></button>
     </form>
+  );
+}
+
+/** Adorno del boceto: hojas verdes y trazos rojos curvos en los extremos del encabezado. */
+function HeaderOrnament({ side }: { side: 'left' | 'right' }) {
+  return (
+    <svg aria-hidden viewBox="0 0 160 110" className={`pointer-events-none absolute top-0 hidden h-full w-40 xl:block ${side === 'left' ? 'left-0' : 'right-0 -scale-x-100'}`} preserveAspectRatio="xMinYMin slice">
+      <path d="M-10 18 C 40 0, 70 40, 120 8" fill="none" stroke="#c51718" strokeWidth="3" strokeLinecap="round" opacity=".85" />
+      <path d="M-10 30 C 35 14, 60 52, 105 26" fill="none" stroke="#c51718" strokeWidth="1.6" strokeLinecap="round" opacity=".45" />
+      <g fill="#2f7d4f" opacity=".9">
+        <path d="M8 70 C 10 52, 26 44, 40 46 C 36 60, 24 70, 8 70Z" />
+        <path d="M22 92 C 30 76, 48 74, 58 80 C 48 92, 36 96, 22 92Z" opacity=".75" />
+        <path d="M0 98 C 2 86, 12 80, 22 82 C 18 92, 10 98, 0 98Z" opacity=".6" />
+      </g>
+      <path d="M6 72 C 24 60, 40 70, 56 82" fill="none" stroke="#1f5a38" strokeWidth="1" opacity=".6" />
+    </svg>
   );
 }
 
@@ -83,40 +105,45 @@ export function Header() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
   useEffect(() => setOpen(false), [pathname]);
-  const linkCls = ({ isActive }: { isActive: boolean }) =>
-    `relative block py-2 text-[0.9rem] font-medium whitespace-nowrap hover:text-ut-red ${isActive ? 'text-ut-red after:absolute after:-bottom-0.5 after:left-0 after:h-0.5 after:w-full after:bg-ut-red' : 'text-[#4a4f55]'}`;
+  const navLink = ({ isActive }: { isActive: boolean }) => pill(isActive);
+  const items = (onNavigate?: () => void) => (
+    <>
+      {NAV.map((n) => <li key={n.to}><NavLink to={n.to} end={n.end} className={navLink}>{n.icon && <Icon name={n.icon} />}{n.label}</NavLink></li>)}
+      <StatsMenu onNavigate={onNavigate} />
+      {NAV_END.map((n) => <li key={n.to}><NavLink to={n.to} className={navLink}>{n.label}</NavLink></li>)}
+    </>
+  );
+  const login = (
+    <a href="/admin/" className="flex shrink-0 items-center gap-2 rounded-full bg-ut-red px-4 py-2 text-sm font-bold text-white shadow-md shadow-ut-red/25 hover:bg-ut-red-dark" title="Acceso para funcionarios autorizados">
+      <Icon name="user" className="text-lg" /> Iniciar Sesión
+    </a>
+  );
   return (
     <header className="sticky top-0 z-30 border-b border-line/70 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex max-w-[1500px] items-center gap-4 px-4 py-3 lg:px-8">
-        <Logo />
-        <nav aria-label="Menú principal" className="ml-auto hidden min-[1360px]:block">
-          <ul className="flex items-center gap-4 2xl:gap-7">
-            {NAV.map((n) => <li key={n.to}><NavLink to={n.to} end={n.end} className={linkCls}>{n.label}</NavLink></li>)}
-            <StatsMenu />
-            <li><NavLink to="/transparencia" className={linkCls}>Transparencia</NavLink></li>
-            <li><NavLink to="/sobre-idead" className={linkCls}>Sobre IDEAD</NavLink></li>
-          </ul>
-        </nav>
-        <SearchBox className="ml-auto hidden w-48 min-[1360px]:ml-3 min-[1360px]:flex 2xl:w-64" />
-        <a href="/admin/" className="hidden shrink-0 items-center gap-1.5 rounded-full border border-ut-red p-2 text-sm font-semibold text-ut-red hover:bg-ut-red hover:text-white min-[1360px]:flex 2xl:px-3 2xl:py-1.5" title="Acceso para funcionarios autorizados" aria-label="Acceso funcionarios">
-          <Icon name="lock" /> <span className="hidden 2xl:inline">Funcionarios</span>
-        </a>
-        <button className="ml-auto rounded-lg p-2 text-2xl text-ink min-[1360px]:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setOpen((o) => !o)}>
-          <Icon name={open ? 'close' : 'menu'} />
-        </button>
+      <div className="relative">
+        <HeaderOrnament side="left" />
+        <HeaderOrnament side="right" />
+        <div className="relative mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 lg:px-8 xl:px-40 min-[1800px]:px-8">
+          <Logo />
+          <nav aria-label="Menú principal" className="order-3 hidden w-full lg:block min-[1700px]:order-none min-[1700px]:ml-auto min-[1700px]:w-auto">
+            <ul className="flex items-center justify-center gap-0.5 rounded-full border border-line bg-surface/70 p-1 min-[1700px]:justify-start">{items()}</ul>
+          </nav>
+          <div className="ml-auto hidden items-center gap-3 lg:flex min-[1700px]:ml-2">
+            <SearchBox className="w-52" />
+            {login}
+          </div>
+          <button className="ml-auto rounded-lg p-2 text-2xl text-ink lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setOpen((o) => !o)}>
+            <Icon name={open ? 'close' : 'menu'} />
+          </button>
+        </div>
       </div>
       {open && (
-        <div id="mobile-menu" className="fade-in max-h-[80vh] overflow-y-auto border-t border-line bg-white px-4 pb-6 min-[1360px]:hidden">
+        <div id="mobile-menu" className="fade-in max-h-[80vh] overflow-y-auto border-t border-line bg-white px-4 pb-6 lg:hidden">
           <SearchBox className="my-3 flex" />
           <nav aria-label="Menú principal móvil">
-            <ul className="divide-y divide-line">
-              {NAV.map((n) => <li key={n.to}><NavLink to={n.to} end={n.end} className={linkCls}>{n.label}</NavLink></li>)}
-              <StatsMenu onNavigate={() => setOpen(false)} />
-              <li><NavLink to="/transparencia" className={linkCls}>Transparencia</NavLink></li>
-              <li><NavLink to="/sobre-idead" className={linkCls}>Sobre IDEAD</NavLink></li>
-              <li><a href="/admin/" className="flex items-center gap-2 py-2 font-semibold text-ut-red"><Icon name="lock" /> Acceso funcionarios</a></li>
-            </ul>
+            <ul className="space-y-1">{items(() => setOpen(false))}</ul>
           </nav>
+          <div className="mt-4">{login}</div>
         </div>
       )}
     </header>
@@ -133,59 +160,67 @@ export function DemoBanner() {
   );
 }
 
+const SOCIAL: { match: RegExp; name: string; d: string }[] = [
+  { match: /facebook/i, name: 'Facebook', d: 'M14 8h2.5V4.5H14c-2.5 0-4 1.6-4 4V11H7.5v3.5H10V21h3.5v-6.5H16l.5-3.5h-3V8.6c0-.4.2-.6.5-.6z' },
+  { match: /instagram/i, name: 'Instagram', d: 'M7.5 3h9A4.5 4.5 0 0 1 21 7.5v9a4.5 4.5 0 0 1-4.5 4.5h-9A4.5 4.5 0 0 1 3 16.5v-9A4.5 4.5 0 0 1 7.5 3zm4.5 5a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 2a2 2 0 1 1 0 4 2 2 0 0 1 0-4zm5-3.2a1.2 1.2 0 1 0 0 2.4 1.2 1.2 0 0 0 0-2.4z' },
+  { match: /youtube/i, name: 'YouTube', d: 'M21.6 7.2c-.2-.9-.9-1.6-1.8-1.8C18.2 5 12 5 12 5s-6.2 0-7.8.4c-.9.2-1.6.9-1.8 1.8C2 8.8 2 12 2 12s0 3.2.4 4.8c.2.9.9 1.6 1.8 1.8C5.8 19 12 19 12 19s6.2 0 7.8-.4c.9-.2 1.6-.9 1.8-1.8.4-1.6.4-4.8.4-4.8s0-3.2-.4-4.8zM10 15V9l5.2 3L10 15z' },
+  { match: /twitter|x\.com|\bX\b/i, name: 'X', d: 'M17.8 3h3.1l-6.8 7.8L22 21h-6.2l-4.9-6.4L5.3 21H2.2l7.3-8.3L2 3h6.4l4.4 5.8L17.8 3zm-1.1 16.2h1.7L7.4 4.7H5.6l11.1 14.5z' },
+];
+
+function SocialIcon({ label, url }: { label: string; url: string }) {
+  const s = SOCIAL.find((x) => x.match.test(label) || x.match.test(url));
+  return (
+    <a href={url} target="_blank" rel="noopener noreferrer" aria-label={s?.name ?? label} title={s?.name ?? label}
+      className="grid h-8 w-8 place-items-center rounded-full bg-white/15 text-white transition hover:bg-white hover:text-ut-red">
+      {s ? <svg viewBox="0 0 24 24" width="16" height="16" fill="currentColor" aria-hidden><path d={s.d} /></svg> : <Icon name="globe" />}
+    </a>
+  );
+}
+
+/** Pie del boceto: franja roja con identidad UT/IDEAD, accesos y redes sociales oficiales. */
 export function Footer() {
   const site = useSite();
   const s = site?.settings;
+  const hasPage = (slug: string) => site?.pages.some((p) => p.slug === slug);
+  const sep = <span aria-hidden className="hidden h-5 w-px bg-white/40 md:block" />;
   return (
-    <footer className="mt-16 bg-green-dark text-white">
-      <div className="flex h-2" aria-hidden>
-        <span className="flex-1 bg-teal-light" /><span className="flex-1 bg-teal" /><span className="flex-1 bg-green" /><span className="flex-1 bg-green-dark" />
-      </div>
-      <div className="mx-auto grid max-w-[1500px] gap-10 px-4 py-12 md:grid-cols-2 lg:grid-cols-4 lg:px-8">
-        <div>
-          <p className="text-lg font-extrabold">{s?.site_name ?? 'Instituto de Educación a Distancia – IDEAD'}</p>
-          <p className="mt-1 text-white/80">{s?.university_name ?? 'Universidad del Tolima'}</p>
-          <p className="mt-4 text-sm text-white/70">Portal institucional de información, indicadores y gestión.</p>
-        </div>
-        <div>
-          <p className="mb-3 font-bold">Contacto</p>
-          {(() => {
-            // Solo se muestran los datos ya suministrados (nunca el texto «Pendiente…»).
-            const real = (v?: string | null) => (v && !/^pendiente/i.test(v.trim()) ? v : null);
-            const items = [['pin', real(s?.contact_address)], ['phone', real(s?.contact_phone)], ['mail', real(s?.contact_email)]].filter(([, v]) => v) as [string, string][];
-            return items.length ? (
-              <ul className="space-y-2 text-sm text-white/85">
-                {items.map(([icon, v]) => <li key={icon} className="flex gap-2"><Icon name={icon} className="mt-0.5 shrink-0" />{icon === 'mail' ? <a href={`mailto:${v}`} className="hover:underline">{v}</a> : v}</li>)}
-              </ul>
-            ) : <p className="text-sm text-white/70">Datos de contacto en actualización.</p>;
-          })()}
-        </div>
-        <div>
-          <p className="mb-3 font-bold">El portal</p>
-          <ul className="space-y-2 text-sm text-white/85">
-            <li><Link className="hover:underline" to="/estadisticas">Estadísticas e indicadores</Link></li>
-            <li><Link className="hover:underline" to="/transparencia">Transparencia y fuentes</Link></li>
-            <li><Link className="hover:underline" to="/pagina/privacidad">Privacidad y tratamiento de datos</Link></li>
-            <li><Link className="hover:underline" to="/pagina/accesibilidad">Accesibilidad</Link></li>
-            <li><Link className="hover:underline" to="/mapa-del-sitio">Mapa del sitio</Link></li>
-            <li><a className="hover:underline" href="/admin/">Acceso funcionarios</a></li>
-          </ul>
-        </div>
-        <div>
-          <p className="mb-3 font-bold">Enlaces oficiales</p>
-          <ul className="space-y-2 text-sm text-white/85">
-            {s?.official_links?.map((l) => (
-              <li key={l.url}><a className="inline-flex items-center gap-1 hover:underline" href={l.url} target="_blank" rel="noopener noreferrer">{l.label} <Icon name="external" /></a></li>
-            ))}
-            {s?.social_links?.map((l) => (
-              <li key={l.url}><a className="hover:underline" href={l.url} target="_blank" rel="noopener noreferrer">{l.label}</a></li>
-            ))}
-          </ul>
+    <footer className="mt-16 text-white">
+      <div className="bg-gradient-to-r from-ut-red-dark via-ut-red to-ut-red-dark">
+        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-6 gap-y-4 px-4 py-5 lg:px-8">
+          <div className="flex items-center gap-4">
+            <span className="rounded-lg bg-white px-2 py-1"><img src={s?.logo_url ?? '/img/logo-ut-temporal.png'} alt="" className="h-9 w-auto" /></span>
+            <p className="flex flex-wrap items-center gap-x-3 text-sm leading-tight">
+              <strong className="text-base font-extrabold">{s?.university_name ?? 'Universidad del Tolima'}</strong>
+              <span aria-hidden className="text-white/50">|</span>
+              <span className="text-white/90">{s?.site_name ?? 'Instituto de Educación a Distancia - IDEAD'}</span>
+            </p>
+          </div>
+          <nav aria-label="Enlaces del pie de página" className="flex flex-wrap items-center gap-x-5 gap-y-3 text-sm font-semibold lg:ml-auto">
+            <Link to={hasPage('contacto') ? '/pagina/contacto' : '/sobre-idead'} className="hover:underline">Contáctanos</Link>
+            {hasPage('preguntas-frecuentes') && <>{sep}<Link to="/pagina/preguntas-frecuentes" className="hover:underline">Preguntas Frecuentes</Link></>}
+            {!!s?.social_links?.length && (
+              <>
+                {sep}
+                <span className="flex items-center gap-2"><span className="mr-1">Redes Sociales</span>{s.social_links.map((l) => <SocialIcon key={l.url} {...l} />)}</span>
+              </>
+            )}
+            {sep}
+            <a href="https://www.ut.edu.co" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1.5 hover:underline"><Icon name="globe" /> www.ut.edu.co</a>
+          </nav>
         </div>
       </div>
-      <p className="border-t border-white/15 px-4 py-4 text-center text-xs text-white/70">
-        © {new Date().getFullYear()} {s?.university_name ?? 'Universidad del Tolima'} · IDEAD. La información publicada es agregada y autorizada.
-      </p>
+      <div className="bg-ut-red-900 text-white/80">
+        <div className="mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-5 gap-y-1 px-4 py-3 text-xs lg:px-8">
+          <span>© {new Date().getFullYear()} {s?.university_name ?? 'Universidad del Tolima'} · IDEAD. La información publicada es agregada y autorizada.</span>
+          <span className="flex flex-wrap gap-x-4 gap-y-1 lg:ml-auto">
+            <Link className="hover:underline" to="/transparencia">Transparencia y fuentes</Link>
+            <Link className="hover:underline" to="/pagina/privacidad">Privacidad</Link>
+            <Link className="hover:underline" to="/pagina/accesibilidad">Accesibilidad</Link>
+            <Link className="hover:underline" to="/mapa-del-sitio">Mapa del sitio</Link>
+            <a className="hover:underline" href="/admin/">Acceso funcionarios</a>
+          </span>
+        </div>
+      </div>
     </footer>
   );
 }

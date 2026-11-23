@@ -1,5 +1,5 @@
-import { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { Icon } from '../../shared/icons';
 import { fmtDate, fmtNumber } from '../../shared/format';
 import { DemoBadge } from '../../shared/ui';
@@ -36,9 +36,9 @@ export function HeroCarousel({ slides }: { slides: HomeData['slides'] }) {
     </>
   );
   return (
-    <section aria-roledescription="carrusel" aria-label="Destacados" className="relative overflow-hidden rounded-sm bg-surface shadow-sm"
+    <section aria-roledescription="carrusel" aria-label="Destacados" className="relative overflow-hidden rounded-2xl bg-surface shadow-[0_4px_18px_rgba(0,0,0,0.08)]"
       onMouseEnter={() => setPaused(true)} onMouseLeave={() => setPaused(false)} onFocus={() => setPaused(true)} onBlur={() => setPaused(false)}>
-      <div className="aspect-[857/413] w-full" aria-live={paused ? 'polite' : 'off'}>
+      <div className="aspect-[16/9] h-full w-full lg:aspect-auto lg:min-h-[22rem]" aria-live={paused ? 'polite' : 'off'}>
         {s.link_url ? (s.link_url.startsWith('/') ? <Link to={s.link_url} className="block h-full">{Inner}</Link> : <a href={s.link_url} className="block h-full" rel="noopener noreferrer">{Inner}</a>) : Inner}
       </div>
       {s.is_demo && <DemoBadge className="absolute top-2 right-2" />}
@@ -53,6 +53,101 @@ export function HeroCarousel({ slides }: { slides: HomeData['slides'] }) {
       )}
       <p className="sr-only">{s.title}. {s.subtitle}</p>
     </section>
+  );
+}
+
+
+/** Cifras del boceto: tarjetas blancas (icono rojo, número, etiqueta), 3 × 2. Sin dato → «Pendiente». */
+export function StatCards({ items }: { items: Highlight[] }) {
+  return (
+    <section aria-labelledby="kpi-title">
+      <h2 id="kpi-title" className="sr-only">Cifras institucionales destacadas</h2>
+      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+        {items.map((h) => {
+          const tip = [h.source && `Fuente: ${h.source}`, h.period && `Período: ${h.period}`, h.indicator_code && `Indicador ${h.indicator_code}`].filter(Boolean).join(' · ');
+          const content = (
+            <>
+              <Icon name={h.icon} className="text-[2.3rem] text-ut-red" strokeWidth={1.4} />
+              {h.value !== null ? (
+                <span className="mt-2 block text-[1.65rem] leading-none font-extrabold text-ink">{fmtNumber(h.value, 0)}</span>
+              ) : (
+                <span className="mt-2 block text-xs leading-tight font-semibold text-muted">Pendiente de actualización</span>
+              )}
+              <span className="mt-1 block text-sm leading-tight font-medium text-muted">{h.label}</span>
+              {h.is_demo && <DemoBadge className="mt-1" />}
+            </>
+          );
+          const cls = 'flex h-full flex-col items-center justify-center rounded-2xl border border-line bg-white px-2 py-4 text-center shadow-[0_4px_18px_rgba(0,0,0,0.06)]';
+          return (
+            <li key={h.label}>
+              {h.link ? <Link to={h.link} title={tip} className={`${cls} transition hover:-translate-y-0.5 hover:border-ut-red/40 hover:shadow-lg`}>{content}</Link> : <div title={tip} className={cls}>{content}</div>}
+              {tip && <span className="sr-only">{tip}</span>}
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+}
+
+/** Botón rojo «CAT Ibagué →» del boceto: elige un CAT y abre su ficha. */
+export function CatPicker({ cats }: { cats: CatSummary[] }) {
+  const nav = useNavigate();
+  const initial = cats.find((c) => /ibagu/i.test(c.name)) ?? cats[0];
+  const [slug, setSlug] = useState(initial?.slug ?? '');
+  if (!cats.length) return null;
+  return (
+    <div className="mt-3 flex items-stretch overflow-hidden rounded-2xl bg-ut-red text-white shadow-lg shadow-ut-red/25">
+      <label htmlFor="cat-picker" className="sr-only">Seleccione un Centro de Atención Tutorial</label>
+      <div className="relative flex-1">
+        <select id="cat-picker" value={slug} onChange={(e) => setSlug(e.target.value)}
+          className="h-full w-full cursor-pointer appearance-none bg-transparent py-3.5 pr-10 pl-5 text-lg font-extrabold focus:bg-ut-red-dark focus:outline-none">
+          {cats.map((c) => <option key={c.slug} value={c.slug} className="bg-white text-ink">{c.name}</option>)}
+        </select>
+        <Icon name="chevronDown" className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xl" />
+      </div>
+      <button type="button" onClick={() => nav(`/cat/${slug}`)} aria-label="Ver ficha del CAT seleccionado"
+        className="grid w-16 place-items-center border-l border-white/25 text-2xl hover:bg-ut-red-dark"><Icon name="arrowRight" /></button>
+    </div>
+  );
+}
+
+/** Tarjeta de la segunda fila del boceto: icono, título, texto, enlace y foto a la derecha. */
+export function FeatureCard({ icon, title, children, link, linkLabel, image, imageAlt = '' }: { icon: string; title: string; children: ReactNode; link: string; linkLabel: string; image?: string | null; imageAlt?: string }) {
+  return (
+    <article className="group flex h-full overflow-hidden rounded-2xl border border-line bg-white shadow-[0_4px_18px_rgba(0,0,0,0.06)]">
+      <div className="flex min-w-0 flex-1 flex-col p-5">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-ut-red-50 text-2xl text-ut-red"><Icon name={icon} /></span>
+        <h2 className="mt-3 text-lg leading-tight font-extrabold text-ink">{title}</h2>
+        <div className="mt-1.5 flex-1 text-sm leading-snug text-muted">{children}</div>
+        <Link to={link} className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-ut-red hover:underline">{linkLabel} <Icon name="arrowRight" /></Link>
+      </div>
+      <div className="w-[36%] shrink-0 overflow-hidden">
+        {image ? <img src={image} alt={imageAlt} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <Placeholder />}
+      </div>
+    </article>
+  );
+}
+
+/** Tarjeta roja «Mapa de Cobertura» del boceto. */
+export function CoverageCard({ cats }: { cats: CatSummary[] }) {
+  const byDept = useMemo(() => {
+    const m: Record<string, number> = {};
+    cats.forEach((c) => { m[c.department_code] = (m[c.department_code] ?? 0) + 1; });
+    return m;
+  }, [cats]);
+  return (
+    <article className="relative flex h-full overflow-hidden rounded-2xl bg-gradient-to-br from-ut-red to-ut-red-dark text-white shadow-lg shadow-ut-red/25">
+      <div className="relative z-10 flex flex-1 flex-col p-5">
+        <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 text-2xl"><Icon name="pin" /></span>
+        <h2 className="mt-3 text-lg leading-tight font-extrabold">Mapa de Cobertura</h2>
+        <p className="mt-1.5 flex-1 text-sm leading-snug text-white/90">Presencia del IDEAD en todo el territorio{cats.length ? `: ${cats.length} CAT en ${Object.keys(byDept).length} departamentos.` : '.'}</p>
+        <Link to="/cat" className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-white px-4 whitespace-nowrap py-1.5 text-sm font-bold text-ut-red hover:bg-ut-red-50">Explorar mapa <Icon name="arrowRight" /></Link>
+      </div>
+      <div className="pointer-events-none m-3 ml-0 w-[40%] shrink-0 self-center rounded-xl bg-white/95 p-1.5 [&_figcaption]:hidden">
+        <ColombiaMap title="Departamentos con Centros de Atención Tutorial del IDEAD" values={byDept} formatValue={(v) => `${v} CAT`} className="h-full w-full" />
+      </div>
+    </article>
   );
 }
 
