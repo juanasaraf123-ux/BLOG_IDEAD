@@ -78,13 +78,15 @@ body { @apply bg-white text-ink antialiased; font-size: 16px; }
 .admin-bg {
   background-color: var(--color-ivory);
   background-image:
-    radial-gradient(60rem 30rem at 100% -10%, rgb(201 21 32 / 0.07), transparent 60%),
-    radial-gradient(40rem 26rem at -10% 110%, rgb(32 169 156 / 0.08), transparent 60%),
-    url('/img/admin/ondas.svg');
+    linear-gradient(rgb(250 247 244 / 0.62), rgb(250 247 244 / 0.62)),
+    url('/img/fondos/fondo-campus.webp');
   background-repeat: no-repeat;
-  background-position: 0 0, 0 0, right bottom;
-  background-size: auto, auto, min(70rem, 90vw) auto;
+  background-position: center, center bottom;
+  background-size: cover, cover;
   background-attachment: fixed;
+}
+.admin-bg-login {
+  background: linear-gradient(rgb(255 255 255 / 0.35), rgb(255 255 255 / 0.35)), url('/img/fondos/fondo-edificio.webp') center / cover no-repeat;
 }
 .admin-card { background: #fff; border: 1px solid rgb(230 222 214 / 0.9); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 .admin-card-hover { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }

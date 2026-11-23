@@ -9,7 +9,7 @@ import { Button, inputCls, Notice } from '../components/Form';
 
 function Frame({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <div className="admin-ui admin-bg flex min-h-screen">
+    <div className="admin-ui admin-bg-login flex min-h-screen">
       {/* Panel institucional: fotografía real del IDEAD sobre degradado rojo, círculos y lema */}
       <aside className="relative hidden w-[46%] overflow-hidden bg-gradient-to-br from-ut-red via-[#b3161f] to-ut-red-900 text-white lg:flex lg:flex-col">
         <div className="absolute top-32 right-10 left-10 grid grid-cols-5 grid-rows-2 gap-3" aria-hidden>

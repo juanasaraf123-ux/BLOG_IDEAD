@@ -43,7 +43,7 @@ const KPI_CARDS: { key: string; label: string; icon: string; tone: string; glow:
   { key: 'students', label: 'Estudiantes', icon: 'students', tone: 'bg-idead-teal-50 text-idead-teal-dark', glow: 'from-idead-teal/12', to: '/indicadores' },
   { key: 'teachers', label: 'Docentes', icon: 'teacher', tone: 'bg-idead-blue-50 text-idead-blue', glow: 'from-idead-blue/10', to: '/indicadores' },
   { key: 'municipalities', label: 'Municipios', icon: 'pin', tone: 'bg-[#fdf1e4] text-[#a35a00]', glow: 'from-[#f0a040]/14', to: '/indicadores' },
-  { key: 'programs', label: 'Programas académicos', icon: 'graduation', tone: 'bg-ut-red-50 text-ut-red', glow: 'from-ut-red/10', to: '/r/programas' },
+  { key: 'programs', label: 'Programas', icon: 'graduation', tone: 'bg-ut-red-50 text-ut-red', glow: 'from-ut-red/10', to: '/r/programas' },
   { key: 'events', label: 'Actividades', icon: 'calendar', tone: 'bg-idead-teal-50 text-idead-teal-dark', glow: 'from-idead-teal/12', to: '/r/actividades' },
   { key: 'projects', label: 'Proyectos', icon: 'project', tone: 'bg-idead-blue-50 text-idead-blue', glow: 'from-idead-blue/10', to: '/h/proyectos' },
 ];
@@ -91,185 +91,180 @@ function Card({ title, subtitle, children, className = '', action, icon }: { tit
 export function Dashboard() {
   const { me, can } = useAuth();
   const { data, loading } = useAsync(() => admin.get<Row>('dashboard'), []);
-  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 6);
+  const quick = QUICK.filter((q) => can(...q.perms)).slice(0, 8);
   const first = (me?.user.name ?? '').split(/\s+/)[0];
   const today = new Intl.DateTimeFormat('es-CO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date());
   const charts = data?.charts;
   const territory = (charts?.territory ?? {}) as Record<string, { name: string; value: number }>;
   const subs = (charts?.submissions ?? {}) as Record<string, number>;
   const demo = charts?.is_demo ? <Badge tone="amber">DEMO</Badge> : null;
+
+  const recent = data?.recent && (
+    <Card title="Actividad Reciente" icon="history"
+      action={can('audit.view') ? <Link to="/auditoria" className="inline-flex items-center gap-1 text-sm font-semibold text-ut-red underline-offset-2 hover:underline">Ver todas <Icon name="arrowRight" /></Link> : undefined}>
+      {data.recent.length === 0 ? <p className="text-sm text-muted">Sin cambios registrados.</p> : (
+        <ol className="space-y-1">
+          {data.recent.map((r: Row) => {
+            const [ic, tone] = ACTIVITY_ICON[r.entity] ?? ['info', 'bg-warm text-ink'];
+            return (
+              <li key={r.id} className="flex items-center gap-3 rounded-xl p-1.5 hover:bg-ivory">
+                <span className={`grid h-9 w-9 shrink-0 place-items-center rounded-full text-lg ${tone}`}><Icon name={ic} /></span>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-[0.85rem] font-medium text-ink" title={r.title}>{r.type} {r.action === 'creó' ? 'creada' : r.action === 'actualizó' ? 'actualizada' : 'eliminada'}: {r.title}</p>
+                  <p className="truncate text-xs text-muted">{r.user}</p>
+                </div>
+                <span className="flex shrink-0 items-center gap-1.5 text-[0.7rem] text-muted">{timeAgo(r.at)}<span className="h-1.5 w-1.5 rounded-full bg-idead-blue" aria-hidden /></span>
+              </li>
+            );
+          })}
+        </ol>
+      )}
+    </Card>
+  );
+  const quickCard = quick.length > 0 && (
+    <Card title="Accesos Rápidos" icon="home">
+      <div className="grid grid-cols-4 gap-2">
+        {quick.map((q) => (
+          <Link key={q.to} to={q.to} title={q.text} className="admin-card-hover group flex flex-col items-center gap-1.5 rounded-2xl border border-[#ece4dc] bg-white px-1 py-3 text-center">
+            <span className={`grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br ${q.tone} text-xl text-white shadow-md transition group-hover:scale-110`}><Icon name={q.icon} /></span>
+            <span className="text-[0.68rem] leading-tight font-semibold text-ink group-hover:text-ut-red">{q.label}</span>
+          </Link>
+        ))}
+      </div>
+    </Card>
+  );
+
   return (
-    <div className="mx-auto max-w-[1600px] space-y-6">
-      {/* Banner de bienvenida */}
-      <section className="relative isolate overflow-hidden rounded-[1.5rem] bg-gradient-to-r from-ut-red via-[#c21a26] to-ut-red-dark text-white md:from-[#f7d4d6] md:via-[#e04a52] shadow-[0_24px_48px_-22px_rgb(149_21_29/0.7)]">
-        <div className="absolute inset-y-0 left-0 -z-10 hidden w-[27%] md:block">
-          <img src="/img/home/grupo-idead.jpg" alt="Comunidad IDEAD en el campus de la Universidad del Tolima" className="h-full w-full object-cover object-[30%_center] [mask-image:linear-gradient(to_right,black_55%,transparent)]" />
-        </div>
-        <span className="absolute -top-24 right-[28%] -z-10 h-64 w-64 rounded-full bg-white/10" aria-hidden />
-        <span className="absolute right-10 -bottom-24 -z-10 h-56 w-56 rounded-full border-[22px] border-white/10" aria-hidden />
-        <span className="absolute top-8 left-[46%] -z-10 hidden h-10 w-10 rounded-full bg-idead-teal/50 md:block" aria-hidden />
-        <svg className="absolute inset-x-0 bottom-0 -z-10 h-14 w-full" viewBox="0 0 1200 60" preserveAspectRatio="none" aria-hidden>
-          <path d="M0 40 C 220 10, 420 60, 640 34 S 1020 6, 1200 30 V60 H0Z" fill="#20a99c" fillOpacity=".25" />
-          <path d="M0 50 C 260 30, 460 66, 700 46 S 1040 24, 1200 40 V60 H0Z" fill="#fff" fillOpacity=".12" />
+    <div className="mx-auto max-w-[1600px] space-y-5">
+      {/* Banner de bienvenida del boceto: edificio de la UT, degradado rosado-rojo, ondas y lema */}
+      <section className="relative isolate overflow-hidden rounded-[1.375rem] bg-gradient-to-r from-white via-[#fbe3e4] to-[#f5b9bd] shadow-[0_18px_40px_-22px_rgb(149_21_29/0.6)]">
+        <img src="/img/fondos/edificio-ut.webp" alt="Edificio de la Universidad del Tolima" className="absolute inset-y-0 left-0 -z-10 hidden h-full w-[24%] object-cover [mask-image:linear-gradient(to_right,black_75%,transparent)] md:block" />
+        <svg className="absolute inset-y-0 right-0 -z-10 h-full w-[55%]" viewBox="0 0 600 200" preserveAspectRatio="none" aria-hidden>
+          <path d="M180 200 C 260 120, 330 60, 470 0 H600 V200Z" fill="#c91520" fillOpacity=".10" />
+          <path d="M250 200 C 330 130, 400 70, 540 0 H600 V200Z" fill="#c91520" fillOpacity=".55" />
+          <path d="M330 200 C 400 140, 470 80, 600 30 V200Z" fill="#95151d" fillOpacity=".75" />
+          <path d="M150 200 C 240 130, 330 60, 480 0" stroke="#fff" strokeOpacity=".7" strokeWidth="2" fill="none" />
+          <path d="M300 200 C 380 140, 450 80, 600 20" stroke="#20a99c" strokeOpacity=".6" strokeWidth="2" fill="none" />
         </svg>
-        <div className="flex flex-wrap items-center gap-6 px-6 py-8 md:py-9 md:pl-[29%] lg:pr-10">
+        <div className="flex flex-wrap items-center gap-6 px-6 py-7 md:pl-[26%] lg:pr-8">
           <div className="min-w-0 flex-1">
-            <p className="text-xs font-semibold tracking-wide text-white/85 first-letter:uppercase">{today}</p>
-            <h1 className="mt-1 text-3xl font-extrabold drop-shadow md:text-[2.15rem]">¡Te damos la bienvenida, {first}!</h1>
-            <p className="mt-1 text-lg text-white/95">Gestiona y administra el contenido del portal IDEAD</p>
-            <p className="admin-glass mt-4 inline-flex items-center gap-2 rounded-full px-3 py-1 text-sm font-semibold"><Icon name="user" /> {me?.user.name} · {me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
+            <p className="text-xs font-semibold text-muted first-letter:uppercase">{today}</p>
+            <h1 className="mt-0.5 text-[1.75rem] font-extrabold text-ink md:text-[2rem]">¡Te damos la bienvenida, {first}!</h1>
+            <p className="text-[1.05rem] text-ink">Gestiona y administra el contenido del portal IDEAD</p>
+            <p className="mt-3 inline-flex items-center gap-2 rounded-full bg-white/80 px-3 py-1 text-xs font-semibold text-ut-red-dark shadow-sm ring-1 ring-ut-red/15"><Icon name="user" /> {me?.user.roles.map((r) => r.name).join(' · ') || 'Sin rol asignado'}</p>
           </div>
-          <div className="hidden text-right drop-shadow lg:block" aria-hidden>
-            <p className="font-display text-[2.6rem] leading-none font-extrabold">Conocimiento</p>
-            <p className="font-serif text-[2.1rem] leading-tight italic">que Transforma</p>
+          <div className="hidden rounded-2xl bg-white/85 px-5 py-3 text-right shadow-lg backdrop-blur lg:block" aria-hidden>
+            <p className="font-display text-[2rem] leading-none font-extrabold text-ut-red">Conocimiento</p>
+            <p className="font-serif text-[1.6rem] leading-tight text-ink italic">que <span className="text-ut-red">Transforma</span></p>
           </div>
         </div>
       </section>
 
       {!me?.user.mfa_enabled && <Notice kind="info">Recomendación de seguridad: active la verificación en dos pasos en <Link to="/cuenta" className="font-semibold underline">Mi cuenta</Link>.</Notice>}
-      {loading && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">{KPI_CARDS.map((k) => <div key={k.key} className="skeleton h-36" />)}</div>}
 
-      {data?.kpis && (
-        <section aria-label="Indicadores generales" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4 2xl:grid-cols-7">
-          {KPI_CARDS.map((k) => {
-            const v = (data.kpis[k.key] ?? { value: null, note: 'Sin datos' }) as Row;
-            const body = (
-              <>
-                <span className={`pointer-events-none absolute -top-10 -right-10 h-28 w-28 rounded-full bg-gradient-to-br ${k.glow} to-transparent`} aria-hidden />
-                <div className="flex items-start justify-between gap-2">
-                  <span className={`grid h-12 w-12 place-items-center rounded-2xl text-2xl ${k.tone}`}><Icon name={k.icon} /></span>
-                  {typeof v.change === 'number' && (
-                    <span className={`rounded-full px-2 py-0.5 text-xs font-bold ${v.change >= 0 ? 'bg-idead-teal-50 text-idead-teal-dark' : 'bg-ut-red-50 text-ut-red'}`} title={`Variación frente a ${v.versus}`}>{v.change >= 0 ? '▲' : '▼'} {Math.abs(v.change).toLocaleString('es-CO')} %</span>
-                  )}
-                </div>
-                <p className="font-display mt-3 text-[1.9rem] leading-none font-extrabold text-ink tabular-nums">{v.value === null || v.value === undefined ? '—' : fmtNumber(v.value, 0)}</p>
-                <p className="mt-1 text-sm font-semibold text-ink">{k.label} {v.is_demo && <Badge tone="amber">DEMO</Badge>}</p>
-                <p className="mt-0.5 truncate text-xs text-muted">{typeof v.change === 'number' ? `${v.note} · vs ${v.versus}` : v.note}</p>
-              </>
-            );
-            return k.to ? <Link key={k.key} to={k.to} className="admin-card admin-card-hover relative overflow-hidden p-4">{body}</Link> : <div key={k.key} className="admin-card relative overflow-hidden p-4">{body}</div>;
-          })}
-        </section>
-      )}
+      <div className="grid gap-5 2xl:grid-cols-[minmax(0,1fr)_23rem] xl:grid-cols-[minmax(0,1fr)_21rem]">
+        <div className="min-w-0 space-y-5">
+          {loading && <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{[0, 1, 2, 3].map((k) => <div key={k} className="skeleton h-24" />)}</div>}
+          {data?.kpis && (
+            <section aria-label="Indicadores generales" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4">
+              {KPI_CARDS.map((k) => {
+                const v = (data.kpis[k.key] ?? { value: null, note: 'Sin datos' }) as Row;
+                const body = (
+                  <>
+                    <span className={`grid h-12 w-12 shrink-0 place-items-center rounded-full text-[1.5rem] ${k.tone}`}><Icon name={k.icon} /></span>
+                    <span className="min-w-0 flex-1">
+                      <span className="flex flex-wrap items-baseline gap-x-2">
+                        <span className="font-display text-[1.55rem] leading-none font-extrabold text-ink tabular-nums">{v.value === null || v.value === undefined ? '—' : fmtNumber(v.value, 0)}</span>
+                        {typeof v.change === 'number' && (
+                          <span className={`text-xs font-bold ${v.change >= 0 ? 'text-[#14935a]' : 'text-ut-red'}`} title={`Variación frente a ${v.versus}`}>{v.change >= 0 ? '↑' : '↓'} {Math.abs(v.change).toLocaleString('es-CO')}%</span>
+                        )}
+                      </span>
+                      <span className="mt-1 block truncate text-sm text-muted" title={k.label}>{k.label}</span>
+                      <span className="block truncate text-[0.7rem] text-muted/80" title={v.note}>{v.note}{v.is_demo ? ' · DEMO' : ''}</span>
+                    </span>
+                  </>
+                );
+                const cls = 'admin-card flex items-center gap-3 p-4';
+                return k.to ? <Link key={k.key} to={k.to} className={`${cls} admin-card-hover`}>{body}</Link> : <div key={k.key} className={cls}>{body}</div>;
+              })}
+            </section>
+          )}
 
-      {charts && (
-        <>
-          <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-            <Card title="Estudiantes matriculados por semestre" subtitle={<>Últimos {charts.enrollment.length} semestres · indicador M02-I01 {demo}</>} icon="students">
-              <LineChart data={charts.enrollment} label="Estudiantes matriculados por semestre" />
-            </Card>
-            <Card title="Distribución de estudiantes por CAT" subtitle={<>Período {charts.period ?? '—'} · indicador M02-I03</>} icon="building">
-              <Donut data={charts.by_cat} center="estudiantes" />
-            </Card>
-          </div>
-
-          <div className="grid gap-6 lg:grid-cols-2 2xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_minmax(0,1.1fr)]">
-            <Card title="Estudiantes nuevos" subtitle={<>Comparación entre períodos · indicador M02-I04 {demo}</>} icon="chart">
-              <BarChart data={charts.new_students} unit="estudiantes nuevos" />
-            </Card>
-            <Card title="Presencia territorial" subtitle={`Estudiantes por departamento del CAT · ${charts.period ?? ''}`} icon="pin">
-              <div className="grid items-center gap-3 sm:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-                <ColombiaMap title="Estudiantes del IDEAD por departamento" values={Object.fromEntries(Object.entries(territory).map(([c, t]) => [c, t.value]))} formatValue={(v) => `${fmtNumber(v, 0)} estudiantes`} className="[&_figcaption]:hidden" />
-                <ul className="space-y-1.5 text-sm">
-                  {Object.entries(territory).sort((x, y) => y[1].value - x[1].value).map(([c, t]) => (
-                    <li key={c} className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate">{t.name}</span><span className="font-semibold tabular-nums">{fmtNumber(t.value, 0)}</span></li>
-                  ))}
-                </ul>
+          {charts && (
+            <>
+              <div className="grid gap-5 lg:grid-cols-2">
+                <Card title="Estudiantes matriculados" subtitle={<>Últimos {charts.enrollment.length} semestres · M02-I01 {demo}</>} icon="students">
+                  <LineChart data={charts.enrollment} label="Estudiantes matriculados por semestre" />
+                </Card>
+                <Card title="Distribución por CAT" subtitle={<>Estudiantes · período {charts.period ?? '—'}</>} icon="building">
+                  <Donut data={charts.by_cat} center="estudiantes" />
+                </Card>
               </div>
-            </Card>
-            <Card title="Comportamiento de los indicadores" subtitle="Por módulo del portal" icon="chart" className="lg:col-span-2 2xl:col-span-1">
-              <ModuleBars modules={charts.modules} />
-            </Card>
-          </div>
+              <div className="grid gap-5 lg:grid-cols-2">
+                <Card title="Estudiantes nuevos" subtitle={<>Comparación entre períodos · M02-I04 {demo}</>} icon="chart">
+                  <BarChart data={charts.new_students} unit="estudiantes nuevos" />
+                </Card>
+                <Card title="Presencia territorial" subtitle={`Estudiantes por departamento del CAT · ${charts.period ?? ''}`} icon="pin">
+                  <div className="grid items-center gap-3 sm:grid-cols-2">
+                    <ColombiaMap title="Estudiantes del IDEAD por departamento" values={Object.fromEntries(Object.entries(territory).map(([c, t]) => [c, t.value]))} formatValue={(v) => `${fmtNumber(v, 0)} estudiantes`} className="[&_figcaption]:hidden" />
+                    <ul className="space-y-1.5 text-sm">
+                      {Object.entries(territory).sort((x, y) => y[1].value - x[1].value).map(([c, t]) => (
+                        <li key={c} className="flex items-center gap-2"><span className="min-w-0 flex-1 truncate">{t.name}</span><span className="font-semibold tabular-nums">{fmtNumber(t.value, 0)}</span></li>
+                      ))}
+                    </ul>
+                  </div>
+                </Card>
+              </div>
+              <Card title="Comportamiento de los indicadores" subtitle="Por módulo del portal" icon="chart">
+                <ModuleBars modules={charts.modules} />
+              </Card>
+            </>
+          )}
+        </div>
 
-          <section aria-labelledby="estados-title">
-            <div className="mb-3 flex flex-wrap items-baseline gap-x-3">
-              <h2 id="estados-title" className="text-[1.05rem] font-extrabold text-ink">Indicadores pendientes y publicados</h2>
-              <p className="text-xs text-muted">Estado de las cargas de datos de las oficinas</p>
-              <Link to="/cargas" className="ml-auto inline-flex items-center gap-1 text-sm font-semibold text-ut-red hover:underline">Ver cargas <Icon name="arrowRight" /></Link>
-            </div>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-              {SUBMISSION_STATES.map((st) => (
-                <Link key={st.key} to="/cargas" className={`admin-card-hover flex items-center gap-3 rounded-[1.125rem] border p-4 ${st.tone}`}>
-                  <span className="grid h-11 w-11 shrink-0 place-items-center rounded-2xl bg-white/80 text-xl shadow-sm"><Icon name={st.icon} /></span>
-                  <span className="min-w-0">
-                    <span className="font-display block text-2xl leading-none font-extrabold tabular-nums">{subs[st.key] ?? 0}</span>
-                    <span className="block text-sm font-bold">{st.label}</span>
-                    <span className="block truncate text-xs opacity-80">{st.text}</span>
-                  </span>
-                </Link>
-              ))}
-            </div>
-          </section>
-        </>
-      )}
-
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.6fr)_minmax(0,1fr)]">
-        {data?.recent && (
-          <Card title="Actividad reciente" subtitle="Últimos cambios en contenidos, fichas y cargas" icon="history"
-            action={can('audit.view') ? <Link to="/auditoria" className="inline-flex items-center gap-1 text-sm font-semibold text-ut-red hover:underline">Ver todo <Icon name="arrowRight" /></Link> : undefined}>
-            {data.recent.length === 0 ? <p className="text-sm text-muted">Sin cambios registrados.</p> : (
-              <ol className="relative space-y-1 before:absolute before:top-3 before:bottom-3 before:left-[1.2rem] before:w-px before:bg-line">
-                {data.recent.map((r: Row) => {
-                  const [ic, tone] = ACTIVITY_ICON[r.entity] ?? ['info', 'bg-warm text-ink'];
-                  return (
-                    <li key={r.id} className="relative flex items-center gap-3 rounded-xl p-1.5 hover:bg-ivory">
-                      <span className={`relative grid h-10 w-10 shrink-0 place-items-center rounded-full text-lg ring-4 ring-white ${tone}`}><Icon name={ic} /></span>
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm text-ink"><span className="font-semibold">{r.user}</span> {r.action} {r.type.toLowerCase()}: <span className="font-medium">{r.title}</span></p>
-                        <p className="text-xs text-muted">{r.type} · {timeAgo(r.at)}</p>
-                      </div>
-                    </li>
-                  );
-                })}
-              </ol>
-            )}
-          </Card>
-        )}
-        {quick.length > 0 && (
-          <Card title="Accesos rápidos" subtitle="Según los permisos de su rol" icon="home">
-            <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-2 2xl:grid-cols-3">
-              {quick.map((q) => (
-                <Link key={q.to} to={q.to} className="admin-card-hover group flex flex-col items-center gap-2 rounded-2xl border border-[#ece4dc] bg-gradient-to-b from-white to-ivory p-4 text-center">
-                  <span className={`grid h-12 w-12 place-items-center rounded-2xl bg-gradient-to-br ${q.tone} text-2xl text-white shadow-lg transition group-hover:scale-110`}><Icon name={q.icon} /></span>
-                  <span className="text-sm leading-tight font-bold text-ink group-hover:text-ut-red">{q.label}</span>
-                  <span className="text-[0.7rem] leading-tight text-muted">{q.text}</span>
-                </Link>
-              ))}
-            </div>
-          </Card>
-        )}
+        <aside className="min-w-0 space-y-5" aria-label="Actividad y accesos">
+          {recent}
+          {quickCard}
+          {charts && (
+            <Card title="Estado de las cargas" subtitle="Indicadores enviados por las oficinas" icon="upload"
+              action={<Link to="/cargas" className="text-sm font-semibold text-ut-red hover:underline">Ver</Link>}>
+              <ul className="space-y-2">
+                {SUBMISSION_STATES.map((st) => (
+                  <li key={st.key}>
+                    <Link to="/cargas" className={`flex items-center gap-3 rounded-xl border px-3 py-2 transition hover:shadow-sm ${st.tone}`}>
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-lg bg-white/80 text-base"><Icon name={st.icon} /></span>
+                      <span className="min-w-0 flex-1"><span className="block text-sm font-bold">{st.label}</span><span className="block truncate text-[0.7rem] opacity-80">{st.text}</span></span>
+                      <span className="font-display text-xl font-extrabold tabular-nums">{subs[st.key] ?? 0}</span>
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+          {data && Object.keys(data.pending).length > 0 && (
+            <Card title="Mis pendientes" icon="clock">
+              <ul className="space-y-1.5">
+                {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
+                  <li key={k}>
+                    <Link to={PENDING_LABELS[k]?.[1] ?? '/'} className="flex items-center gap-3 rounded-xl px-2 py-1.5 hover:bg-ivory">
+                      <span className={`grid h-8 min-w-8 place-items-center rounded-full px-1.5 text-sm font-bold ${v > 0 ? 'bg-ut-red text-white' : 'bg-idead-teal-50 text-idead-teal-dark'}`}>{v}</span>
+                      <span className="min-w-0 flex-1 text-sm">{PENDING_LABELS[k]?.[0] ?? k}</span>
+                      {v === 0 && <span className="text-xs text-idead-teal-dark">Al día</span>}
+                    </Link>
+                  </li>
+                ))}
+              </ul>
+            </Card>
+          )}
+          {data?.indicators && (
+            <section className="admin-card p-4">
+              <div className="flex items-end justify-between"><p className="text-sm font-semibold text-ink">Indicadores con datos publicados</p><p className="font-display text-lg font-extrabold text-ink">{data.indicators.con_datos_publicados}<span className="text-sm font-semibold text-muted"> / {data.indicators.total}</span></p></div>
+              <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#f3eee9]"><div className="h-full rounded-full bg-gradient-to-r from-idead-teal to-idead-teal-dark" style={{ width: `${Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100)}%` }} /></div>
+              <p className="mt-1.5 text-xs text-muted">{data.indicators.metodologia_validada} con metodología validada</p>
+            </section>
+          )}
+        </aside>
       </div>
-
-      {data && Object.keys(data.pending).length > 0 && (
-        <section aria-labelledby="mis-pendientes">
-          <h2 id="mis-pendientes" className="mb-3 text-[1.05rem] font-extrabold text-ink">Mis pendientes</h2>
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-            {Object.entries(data.pending as Record<string, number>).map(([k, v]) => (
-              <Link key={k} to={PENDING_LABELS[k]?.[1] ?? '/'} className={`admin-card admin-card-hover relative overflow-hidden p-4 ${v > 0 ? '!border-ut-red/30' : ''}`}>
-                <span className={`absolute inset-x-0 top-0 h-1 ${v > 0 ? 'bg-ut-red' : 'bg-idead-teal'}`} aria-hidden />
-                <div className="flex items-start justify-between">
-                  <p className={`font-display text-3xl font-extrabold ${v > 0 ? 'text-ut-red' : 'text-ink'}`}>{v}</p>
-                  <span className={`grid h-9 w-9 place-items-center rounded-full text-lg ${v > 0 ? 'bg-ut-red text-white' : 'bg-idead-teal-50 text-idead-teal-dark'}`}><Icon name={v > 0 ? PENDING_LABELS[k]?.[2] ?? 'info' : 'check'} /></span>
-                </div>
-                <p className="mt-1 text-sm">{PENDING_LABELS[k]?.[0] ?? k}</p>
-                {v === 0 && <p className="text-xs text-idead-teal-dark">Al día</p>}
-              </Link>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {data?.indicators && (
-        <section className="admin-card flex flex-wrap items-center gap-5 p-5">
-          <span className="grid h-12 w-12 place-items-center rounded-2xl bg-idead-teal-50 text-2xl text-idead-teal-dark"><Icon name="chart" /></span>
-          <div className="min-w-56 flex-1">
-            <div className="flex items-end justify-between"><p className="text-sm font-semibold text-ink">Indicadores con datos publicados</p><p className="font-display text-xl font-extrabold text-ink">{data.indicators.con_datos_publicados}<span className="text-sm font-semibold text-muted"> / {data.indicators.total}</span></p></div>
-            <div className="mt-2 h-2.5 overflow-hidden rounded-full bg-[#f3eee9]"><div className="h-full rounded-full bg-gradient-to-r from-idead-teal to-idead-teal-dark" style={{ width: `${Math.round((data.indicators.con_datos_publicados / data.indicators.total) * 100)}%` }} /></div>
-            <p className="mt-1.5 text-xs text-muted">{data.indicators.metodologia_validada} con metodología validada</p>
-          </div>
-        </section>
-      )}
     </div>
   );
 }

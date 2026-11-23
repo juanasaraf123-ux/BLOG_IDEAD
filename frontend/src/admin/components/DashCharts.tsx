@@ -71,7 +71,7 @@ export function Donut({ data, center }: { data: { label: string; value: number }
   });
   const h = hover !== null ? data[hover] : null;
   return (
-    <div className="flex flex-col items-center gap-5 2xl:flex-row">
+    <div className="@container"><div className="flex flex-col items-center gap-5 @md:flex-row">
       <svg viewBox="0 0 200 200" className="w-44 shrink-0" role="img" aria-label={data.map((d) => `${d.label} ${fmtNumber(d.value, 0)}`).join(', ')} onMouseLeave={() => setHover(null)}>
         {arcs.map((a) => <path key={a.i} d={a.d} fill={a.fill} opacity={hover === null || hover === a.i ? 1 : 0.35} onMouseEnter={() => setHover(a.i)} className="transition-opacity" />)}
         <text x={C} y={C - 4} textAnchor="middle" className="fill-ink text-[22px] font-extrabold">{fmtNumber(h ? h.value : total, 0)}</text>
@@ -87,7 +87,7 @@ export function Donut({ data, center }: { data: { label: string; value: number }
           </li>
         ))}
       </ul>
-    </div>
+    </div></div>
   );
 }
 

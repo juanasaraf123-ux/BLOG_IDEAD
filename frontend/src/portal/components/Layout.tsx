@@ -8,7 +8,7 @@ export function Logo() {
   const site = useSite();
   return (
     <Link to="/" className="flex shrink-0 items-center gap-3" aria-label="Inicio — IDEAD, Universidad del Tolima">
-      <img src={site?.settings.logo_url ?? '/img/logo-ut-temporal.png'} alt="Universidad del Tolima — Conocimiento que transforma" className="h-11 w-auto md:h-14" />
+      <img src={site?.settings.logo_url ?? '/img/logo-ut-temporal.png'} alt="Universidad del Tolima — Conocimiento que transforma" className="h-11 w-auto md:h-12" />
       <span className="hidden shrink-0 border-l border-gray-300 pl-3 text-[0.72rem] leading-tight font-medium whitespace-nowrap text-ink uppercase sm:block md:text-[0.78rem]">
         Instituto de<br />Educación<br />a Distancia
       </span>
@@ -31,7 +31,7 @@ const NAV_END = [
 ];
 
 const pill = (active: boolean) =>
-  `flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[0.86rem] font-semibold whitespace-nowrap transition ${active ? 'bg-ut-red text-white shadow-md shadow-ut-red/25' : 'text-[#4a4f55] hover:bg-ut-red-50 hover:text-ut-red'}`;
+  `flex items-center gap-1.5 rounded-full px-2 py-1.5 text-[0.8rem] font-semibold min-[1600px]:px-2.5 whitespace-nowrap transition ${active ? 'bg-ut-red text-white shadow-md shadow-ut-red/25' : 'text-[#4a4f55] hover:bg-ut-red-50 hover:text-ut-red'}`;
 
 function StatsMenu({ onNavigate }: { onNavigate?: () => void }) {
   const site = useSite();
@@ -85,22 +85,6 @@ function SearchBox({ className = '' }: { className?: string }) {
   );
 }
 
-/** Adorno del boceto: hojas verdes y trazos rojos curvos en los extremos del encabezado. */
-function HeaderOrnament({ side }: { side: 'left' | 'right' }) {
-  return (
-    <svg aria-hidden viewBox="0 0 160 110" className={`pointer-events-none absolute top-0 hidden h-full w-40 xl:block ${side === 'left' ? 'left-0' : 'right-0 -scale-x-100'}`} preserveAspectRatio="xMinYMin slice">
-      <path d="M-10 18 C 40 0, 70 40, 120 8" fill="none" stroke="#c51718" strokeWidth="3" strokeLinecap="round" opacity=".85" />
-      <path d="M-10 30 C 35 14, 60 52, 105 26" fill="none" stroke="#c51718" strokeWidth="1.6" strokeLinecap="round" opacity=".45" />
-      <g fill="#2f7d4f" opacity=".9">
-        <path d="M8 70 C 10 52, 26 44, 40 46 C 36 60, 24 70, 8 70Z" />
-        <path d="M22 92 C 30 76, 48 74, 58 80 C 48 92, 36 96, 22 92Z" opacity=".75" />
-        <path d="M0 98 C 2 86, 12 80, 22 82 C 18 92, 10 98, 0 98Z" opacity=".6" />
-      </g>
-      <path d="M6 72 C 24 60, 40 70, 56 82" fill="none" stroke="#1f5a38" strokeWidth="1" opacity=".6" />
-    </svg>
-  );
-}
-
 export function Header() {
   const [open, setOpen] = useState(false);
   const { pathname } = useLocation();
@@ -119,17 +103,15 @@ export function Header() {
     </a>
   );
   return (
-    <header className="sticky top-0 z-30 border-b border-line/70 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-white/60 bg-white/85 shadow-[0_6px_20px_-14px_rgba(120,20,20,0.35)] backdrop-blur-md">
       <div className="relative">
-        <HeaderOrnament side="left" />
-        <HeaderOrnament side="right" />
-        <div className="relative mx-auto flex max-w-[1500px] flex-wrap items-center gap-x-4 gap-y-2 px-4 py-3 lg:px-8 xl:px-40 min-[1800px]:px-8">
+        <div className="relative mx-auto flex max-w-[1600px] flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 lg:px-6">
           <Logo />
-          <nav aria-label="Menú principal" className="order-3 hidden w-full lg:block min-[1700px]:order-none min-[1700px]:ml-auto min-[1700px]:w-auto">
-            <ul className="flex items-center justify-center gap-0.5 rounded-full border border-line bg-surface/70 p-1 min-[1700px]:justify-start">{items()}</ul>
+          <nav aria-label="Menú principal" className="order-3 hidden w-full lg:block 2xl:order-none 2xl:ml-auto 2xl:w-auto">
+            <ul className="flex items-center justify-center gap-0.5 rounded-full border border-line/80 bg-white/80 p-1 shadow-sm 2xl:justify-start">{items()}</ul>
           </nav>
-          <div className="ml-auto hidden items-center gap-3 lg:flex min-[1700px]:ml-2">
-            <SearchBox className="w-52" />
+          <div className="ml-auto hidden items-center gap-3 lg:flex 2xl:ml-2">
+            <SearchBox className="w-36 min-[1600px]:w-40" />
             {login}
           </div>
           <button className="ml-auto rounded-lg p-2 text-2xl text-ink lg:hidden" aria-expanded={open} aria-controls="mobile-menu" aria-label={open ? 'Cerrar menú' : 'Abrir menú'} onClick={() => setOpen((o) => !o)}>

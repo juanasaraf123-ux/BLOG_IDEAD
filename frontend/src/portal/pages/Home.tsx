@@ -14,15 +14,15 @@ export default function Home() {
   const news = data?.news[0];
   const event = data?.events[0];
   return (
-    <div className="bg-[radial-gradient(circle_at_80%_0%,#fdf1f1_0,transparent_45%),radial-gradient(circle_at_0%_60%,#eef8f6_0,transparent_40%)]">
+    <div className="-mb-16 bg-white bg-[url(/img/fondos/fondo-hojas.webp)] bg-cover bg-fixed bg-center pb-16">
       <h1 className="sr-only">{site?.settings.site_name ?? 'Instituto de Educación a Distancia – IDEAD'} · Universidad del Tolima</h1>
-      <div className="mx-auto max-w-[1500px] px-4 pt-6 lg:px-8">
+      <div className="mx-auto max-w-[1600px] px-4 pt-5 lg:px-8">
         {loading && <Spinner />}
         {error && <ErrorBox message={error} onRetry={reload} />}
         {data && (
           <>
             {/* Fila 1 del boceto: carrusel | cifras 3×2 + selector rojo de CAT */}
-            <div className="grid gap-6 lg:grid-cols-[minmax(0,1.35fr)_minmax(0,1fr)]">
+            <div className="grid gap-5 lg:grid-cols-[minmax(0,1.75fr)_minmax(0,1fr)]">
               <HeroCarousel slides={data.slides} />
               <div className="flex flex-col justify-between">
                 <StatCards items={data.highlights} />
@@ -31,7 +31,7 @@ export default function Home() {
             </div>
 
             {/* Fila 2 del boceto: noticias · actividades · equipo · mapa de cobertura */}
-            <div className="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            <div className="mt-5 grid gap-4 md:grid-cols-2 xl:grid-cols-4">
               <FeatureCard icon="book" title="Noticias Destacadas" link={news ? `/noticias/${news.slug}` : '/noticias'} linkLabel="Ver más"
                 image={news?.image_url ?? '/img/home/estudiantes-circulo.jpg'} imageAlt={news?.image_url ? news.title : 'Estudiantes del IDEAD reunidos en el campus'}>
                 {news ? <><span className="line-clamp-3 font-semibold text-ink">{news.title}</span><span className="mt-1 block text-xs">{fmtDate(news.date)} {news.is_demo && <DemoBadge />}</span></> : 'Conoce lo que sucede en el IDEAD y sus Centros de Atención Tutorial.'}
@@ -49,7 +49,7 @@ export default function Home() {
           </>
         )}
 
-        <section aria-labelledby="modulos" className="mt-14">
+        <section aria-labelledby="modulos" className="mt-12 rounded-[1.5rem] border border-white bg-white/90 p-6 shadow-[0_10px_30px_-14px_rgba(120,20,20,0.3)] backdrop-blur md:p-8">
           <div className="mb-6 max-w-3xl">
             <h2 id="modulos" className="text-2xl font-extrabold text-ut-red md:text-3xl">{site?.settings.hero_title ?? 'Información institucional del IDEAD'}</h2>
             <p className="mt-2 text-lg text-muted">{site?.settings.hero_text} Cada cifra muestra su fuente, período y fecha de actualización.</p>

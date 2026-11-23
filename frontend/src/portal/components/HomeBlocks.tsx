@@ -57,30 +57,32 @@ export function HeroCarousel({ slides }: { slides: HomeData['slides'] }) {
 }
 
 
-/** Cifras del boceto: tarjetas blancas (icono rojo, número, etiqueta), 3 × 2. Sin dato → «Pendiente». */
+/** Cifras del boceto: tarjetas blancas en 2 columnas (icono rojo a la izquierda, número y etiqueta). Sin dato → «Pendiente». */
 export function StatCards({ items }: { items: Highlight[] }) {
   return (
-    <section aria-labelledby="kpi-title">
+    <section aria-labelledby="kpi-title" className="flex-1">
       <h2 id="kpi-title" className="sr-only">Cifras institucionales destacadas</h2>
-      <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+      <ul className="grid h-full grid-cols-2 auto-rows-fr gap-3">
         {items.map((h) => {
           const tip = [h.source && `Fuente: ${h.source}`, h.period && `Período: ${h.period}`, h.indicator_code && `Indicador ${h.indicator_code}`].filter(Boolean).join(' · ');
           const content = (
             <>
-              <Icon name={h.icon} className="text-[2.3rem] text-ut-red" strokeWidth={1.4} />
-              {h.value !== null ? (
-                <span className="mt-2 block text-[1.65rem] leading-none font-extrabold text-ink">{fmtNumber(h.value, 0)}</span>
-              ) : (
-                <span className="mt-2 block text-xs leading-tight font-semibold text-muted">Pendiente de actualización</span>
-              )}
-              <span className="mt-1 block text-sm leading-tight font-medium text-muted">{h.label}</span>
-              {h.is_demo && <DemoBadge className="mt-1" />}
+              <Icon name={h.icon} className="shrink-0 text-[2.6rem] text-ut-red" strokeWidth={1.4} />
+              <span className="min-w-0">
+                {h.value !== null ? (
+                  <span className="block text-[1.6rem] leading-none font-extrabold text-ut-red-dark">{fmtNumber(h.value, 0)}</span>
+                ) : (
+                  <span className="block text-xs leading-tight font-semibold text-muted">Pendiente de actualización</span>
+                )}
+                <span className="mt-0.5 block text-sm leading-tight font-medium text-ink">{h.label}</span>
+                {h.is_demo && <DemoBadge className="mt-0.5" />}
+              </span>
             </>
           );
-          const cls = 'flex h-full flex-col items-center justify-center rounded-2xl border border-line bg-white px-2 py-4 text-center shadow-[0_4px_18px_rgba(0,0,0,0.06)]';
+          const cls = 'flex h-full items-center gap-3 rounded-2xl border border-white bg-white/90 px-4 py-3.5 shadow-[0_6px_20px_-8px_rgba(120,20,20,0.25)] backdrop-blur';
           return (
             <li key={h.label}>
-              {h.link ? <Link to={h.link} title={tip} className={`${cls} transition hover:-translate-y-0.5 hover:border-ut-red/40 hover:shadow-lg`}>{content}</Link> : <div title={tip} className={cls}>{content}</div>}
+              {h.link ? <Link to={h.link} title={tip} className={`${cls} transition hover:-translate-y-0.5 hover:shadow-lg`}>{content}</Link> : <div title={tip} className={cls}>{content}</div>}
               {tip && <span className="sr-only">{tip}</span>}
             </li>
           );
@@ -97,11 +99,11 @@ export function CatPicker({ cats }: { cats: CatSummary[] }) {
   const [slug, setSlug] = useState(initial?.slug ?? '');
   if (!cats.length) return null;
   return (
-    <div className="mt-3 flex items-stretch overflow-hidden rounded-2xl bg-ut-red text-white shadow-lg shadow-ut-red/25">
+    <div className="mt-3 flex items-stretch overflow-hidden rounded-2xl bg-gradient-to-r from-ut-red to-[#e0242e] text-white shadow-lg shadow-ut-red/30">
       <label htmlFor="cat-picker" className="sr-only">Seleccione un Centro de Atención Tutorial</label>
       <div className="relative flex-1">
         <select id="cat-picker" value={slug} onChange={(e) => setSlug(e.target.value)}
-          className="h-full w-full cursor-pointer appearance-none bg-transparent py-3.5 pr-10 pl-5 text-lg font-extrabold focus:bg-ut-red-dark focus:outline-none">
+          className="h-full w-full cursor-pointer appearance-none bg-transparent py-3 pr-10 pl-5 text-center text-xl font-extrabold focus:bg-ut-red-dark focus:outline-none">
           {cats.map((c) => <option key={c.slug} value={c.slug} className="bg-white text-ink">{c.name}</option>)}
         </select>
         <Icon name="chevronDown" className="pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-xl" />
@@ -112,24 +114,23 @@ export function CatPicker({ cats }: { cats: CatSummary[] }) {
   );
 }
 
-/** Tarjeta de la segunda fila del boceto: icono, título, texto, enlace y foto a la derecha. */
+/** Tarjeta de la segunda fila del boceto: icono y título rojos en línea, texto breve, enlace y foto a la derecha. */
 export function FeatureCard({ icon, title, children, link, linkLabel, image, imageAlt = '' }: { icon: string; title: string; children: ReactNode; link: string; linkLabel: string; image?: string | null; imageAlt?: string }) {
   return (
-    <article className="group flex h-full overflow-hidden rounded-2xl border border-line bg-white shadow-[0_4px_18px_rgba(0,0,0,0.06)]">
-      <div className="flex min-w-0 flex-1 flex-col p-5">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-ut-red-50 text-2xl text-ut-red"><Icon name={icon} /></span>
-        <h2 className="mt-3 text-lg leading-tight font-extrabold text-ink">{title}</h2>
-        <div className="mt-1.5 flex-1 text-sm leading-snug text-muted">{children}</div>
-        <Link to={link} className="mt-3 inline-flex items-center gap-1 text-sm font-bold text-ut-red hover:underline">{linkLabel} <Icon name="arrowRight" /></Link>
+    <article className="group flex h-full min-h-[9.5rem] overflow-hidden rounded-2xl border border-white bg-white/95 shadow-[0_8px_24px_-10px_rgba(120,20,20,0.3)]">
+      <div className="flex min-w-0 flex-1 flex-col p-4">
+        <h2 className="flex items-center gap-2 text-[1.05rem] leading-tight font-extrabold text-ut-red"><Icon name={icon} className="shrink-0 text-[1.7rem]" strokeWidth={2} />{title}</h2>
+        <div className="mt-2 flex-1 text-[0.8rem] leading-snug text-ink">{children}</div>
+        <Link to={link} className="mt-2 inline-flex items-center gap-1 text-sm font-bold text-ut-red hover:underline">{linkLabel} <Icon name="arrowRight" /></Link>
       </div>
-      <div className="w-[36%] shrink-0 overflow-hidden">
+      <div className="w-[40%] shrink-0 overflow-hidden">
         {image ? <img src={image} alt={imageAlt} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" /> : <Placeholder />}
       </div>
     </article>
   );
 }
 
-/** Tarjeta roja «Mapa de Cobertura» del boceto. */
+/** Tarjeta roja «Mapa de Cobertura» del boceto: texto a la izquierda y mapa de Colombia superpuesto a la derecha. */
 export function CoverageCard({ cats }: { cats: CatSummary[] }) {
   const byDept = useMemo(() => {
     const m: Record<string, number> = {};
@@ -137,16 +138,17 @@ export function CoverageCard({ cats }: { cats: CatSummary[] }) {
     return m;
   }, [cats]);
   return (
-    <article className="relative flex h-full overflow-hidden rounded-2xl bg-gradient-to-br from-ut-red to-ut-red-dark text-white shadow-lg shadow-ut-red/25">
-      <div className="relative z-10 flex flex-1 flex-col p-5">
-        <span className="grid h-10 w-10 place-items-center rounded-xl bg-white/15 text-2xl"><Icon name="pin" /></span>
-        <h2 className="mt-3 text-lg leading-tight font-extrabold">Mapa de Cobertura</h2>
-        <p className="mt-1.5 flex-1 text-sm leading-snug text-white/90">Presencia del IDEAD en todo el territorio{cats.length ? `: ${cats.length} CAT en ${Object.keys(byDept).length} departamentos.` : '.'}</p>
-        <Link to="/cat" className="mt-3 inline-flex w-fit items-center gap-1 rounded-full bg-white px-4 whitespace-nowrap py-1.5 text-sm font-bold text-ut-red hover:bg-ut-red-50">Explorar mapa <Icon name="arrowRight" /></Link>
+    <article className="relative flex h-full min-h-[9.5rem] overflow-hidden rounded-2xl bg-gradient-to-r from-ut-red-dark via-ut-red to-[#e0242e] text-white shadow-[0_10px_28px_-10px_rgba(149,21,29,0.6)]">
+      <span className="pointer-events-none absolute -bottom-16 -left-10 h-40 w-40 rounded-full bg-white/10" aria-hidden />
+      <div className="relative z-10 flex flex-1 flex-col p-4">
+        <h2 className="text-lg leading-tight font-extrabold">Mapa de Cobertura</h2>
+        <p className="mt-1.5 flex-1 text-[0.8rem] leading-snug text-white/90">Presencia del IDEAD en todo el territorio{cats.length ? `: ${cats.length} CAT en ${Object.keys(byDept).length} departamentos` : ''}</p>
+        <Link to="/cat" className="mt-2 inline-flex w-fit items-center gap-1 rounded-full bg-white/20 px-4 py-1.5 text-sm font-bold whitespace-nowrap ring-1 ring-white/40 hover:bg-white hover:text-ut-red">Explorar mapa <Icon name="arrowRight" /></Link>
       </div>
-      <div className="pointer-events-none m-3 ml-0 w-[40%] shrink-0 self-center rounded-xl bg-white/95 p-1.5 [&_figcaption]:hidden">
+      <div className="pointer-events-none relative w-[46%] shrink-0 py-1 pr-8 opacity-95 [&_figcaption]:hidden [&_path]:stroke-white">
         <ColombiaMap title="Departamentos con Centros de Atención Tutorial del IDEAD" values={byDept} formatValue={(v) => `${v} CAT`} className="h-full w-full" />
       </div>
+      <Link to="/cat" aria-label="Explorar el mapa de cobertura" className="absolute top-1/2 right-2 z-10 grid h-8 w-8 -translate-y-1/2 place-items-center rounded-full bg-white text-ut-red shadow-lg hover:scale-110"><Icon name="chevronRight" /></Link>
     </article>
   );
 }

@@ -143,7 +143,7 @@ function Shell({ children }: { children: ReactNode }) {
   const mini = collapsed && !open; // en celular el menú abierto siempre va completo
 
   const itemCls = (a: boolean, sub = false) =>
-    `group relative flex items-center gap-3 rounded-xl ${mini ? 'justify-center px-0 py-2.5' : sub ? 'px-3 py-1.5 text-[0.85rem]' : 'px-3 py-2.5 text-[0.9rem]'} font-medium transition ${a ? 'bg-white text-ut-red shadow-[0_6px_18px_-6px_rgb(0_0_0/0.45)]' : 'text-white/85 hover:bg-white/12 hover:text-white'}`;
+    `group relative flex items-center gap-3 rounded-xl ${mini ? 'justify-center px-0 py-2.5' : sub ? 'px-3 py-1.5 text-[0.85rem]' : 'px-3 py-2.5 text-[0.9rem]'} font-medium transition ${a ? 'bg-white/22 font-semibold text-white shadow-[0_6px_18px_-8px_rgb(0_0_0/0.45)] ring-1 ring-white/35' : 'text-white/85 hover:bg-white/12 hover:text-white'}`;
   const indicator = (a: boolean) => a && !mini ? <span className="absolute top-1/2 -left-4 h-7 w-1.5 -translate-y-1/2 rounded-r-full bg-idead-teal" aria-hidden /> : null;
   const nav = (
     <nav aria-label="Menú del panel" className="space-y-5">
