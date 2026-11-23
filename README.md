@@ -26,10 +26,14 @@ Portal: <http://localhost:5173> · Panel: <http://localhost:5173/admin/> (usuari
 
 > Los datos de demostración están marcados como **DEMO** y nunca deben cargarse en producción. Sin ellos, el portal muestra «Información pendiente de actualización» en lugar de cifras.
 
+## Información oficial precargada
+
+`php artisan db:seed` carga, además del catálogo, la información pública oficial tomada de las páginas de la Universidad del Tolima (`database/seeders/UniversidadTolimaSeeder.php`, datos en `backend/database/data/ut/`): misión, visión, valores e historia del IDEAD (Acuerdo 0237 de 2026), 23 programas con su ficha, 25 CAT con dirección, teléfonos, horario e historia, 1.050 artículos de las revistas del IDEAD, oferta de educación continua, normatividad, contacto y fechas del calendario académico 2027. Se puede ejecutar de nuevo sin duplicar datos (`php artisan db:seed --class=UniversidadTolimaSeeder`).
+
 ## Pruebas
 
 ```bash
-cd backend && php artisan test          # 32 pruebas (seguridad, indicadores, registros, solicitudes, portal)
+cd backend && php artisan test          # 33 pruebas (seguridad, indicadores, registros, solicitudes, portal)
 cd frontend && npm test && npm run build
 npm run e2e:portal && npm run e2e:a11y   # con los servidores en marcha (Playwright + axe)
 ```
