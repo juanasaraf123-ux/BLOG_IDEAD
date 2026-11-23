@@ -86,7 +86,7 @@ body { @apply bg-white text-ink antialiased; font-size: 16px; }
   background-attachment: fixed;
 }
 .admin-bg-login {
-  background: linear-gradient(rgb(255 255 255 / 0.35), rgb(255 255 255 / 0.35)), url('/img/fondos/fondo-edificio.webp') center / cover no-repeat;
+  background: linear-gradient(rgb(255 255 255 / 0.12), rgb(255 255 255 / 0.12)), url('/img/fondos/fondo-edificio.webp') center / cover no-repeat fixed;
 }
 .admin-card { background: #fff; border: 1px solid rgb(230 222 214 / 0.9); border-radius: var(--radius-card); box-shadow: var(--shadow-card); }
 .admin-card-hover { transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease; }
