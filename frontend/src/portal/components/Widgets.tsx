@@ -51,7 +51,7 @@ export function ProgramsTable({ filters }: { filters: Record<string, string> }) 
       {(rows) => (
         <DataTable rows={rows} caption="Programas académicos" csvName="programas" columns={[
           { key: 'name', label: 'Programa', render: (r) => <Link to={`/programas/${r.slug}`} className="font-semibold text-ut-red hover:underline">{r.name}</Link> },
-          { key: 'level', label: 'Nivel' }, { key: 'area', label: 'Área de conocimiento' },
+          { key: 'level', label: 'Nivel' },
           { key: 'status', label: 'Estado', value: (r) => label(r.status) }, { key: 'cats_count', label: 'CAT', align: 'right' },
         ]} />
       )}

@@ -186,7 +186,6 @@ export const RESOURCES: Record<string, ResourceConfig> = {
       { name: 'name', label: 'Nombre', type: 'text', required: true, full: true },
       { name: 'snies_code', label: 'Código SNIES', type: 'text' },
       rel('level_id', 'Nivel de formación', 'education-levels', { required: true }),
-      rel('area_id', 'Área de conocimiento', 'knowledge-areas'),
       { name: 'status', label: 'Estado', type: 'select', required: true, options: opts('activo', 'en_cierre', 'proyectado', 'inactivo') },
       { name: 'modality', label: 'Modalidad', type: 'select', required: true, options: [{ value: 'distancia', label: 'A distancia' }, { value: 'virtual', label: 'Virtual' }, { value: 'presencial', label: 'Presencial' }, { value: 'hibrida', label: 'Híbrida' }] },
       { name: 'duration_semesters', label: 'Duración (semestres)', type: 'number' },

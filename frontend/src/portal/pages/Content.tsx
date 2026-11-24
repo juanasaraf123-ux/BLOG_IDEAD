@@ -8,7 +8,7 @@ import { Badge, DemoBadge, ErrorBox, Pending, SectionTitle, Spinner, useAsync, u
 import { DataTable } from '../../shared/DataTable';
 import { PageShell } from '../components/Layout';
 import { ProgressBars, TrendChart } from '../components/Charts';
-import { PROJECT_STATUS_TONE, ProgramsTable } from '../components/Widgets';
+import { PROJECT_STATUS_TONE } from '../components/Widgets';
 import { useFilterOptions } from '../components/Filters';
 import NotFound from './NotFound';
 
@@ -54,8 +54,55 @@ export function Programs() {
         </label>
         <Link to="/estadisticas/oferta-academica" className="ml-auto self-end font-semibold text-ut-red hover:underline">Indicadores de oferta y acceso →</Link>
       </div>
-      <ProgramsTable filters={{ level, cat }} />
+      <ProgramCards filters={{ level, cat }} />
     </PageShell>
+  );
+}
+
+/** Tarjetas de programas agrupadas por nivel: lo esencial a la vista (nivel, modalidad, duración, SNIES, CAT). */
+function ProgramCards({ filters }: { filters: { level: string; cat: string } }) {
+  const { data, error, loading } = useAsync(() => publicGet<Any[]>('programs', { level_id: filters.level, cat: filters.cat }), [filters.level, filters.cat]);
+  const [q, setQ] = useState('');
+  if (loading) return <Spinner />;
+  if (error) return <ErrorBox message={error} />;
+  const rows = (data ?? []).filter((p) => !q || p.name.toLowerCase().includes(q.toLowerCase()));
+  const groups = [...new Set(rows.map((p) => p.level ?? 'Otros'))];
+  return (
+    <div>
+      <label className="mb-6 flex max-w-md items-center gap-2 rounded-full border border-line bg-white px-4 shadow-sm focus-within:ring-2 focus-within:ring-ut-red/30">
+        <Icon name="search" className="text-muted" /><span className="sr-only">Buscar programa</span>
+        <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Buscar programa…" className="w-full bg-transparent py-2.5 text-sm focus:outline-none" />
+      </label>
+      {rows.length === 0 && <Pending text="No hay programas con estos filtros." />}
+      <div className="space-y-10">
+        {groups.map((g) => (
+          <section key={g} aria-labelledby={`nivel-${g}`}>
+            <h2 id={`nivel-${g}`} className="mb-4 flex items-center gap-3 text-xl font-extrabold text-ink">
+              <span className="grid h-9 w-9 place-items-center rounded-xl bg-ut-red-50 text-lg text-ut-red"><Icon name="graduation" /></span>{g}
+              <span className="text-sm font-semibold text-muted">{rows.filter((p) => (p.level ?? 'Otros') === g).length}</span>
+            </h2>
+            <ul className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {rows.filter((p) => (p.level ?? 'Otros') === g).map((p) => (
+                <li key={p.slug}>
+                  <Link to={`/programas/${p.slug}`} className="group flex h-full flex-col rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-ut-red/40 hover:shadow-lg">
+                    <p className="text-lg leading-snug font-extrabold text-ink group-hover:text-ut-red">{p.name} {p.is_demo && <DemoBadge />}</p>
+                    <ul className="mt-3 flex flex-wrap gap-1.5 text-xs">
+                      <li className="rounded-full bg-ut-red-50 px-2.5 py-1 font-semibold text-ut-red-dark capitalize">{p.modality}</li>
+                      {p.duration_semesters && <li className="rounded-full bg-surface px-2.5 py-1 font-semibold text-ink">{p.duration_semesters} semestres</li>}
+                      {p.snies_code && <li className="rounded-full bg-surface px-2.5 py-1 font-semibold text-ink">SNIES {p.snies_code}</li>}
+                    </ul>
+                    <p className="mt-auto flex items-center justify-between pt-4 text-sm">
+                      <span className="text-muted">{p.cats_count ? `Se ofrece en ${p.cats_count} CAT` : label(p.status)}</span>
+                      <span className="inline-flex items-center gap-1 font-bold text-ut-red">Ver programa <Icon name="arrowRight" /></span>
+                    </p>
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </section>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -65,7 +112,7 @@ export function ProgramDetail() {
   useDocumentTitle(p?.name ?? 'Programa');
   if (status === 404) return <NotFound />;
   return (
-    <PageShell title={p?.name ?? '…'} crumbs={[{ to: '/programas', label: 'Programas' }]} intro={p && <span className="flex flex-wrap gap-2">{p.level?.name} · {p.area?.name ?? 'Área pendiente'} <Badge tone={p.status === 'activo' ? 'green' : 'amber'}>{label(p.status)}</Badge>{p.is_demo && <DemoBadge />}</span>}>
+    <PageShell title={p?.name ?? '…'} crumbs={[{ to: '/programas', label: 'Programas' }]} intro={p && <span className="flex flex-wrap gap-2">{p.level?.name} <Badge tone={p.status === 'activo' ? 'green' : 'amber'}>{label(p.status)}</Badge>{p.is_demo && <DemoBadge />}</span>}>
       {loading && <Spinner />}
       {error && <ErrorBox message={error} />}
       {p && (
@@ -167,44 +214,129 @@ export function NewsDetail() {
 
 // ------------------------------------------------------------------ Actividades
 
+const CATEGORY_TONE: Record<string, string> = {
+  'académica': 'bg-ut-red-50 text-ut-red-dark', cultural: 'bg-[#e8f3f0] text-[#13786f]', deportiva: 'bg-[#e9f0f9] text-[#1d4f88]',
+  institucional: 'bg-amber-50 text-amber-900', bienestar: 'bg-[#f3ecfb] text-[#5b3a8c]', investigación: 'bg-[#e9f0f9] text-[#1d4f88]',
+};
+const catTone = (c?: string | null) => CATEGORY_TONE[(c ?? '').toLowerCase()] ?? 'bg-surface text-ink';
+const monthKey = (iso: string) => iso.slice(0, 7);
+const monthName = (key: string) => new Intl.DateTimeFormat('es-CO', { month: 'long', year: 'numeric' }).format(new Date(`${key}-01T12:00`));
+const hour = (iso: string) => new Date(iso).toLocaleTimeString('es-CO', { hour: 'numeric', minute: '2-digit' });
+const WEEKDAYS = ['L', 'M', 'M', 'J', 'V', 'S', 'D'];
+
+/** Calendario pequeño del mes: marca los días con actividades; al tocar un día se va a esa actividad. */
+function MiniCalendar({ events, month, onMonth }: { events: EventCard[]; month: string; onMonth: (m: string) => void }) {
+  const [y, m] = month.split('-').map(Number);
+  const lead = (new Date(y, m - 1, 1).getDay() + 6) % 7;
+  const days = new Date(y, m, 0).getDate();
+  const byDay = new Map<number, EventCard>();
+  events.filter((e) => monthKey(e.starts_at) === month).forEach((e) => { const d = new Date(e.starts_at).getDate(); if (!byDay.has(d)) byDay.set(d, e); });
+  const shift = (n: number) => { const d = new Date(y, m - 1 + n, 1); onMonth(`${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`); };
+  const today = new Date();
+  return (
+    <div className="overflow-hidden rounded-[1.25rem] border border-line bg-white shadow-sm">
+      <div className="flex items-center bg-gradient-to-r from-ut-red to-ut-red-dark px-3 py-3 text-white">
+        <button type="button" onClick={() => shift(-1)} aria-label="Mes anterior" className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/15"><Icon name="chevronLeft" /></button>
+        <p className="flex-1 text-center font-extrabold first-letter:uppercase">{monthName(month)}</p>
+        <button type="button" onClick={() => shift(1)} aria-label="Mes siguiente" className="grid h-9 w-9 place-items-center rounded-full hover:bg-white/15"><Icon name="chevronRight" /></button>
+      </div>
+      <div className="grid grid-cols-7 gap-1 p-3 text-center text-sm">
+        {WEEKDAYS.map((w, i) => <span key={i} className="py-1 text-xs font-bold text-muted">{w}</span>)}
+        {Array.from({ length: lead }, (_, i) => <span key={`b${i}`} />)}
+        {Array.from({ length: days }, (_, i) => i + 1).map((d) => {
+          const ev = byDay.get(d);
+          const isToday = d === today.getDate() && m === today.getMonth() + 1 && y === today.getFullYear();
+          return ev ? (
+            <a key={d} href={`#ev-${ev.slug}`} title={ev.title} className="grid aspect-square place-items-center rounded-full bg-ut-red font-bold text-white shadow-md shadow-ut-red/30 hover:bg-ut-red-dark">{d}</a>
+          ) : <span key={d} className={`grid aspect-square place-items-center rounded-full ${isToday ? 'font-bold text-ut-red ring-2 ring-ut-red/40' : 'text-ink/80'}`}>{d}</span>;
+        })}
+      </div>
+      <p className="flex items-center gap-2 border-t border-line px-4 py-2.5 text-xs text-muted"><span className="h-3 w-3 rounded-full bg-ut-red" /> Día con actividad (tóquelo para verla)</p>
+    </div>
+  );
+}
+
 export function Events() {
   useDocumentTitle('Actividades');
   const [when, setWhen] = useState<'upcoming' | 'past'>('upcoming');
+  const [category, setCategory] = useState('');
   const [page, setPage] = useState(1);
-  const { data, error, loading } = useAsync(() => publicGet<Paginated<EventCard>>('events', { when: when === 'past' ? 'past' : undefined, page }), [when, page]);
+  const [month, setMonth] = useState<string | null>(null);
+  const { data, error, loading } = useAsync(() => publicGet<Paginated<EventCard>>('events', { when: when === 'past' ? 'past' : undefined, category: category || undefined, page }), [when, category, page]);
+  const all = useAsync(() => publicGet<Paginated<EventCard>>('events', { when: when === 'past' ? 'past' : undefined }), [when]);
+  const categories = [...new Set((all.data?.data ?? []).map((e) => e.category).filter(Boolean))] as string[];
+  const events = data?.data ?? [];
+  const months = [...new Set(events.map((e) => monthKey(e.starts_at)))];
+  const calMonth = month ?? months[0] ?? monthKey(new Date().toISOString());
   return (
-    <PageShell title="Actividades y calendario" intro="Agenda académica, cultural, deportiva e institucional del IDEAD y sus CAT.">
-      <div className="mb-6 flex gap-2" role="tablist">
-        {(['upcoming', 'past'] as const).map((w) => (
-          <button key={w} role="tab" aria-selected={when === w} onClick={() => { setWhen(w); setPage(1); }} className={`rounded-full px-4 py-1.5 text-sm font-semibold ${when === w ? 'bg-ut-red text-white' : 'border border-line'}`}>{w === 'upcoming' ? 'Próximas' : 'Realizadas'}</button>
-        ))}
+    <div className="mx-auto max-w-[1500px] px-4 py-8 lg:px-8">
+      <nav aria-label="Ruta de navegación" className="mb-3 text-sm text-muted"><ol className="flex gap-1"><li><Link to="/" className="hover:text-ut-red">Inicio</Link></li><li className="before:mx-1 before:content-['/']" aria-current="page">Actividades</li></ol></nav>
+      <header className="flex flex-wrap items-end gap-4">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-3xl font-extrabold text-ut-red md:text-4xl">Actividades</h1>
+          <p className="mt-1 text-muted">Agenda académica, cultural e institucional del IDEAD y sus CAT.</p>
+        </div>
+        <div className="flex rounded-full bg-surface p-1" role="tablist" aria-label="Período">
+          {(['upcoming', 'past'] as const).map((w) => (
+            <button key={w} role="tab" type="button" aria-selected={when === w} onClick={() => { setWhen(w); setPage(1); setMonth(null); setCategory(''); }}
+              className={`rounded-full px-5 py-2 text-sm font-semibold transition ${when === w ? 'bg-ut-red text-white shadow' : 'text-ink hover:text-ut-red'}`}>{w === 'upcoming' ? 'Próximas' : 'Realizadas'}</button>
+          ))}
+        </div>
+      </header>
+      {categories.length > 1 && (
+        <div className="mt-5 flex flex-wrap gap-2" aria-label="Categorías">
+          {['', ...categories].map((c) => (
+            <button key={c || 'todas'} type="button" aria-pressed={category === c} onClick={() => { setCategory(c); setPage(1); setMonth(null); }}
+              className={`rounded-full px-4 py-1.5 text-sm font-semibold capitalize transition ${category === c ? 'bg-ink text-white' : 'border border-line bg-white text-ink hover:border-ut-red/50'}`}>{c || 'Todas'}</button>
+          ))}
+        </div>
+      )}
+
+      <div className="mt-6 grid gap-8 lg:grid-cols-[19rem_minmax(0,1fr)]">
+        <aside className="lg:sticky lg:top-28 lg:self-start">{events.length > 0 && <MiniCalendar events={events} month={calMonth} onMonth={setMonth} />}</aside>
+        <div>
+          {loading && <Spinner />}
+          {error && <ErrorBox message={error} />}
+          {!loading && events.length === 0 && <Pending text={when === 'upcoming' ? 'No hay actividades programadas por ahora.' : 'No hay actividades realizadas registradas.'} />}
+          <div className="space-y-8">
+            {months.map((mk) => (
+              <section key={mk} aria-labelledby={`m-${mk}`}>
+                <h2 id={`m-${mk}`} className="mb-3 text-sm font-bold tracking-wide text-muted uppercase">{monthName(mk)}</h2>
+                <ul className="space-y-3">
+                  {events.filter((e) => monthKey(e.starts_at) === mk).map((e) => {
+                    const d = new Date(e.starts_at);
+                    return (
+                      <li key={e.slug} id={`ev-${e.slug}`} className="scroll-mt-28">
+                        <Link to={`/actividades/${e.slug}`} className="group flex items-stretch overflow-hidden rounded-[1.25rem] border border-line bg-white shadow-sm transition hover:-translate-y-0.5 hover:border-ut-red/40 hover:shadow-lg">
+                          <time dateTime={e.starts_at} className="flex w-24 shrink-0 flex-col items-center justify-center bg-gradient-to-b from-ut-red to-ut-red-dark py-4 text-white">
+                            <span className="text-xs font-semibold uppercase opacity-85">{d.toLocaleDateString('es-CO', { weekday: 'short' }).replace('.', '')}</span>
+                            <span className="text-4xl leading-none font-extrabold">{d.getDate()}</span>
+                            <span className="text-xs font-bold uppercase">{d.toLocaleDateString('es-CO', { month: 'short' }).replace('.', '')}</span>
+                          </time>
+                          <div className="flex min-w-0 flex-1 flex-col justify-center gap-1.5 p-4">
+                            <div className="flex flex-wrap items-center gap-2">
+                              {e.category && <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold capitalize ${catTone(e.category)}`}>{e.category}</span>}
+                              {e.is_demo && <DemoBadge />}
+                            </div>
+                            <h3 className="text-lg leading-snug font-bold text-ink group-hover:text-ut-red">{e.title}</h3>
+                            <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
+                              <span className="inline-flex items-center gap-1.5"><Icon name="clock" className="text-ut-red" />{hour(e.starts_at)}{e.ends_at && monthKey(e.ends_at) === mk && e.ends_at.slice(0, 10) === e.starts_at.slice(0, 10) ? ` – ${hour(e.ends_at)}` : e.ends_at ? ` – ${fmtDate(e.ends_at)}` : ''}</span>
+                              {e.location && <span className="inline-flex items-center gap-1.5"><Icon name="pin" className="text-ut-red" />{e.location}</span>}
+                            </p>
+                          </div>
+                          <span className="hidden items-center pr-5 text-2xl text-line transition group-hover:text-ut-red sm:flex"><Icon name="arrowRight" /></span>
+                        </Link>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </section>
+            ))}
+          </div>
+          {data && <Pager page={data.current_page} last={data.last_page} onPage={(p) => { setPage(p); setMonth(null); }} />}
+        </div>
       </div>
-      {loading && <Spinner />}
-      {error && <ErrorBox message={error} />}
-      {data && data.data.length === 0 && <Pending text="No hay actividades en este listado." />}
-      <ul className="space-y-4">
-        {data?.data.map((e) => {
-          const d = new Date(e.starts_at);
-          return (
-            <li key={e.slug}>
-              <Link to={`/actividades/${e.slug}`} className="flex gap-5 rounded-2xl border border-line bg-white p-4 hover:shadow-md">
-                <time dateTime={e.starts_at} className="grid h-20 w-20 shrink-0 place-items-center rounded-xl border border-ut-red/30 leading-none">
-                  <span className="text-3xl font-extrabold text-ut-red">{d.getDate()}</span>
-                  <span className="-mt-3 text-sm font-bold">{d.toLocaleDateString('es-CO', { month: 'short', year: 'numeric' })}</span>
-                </time>
-                <div>
-                  <p className="text-xs font-bold text-muted uppercase">{e.category} {e.is_demo && <DemoBadge />}</p>
-                  <h2 className="text-lg font-bold text-ink">{e.title}</h2>
-                  <p className="text-sm text-muted">{fmtDateTime(e.starts_at)}{e.location ? ` · ${e.location}` : ''}</p>
-                  {e.summary && <p className="mt-1 text-sm">{e.summary}</p>}
-                </div>
-              </Link>
-            </li>
-          );
-        })}
-      </ul>
-      {data && <Pager page={data.current_page} last={data.last_page} onPage={setPage} />}
-    </PageShell>
+    </div>
   );
 }
 
